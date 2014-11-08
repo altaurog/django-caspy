@@ -25,7 +25,8 @@ Testing:
     * factory_boy_
     * PyHamcrest_?
     * coverage.py_
-    * possibly nose or test.py?
+    * nose, django-nose
+    * CI: drone.io (also bitbucket) or travis-ci.org (github only)
     * See also: `TDD w/ Python`_, `Practical Django Testing`_
 
 .. _lettuce: https://github.com/gabrielfalcao/lettuce
