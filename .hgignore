@@ -1,4 +1,5 @@
 syntax:glob
+*.sqlite3
 *.pyc
 *.pid
 *.db
@@ -17,3 +18,4 @@ nohup.out
 syntax:regexp
 ^\w+.egg-info/
 ^docs/_build
+^manage\.py$
