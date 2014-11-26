@@ -28,6 +28,7 @@ setup(
     version = get_version('caspy'),
     packages = ['caspy'],
     install_requires = [
+            'Django',
             'djangorestframework',
         ],
     author = "Aryeh Leib Taurog",
