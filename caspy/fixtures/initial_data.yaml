@@ -1,0 +1,58 @@
+# initial data for casy accounting app
+
+# Currencies
+- model: caspy.currency
+  pk: USD
+  fields:
+    long_name: US Dollar
+    symbol: $
+    shortcut: $
+
+- model: caspy.currency
+  pk: NIS
+  fields:
+    long_name: New Israeli Shekel
+    symbol: ₪
+    shortcut: S
+
+- model: caspy.currency
+  pk: GBP
+  fields:
+    long_name: British Pound
+    symbol: £
+    shortcut: P
+
+- model: caspy.currency
+  pk: EUR
+  fields:
+    long_name: Euro
+    symbol: €
+    shortcut: E
+
+- model: caspy.currency
+  pk: JPY
+  fields:
+    long_name: Japanese Yen
+    symbol: ¥
+    shortcut: Y
+
+- model: caspy.currency
+  pk: CHF
+  fields:
+    long_name: Swiss Franc
+    symbol: Fr.
+    shortcut: F
+
+- model: caspy.currency
+  pk: CAD
+  fields:
+    long_name: Canadian Dollar
+    symbol: $
+    shortcut: C
+
+- model: caspy.currency
+  pk: RUB
+  fields:
+    long_name: Russian Ruble
+    symbol: руб
+    shortcut: R
