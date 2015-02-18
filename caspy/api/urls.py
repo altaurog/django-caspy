@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, url
+from . import views
 
-urlpatterns = patterns('caspy.api.views',
-    url(r'^$', 'api_root', name='api-root'),
+urlpatterns = patterns('',
+    url(r'^$', views.api_root, name='api-root'),
+    url(r'^currency/$', views.CurrencyList.as_view(), name='api-currency-list'),
 )
