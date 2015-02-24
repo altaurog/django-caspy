@@ -59,3 +59,9 @@ class TestCurrencySerializer:
             }
         assert serializer.data == data
 
+
+class TestBookSerializer:
+    def test_valid_without_date(self):
+        data = {'name': 'Test Book'}
+        serializer = serializers.BookSerializer(data=data)
+        assert serializer.is_valid()

@@ -16,6 +16,10 @@ class Book(models.Model):
     created_at = models.DateTimeField()
 
     def save(self, *args, **kwargs):
+        "Instead of auto_now_add"
         if self.created_at is None:
             self.created_at = timezone.now()
         super(Book, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['created_at']
