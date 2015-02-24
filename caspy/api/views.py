@@ -15,3 +15,7 @@ def api_root(request, format=None):
 class CurrencyList(generics.ListCreateAPIView):
     queryset = models.Currency.objects.all()
     serializer_class = serializers.CurrencySerializer
+
+class CurrencyDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Currency.objects.all()
+    serializer_class = serializers.CurrencySerializer

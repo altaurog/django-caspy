@@ -1,3 +1,4 @@
+import pytest
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -51,4 +52,23 @@ class TestCurrency(APITestCase):
             post_response = self.client.post(self.endpoint, post_data, format='json')
             assert post_response.status_code == status.HTTP_400_BAD_REQUEST
             assert post_response.data == {field_omitted: ['This field is required.']}
+
+    def test_currency_detail(self):
+        expected_data = {
+            "code": "USD",
+            "shortcut": "$",
+            "symbol": "$",
+            "long_name": "US Dollar",
+        }
+        url = self.endpoint + 'USD/'
+        assert url == reverse('api-currency-detail', kwargs={'pk': 'USD'})
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == expected_data
+
+    def test_currency_delete(self):
+        url = self.endpoint + 'USD/'
+        response = self.client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.data is None
 
