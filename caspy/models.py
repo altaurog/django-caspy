@@ -7,6 +7,9 @@ class Currency(models.Model):
     symbol = models.CharField(max_length=24)
     long_name = models.CharField(max_length=128)
 
+    class Meta:
+        unique_together = [['shortcut'], ['long_name']]
+
     def __str__(self):
         return self.code
 
@@ -23,3 +26,4 @@ class Book(models.Model):
 
     class Meta:
         ordering = ['created_at']
+        unique_together = [['name']]

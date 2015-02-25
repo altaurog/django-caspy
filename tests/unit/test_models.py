@@ -1,22 +1,31 @@
 from datetime import timedelta
 import mock
 import pytest
+from django.db.utils import IntegrityError
 from django.utils import timezone
 from caspy import models
 
 pytestmark = pytest.mark.django_db()
 
 class TestCurrency:
+    currency_data = {
+            'code': 'MM',
+            'shortcut': 'M',
+            'symbol': 'M',
+            'long_name': 'Monopoly Money',
+        }
     def test_create_currency(self):
-        currency_data = {
-                'code': 'MM',
-                'shortcut': 'M',
-                'symbol': 'M',
-                'long_name': 'Monopoly Money',
-            }
-        cur_obj = models.Currency.objects.create(**currency_data)
-        assert models.Currency.objects.filter(**currency_data).exists()
+        cur_obj = models.Currency.objects.create(**self.currency_data)
+        assert models.Currency.objects.filter(**self.currency_data).exists()
         assert str(cur_obj) == 'MM'
+
+    @pytest.mark.parametrize('field,duplicate',
+        [ ('code', 'USD'), ('shortcut', '$'), ('long_name', 'US Dollar'),])
+    def test_uniquness(self, field, duplicate):
+        data = self.currency_data.copy()
+        data[field] = duplicate
+        with pytest.raises(IntegrityError):
+            models.Currency.objects.create(**data)
 
 class TestBook:
     def test_create_book(self):
@@ -33,3 +42,9 @@ class TestBook:
             book_obj.save()
         assert book_obj.created_at == now
         assert models.Book.objects.filter(**data).exists()
+
+    def test_uniqueness(self):
+        name = 'Test Book'
+        models.Book.objects.create(name=name)
+        with pytest.raises(IntegrityError):
+            models.Book.objects.create(name=name)
