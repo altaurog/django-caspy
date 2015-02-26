@@ -1,3 +1,4 @@
+import functools
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -8,13 +9,16 @@ from . import serializers
 
 @api_view(('GET',))
 def api_root(request, format=None):
+    rev = functools.partial(reverse, request=request, format=format)
     return Response({
-            'currency': reverse('api-currency-list', request=request, format=format),
+            'currency': rev('api-currency-list'),
         })
+
 
 class CurrencyList(generics.ListCreateAPIView):
     queryset = models.Currency.objects.all()
     serializer_class = serializers.CurrencySerializer
+
 
 class CurrencyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Currency.objects.all()

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from . import views
 
-urlpatterns = patterns('',
+urlpatterns = patterns('',  # noqa
     url(r'^$',
         views.api_root,
         name='api-root'),
