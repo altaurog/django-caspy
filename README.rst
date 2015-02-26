@@ -4,11 +4,11 @@ django-caspy
 Introduction
 """"""""""""
 
-Caspy is a double-entry personal accounting system written in Python,
+Caspy is a double-entry personal accounting system 
 designed for simplicity, speed, and extensibility.
 
-Features
-"""""""""""
+Planned Features
+"""""""""""""""""
 
 * Multiple books
 * Multiple currencies
@@ -23,8 +23,9 @@ Features
 Requirements
 """"""""""""
 
-pytz
-PyYAML
-djangorestframework 3.0.X
-Python 2.7 - 3.3
-Django 1.6 - 1.8
+* pytz
+* PyYAML
+* djangorestframework 3.0.X
+* Python 2.7 - 3.3
+* Django 1.6 - 1.8
+
