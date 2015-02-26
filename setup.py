@@ -28,8 +28,10 @@ setup(
     version = get_version('caspy'),
     packages = ['caspy'],
     install_requires = [
-            'Django',
-            'djangorestframework',
+            'pytz',
+            'PyYAML==3.11',
+            'Django==1.7.1',
+            'djangorestframework==3.0.5',
         ],
     author = "Aryeh Leib Taurog",
     author_email = "caspy@aryehleib.com",
