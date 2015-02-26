@@ -23,5 +23,8 @@ Features
 Requirements
 """"""""""""
 
-Python 3.3
-Django 1.7
+pytz
+PyYAML
+djangorestframework 3.0.X
+Python 2.7 - 3.3
+Django 1.6 - 1.8
