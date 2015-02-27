@@ -8,24 +8,28 @@ from caspy import models
 pytestmark = pytest.mark.django_db()
 
 class TestCurrency:
+    mgr = models.Currency.objects
     currency_data = {
             'code': 'MM',
             'shortcut': 'M',
             'symbol': 'M',
             'long_name': 'Monopoly Money',
         }
+
     def test_create_currency(self):
-        cur_obj = models.Currency.objects.create(**self.currency_data)
-        assert models.Currency.objects.filter(**self.currency_data).exists()
+        cur_obj = self.mgr.create(**self.currency_data)
+        assert self.mgr.filter(**self.currency_data).exists()
         assert str(cur_obj) == 'MM'
 
-    @pytest.mark.parametrize('field,duplicate',
-        [ ('code', 'USD'), ('shortcut', '$'), ('long_name', 'US Dollar'),])
-    def test_uniquness(self, field, duplicate):
+    unique_fields = ('code', 'shortcut', 'long_name')
+
+    @pytest.mark.parametrize('dupfield', unique_fields)
+    def test_uniquness(self, dupfield):
+        self.mgr.create(**self.currency_data)
         data = self.currency_data.copy()
-        data[field] = duplicate
+        data.update({f: 'A' for f in data.keys() if f != dupfield})
         with pytest.raises(IntegrityError):
-            models.Currency.objects.create(**data)
+            self.mgr.create(**data)
 
 class TestBook:
     def test_create_book(self):

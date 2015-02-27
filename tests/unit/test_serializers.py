@@ -33,31 +33,24 @@ class TestCurrencySerializer:
         assert models.Currency.objects.filter(**currency_data).exists()
 
     def test_update(self):
+        obj = models.Currency.objects.create(**currency_data)
         data = currency_data.copy()
-        data['code'] = 'USD'
-        usd = models.Currency.objects.get(code='USD')
-        serializer = serializers.CurrencySerializer(usd, data=data)
+        data.update({'symbol': 'm', 'long_name':'Play Money'})
+        serializer = serializers.CurrencySerializer(obj, data=data)
         assert serializer.is_valid()  # updating existing currency
         instance = serializer.save()
-        assert instance is usd
+        assert instance is obj
         assert models.Currency.objects.filter(**data).exists()
 
     def test_pk_unique(self):
-        data = currency_data.copy()
-        data['code'] = 'USD'
-        serializer = serializers.CurrencySerializer(data=data)
+        models.Currency.objects.create(**currency_data)
+        serializer = serializers.CurrencySerializer(data=currency_data)
         assert not serializer.is_valid()  # must request update explicitly
 
     def test_deserialize(self):
-        usd = models.Currency.objects.get(code='USD')
-        serializer = serializers.CurrencySerializer(usd)
-        data = {
-                'code': usd.code,
-                'shortcut': usd.shortcut,
-                'symbol': usd.symbol,
-                'long_name': usd.long_name,
-            }
-        assert serializer.data == data
+        obj = models.Currency.objects.create(**currency_data)
+        serializer = serializers.CurrencySerializer(obj)
+        assert serializer.data == currency_data
 
 
 class TestBookSerializer:
