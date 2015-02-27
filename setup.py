@@ -29,9 +29,9 @@ setup(
     packages = ['caspy'],
     install_requires = [
             'pytz',
-            'PyYAML==3.11',
-            'Django==1.7.1',
-            'djangorestframework==3.0.5',
+            'PyYAML',
+            'Django>=1.6,<1.9',
+            'djangorestframework>=3.0',
         ],
     author = "Aryeh Leib Taurog",
     author_email = "caspy@aryehleib.com",
