@@ -3,14 +3,14 @@ Hacking Caspy
 
 Caspy is built with the following:
 
-    * Python 3.3
-    * Django 1.7
-    * Django Rest Framework
+    * Python 3.3 (will retain support for 2.7 and 3.2 while convenient)
+    * Django 1.7+ (will retain support for 1.4+ while convenient)
+    * Django Rest Framework 3.0.x
     * Angular 1.3
     * (select css framework?)
     * likely pandas and matplotlib
-    * maybe coffeescript or icedcoffee
-    * maybe sass
+    * possibly coffeescript
+    * probably sass
 
 Platform independence is desired on all three tiers.
 We aim to support:
@@ -21,16 +21,13 @@ We aim to support:
 
 Testing:
 
-    * lettuce_ or behave_
     * factory_boy_
     * PyHamcrest_?
     * coverage.py_
-    * nose, django-nose
+    * py.test and tox
     * CI: drone.io (also bitbucket) or travis-ci.org (github only)
     * See also: `TDD w/ Python`_, `Practical Django Testing`_
 
-.. _lettuce: https://github.com/gabrielfalcao/lettuce
-.. _behave: https://github.com/behave/behave
 .. _factory_boy: https://github.com/rbarrois/factory_boy
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
 .. _PyHamcrest: https://github.com/hamcrest/PyHamcrest
