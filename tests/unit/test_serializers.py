@@ -2,6 +2,8 @@ import pytest
 from caspy.api import serializers
 from caspy import models
 
+pytestmark = pytest.mark.django_db
+
 currency_data = {
         'code': 'MM',
         'shortcut': 'M',
@@ -9,7 +11,6 @@ currency_data = {
         'long_name': 'Monopoly Money',
     }
 
-pytestmark = pytest.mark.django_db
 
 class TestCurrencySerializer:
     """
@@ -35,7 +36,7 @@ class TestCurrencySerializer:
     def test_update(self):
         obj = models.Currency.objects.create(**currency_data)
         data = currency_data.copy()
-        data.update({'symbol': 'm', 'long_name':'Play Money'})
+        data.update({'symbol': 'm', 'long_name': 'Play Money'})
         serializer = serializers.CurrencySerializer(obj, data=data)
         assert serializer.is_valid()  # updating existing currency
         instance = serializer.save()

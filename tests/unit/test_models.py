@@ -7,6 +7,7 @@ from caspy import models
 
 pytestmark = pytest.mark.django_db()
 
+
 class TestCurrency:
     mgr = models.Currency.objects
     currency_data = {
@@ -31,6 +32,7 @@ class TestCurrency:
         with pytest.raises(IntegrityError):
             self.mgr.create(**data)
 
+
 class TestBook:
     def test_create_book(self):
         now = timezone.now()    # get an aware timezone
@@ -42,7 +44,8 @@ class TestBook:
         assert book_obj.created_at == now
         data = {'book_id': book_id, 'name': name, 'created_at': now}
         assert models.Book.objects.filter(**data).exists()
-        with mock.patch.object(timezone, 'now', return_value=now + timedelta(1)):
+        return_value = now + timedelta(1)
+        with mock.patch.object(timezone, 'now', return_value=return_value):
             book_obj.save()
         assert book_obj.created_at == now
         assert models.Book.objects.filter(**data).exists()

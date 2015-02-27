@@ -3,14 +3,24 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from caspy import models
 
+
 class TestRoot(APITestCase):
-    def test_api_root_get(self):
+    def setUp(self):
         api_root = reverse('api-root')
-        response = self.client.get(api_root)
-        assert response.status_code == status.HTTP_200_OK
-        request = response.wsgi_request
-        currency_url = reverse('api-currency-list')
-        assert response.data['currency'] == request.build_absolute_uri(currency_url)
+        self.response = self.client.get(api_root)
+
+    def test_api_root_get(self):
+        assert self.response.status_code == status.HTTP_200_OK
+
+    def test_currency_endpoint(self):
+        self.check_endpoint('currency', 'api-currency-list')
+
+    def check_endpoint(self, key, name):
+        request = self.response.wsgi_request
+        url = reverse('api-currency-list')
+        absolute_url = request.build_absolute_uri(url)
+        assert self.response.data[key] == absolute_url
+
 
 currency_data = {
         'code': 'MM',
@@ -33,6 +43,7 @@ currency_fixture = [
     },
 ]
 
+
 class TestCurrency(APITestCase):
     def setUp(self):
         for data in currency_fixture:
@@ -48,8 +59,11 @@ class TestCurrency(APITestCase):
         assert self.get_response.status_code == status.HTTP_200_OK
         assert self.get_response.data == currency_fixture
 
+    def do_post(self, data):
+        return self.client.post(self.endpoint, data, format='json')
+
     def test_list_post(self):
-        post_response = self.client.post(self.endpoint, currency_data, format='json')
+        post_response = self.do_post(currency_data)
         assert post_response.status_code == status.HTTP_201_CREATED
         assert post_response.data == currency_data
         self.do_get()
@@ -59,9 +73,10 @@ class TestCurrency(APITestCase):
         for field_omitted in currency_data.keys():
             post_data = currency_data.copy()
             del post_data[field_omitted]
-            post_response = self.client.post(self.endpoint, post_data, format='json')
+            post_response = self.do_post(post_data)
             assert post_response.status_code == status.HTTP_400_BAD_REQUEST
-            assert post_response.data == {field_omitted: ['This field is required.']}
+            messages = ['This field is required.']
+            assert post_response.data == {field_omitted: messages}
 
     def test_currency_detail(self):
         expected_data = currency_fixture[0]
@@ -79,4 +94,3 @@ class TestCurrency(APITestCase):
         assert response.data is None
         self.do_get()
         assert self.get_response.data == currency_fixture[1:]
-
