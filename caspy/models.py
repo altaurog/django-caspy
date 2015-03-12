@@ -21,10 +21,13 @@ class Book(models.Model):
     name = models.CharField(max_length=64)
     created_at = models.DateTimeField()
 
-    def save(self, *args, **kwargs):
+    def set_created_at(self):
         "Instead of auto_now_add"
         if self.created_at is None:
             self.created_at = timezone.now()
+
+    def save(self, *args, **kwargs):
+        self.set_created_at()
         super(Book, self).save(*args, **kwargs)
 
     class Meta:
