@@ -11,8 +11,8 @@ from . import serializers
 def api_root(request, format=None):
     rev = functools.partial(reverse, request=request, format=format)
     return Response({
-            'currency': rev('api-currency-list'),
-        })
+        'currency': rev('api-currency-list'),
+    })
 
 
 class CurrencyList(generics.ListCreateAPIView):
