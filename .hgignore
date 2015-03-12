@@ -23,6 +23,7 @@ syntax:regexp
 ^dist/
 ^build/
 ^node_modules/
+^caspy/static/bower_components/
 ^\w+.egg-info/
 ^docs/_build
 ^manage\.py$
