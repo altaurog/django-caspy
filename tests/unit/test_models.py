@@ -4,16 +4,10 @@ from caspy import models
 
 
 class TestCurrency:
-    currency_data = {
-            'code': 'MM',
-            'shortcut': 'M',
-            'symbol': 'M',
-            'long_name': 'Monopoly Money',
-        }
-
     def test_str(self):
-        cur_obj = models.Currency(**self.currency_data)
-        assert str(cur_obj) == 'MM'
+        "String representation should be currency code"
+        cur_obj = models.Currency(code='USD')
+        assert str(cur_obj) == 'USD'
 
 
 class TestBook:
