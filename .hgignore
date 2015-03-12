@@ -22,6 +22,7 @@ syntax:regexp
 ^.tox/
 ^dist/
 ^build/
+^node_modules/
 ^\w+.egg-info/
 ^docs/_build
 ^manage\.py$
