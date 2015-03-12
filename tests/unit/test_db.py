@@ -1,6 +1,5 @@
 import pytest
 from django.db.utils import IntegrityError
-from django.utils import timezone
 from caspy import models
 
 pytestmark = pytest.mark.django_db()
@@ -32,10 +31,10 @@ class TestCurrency:
 
 class TestBook:
     def test_create_book(self):
-        now = timezone.now()
         name = 'Test Book'
-        book_obj = models.Book.objects.create(name=name, created_at=now)
+        book_obj = models.Book.objects.create(name=name)
         book_id = book_obj.book_id
+        now = book_obj.created_at
         data = {'book_id': book_id, 'name': name, 'created_at': now}
         assert models.Book.objects.filter(**data).exists()
 
