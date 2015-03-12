@@ -26,6 +26,7 @@ class TestBook:
         assert before <= book_obj.created_at <= after
 
     def test_nonnull_created_at(self):
+        "If created_at is set, it should remain unchanged"
         before = timezone.now() - timedelta(1)
         book_obj = models.Book(name='Test Book', created_at=before)
         book_obj.set_created_at()
