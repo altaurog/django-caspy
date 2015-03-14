@@ -1,12 +1,12 @@
-var caspyApp = angular.module('caspyApp', []);
+var caspyApp = angular.module('caspyApp');
 
 caspyApp.controller('CurrencyController',
-    ['$scope', '$http',
-    function($scope, $http) {
-        $http.get(apiRootUrl).success(function(data) {
-            $http.get(data.currency).success(function(data) {
+    ['$scope', '$http', 'caspyAPI',
+    function($scope, $http, caspyAPI) {
+        caspyAPI.endpoint('currency', function(endpoint) {
+            $http.get(endpoint).success(function(data) {
                 $scope.currencies = data;
             });
         });
-    }
-]);
+    }]
+);

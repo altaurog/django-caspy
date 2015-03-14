@@ -17,12 +17,12 @@
             </ul>
         </div>
         {% endverbatim %}
+        <script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
         <script>
             var apiRootUrl = "{% url 'api-root' %}";
+            angular.module('caspyApp', []);
         </script>
-        <script src="{% static 'bower_components/angular/angular.min.js' %}">
-        </script>
-        <script src="{% static 'js/controllers.js' %}">
-        </script>
+        <script src="{% static 'js/controllers.js' %}"></script>
+        <script src="{% static 'js/services.js' %}"></script>
     </body>
 </html>
