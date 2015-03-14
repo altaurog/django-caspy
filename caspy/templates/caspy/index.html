@@ -1,0 +1,28 @@
+{% load staticfiles %}
+<!doctype html>
+<html lang="en" ng-app="caspyApp">
+    <head>
+        <meta charset="utf-8">
+        <title>Caspy</title>
+    </head>
+    <body>
+        {% verbatim %}
+        <div ng-controller="CurrencyController">
+            <ul>
+                <li ng-repeat="currency in currencies">
+                    <span>{{ currency.code }}</span>
+                    <span>{{ currency.long_name }}</span>
+                    <span>({{ currency.symbol }})</span>
+                </li>
+            </ul>
+        </div>
+        {% endverbatim %}
+        <script>
+            var apiRootUrl = "{% url 'api-root' %}";
+        </script>
+        <script src="{% static 'bower_components/angular/angular.min.js' %}">
+        </script>
+        <script src="{% static 'js/controllers.js' %}">
+        </script>
+    </body>
+</html>
