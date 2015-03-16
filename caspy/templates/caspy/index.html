@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load assets %}
 <!doctype html>
 <html lang="en" ng-app="caspyApp">
     <head>
@@ -22,7 +23,8 @@
             var apiRootUrl = "{% url 'api-root' %}";
             angular.module('caspyApp', []);
         </script>
-        <script src="{% static 'js/controllers.js' %}"></script>
-        <script src="{% static 'js/services.js' %}"></script>
+        {% assets "js_all" %}
+        <script src="{{ ASSET_URL }}"></script>
+        {% endassets %}
     </body>
 </html>
