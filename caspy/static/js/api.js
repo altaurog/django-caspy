@@ -1,6 +1,6 @@
-var caspyApp = angular.module('caspyApp');
+var mod = angular.module('caspy.api', []);
 
-caspyApp.factory('caspyAPI',
+mod.factory('caspyAPI',
     ['$http', function($http) {
         var api = {
             root: null,

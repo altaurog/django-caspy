@@ -1,6 +1,6 @@
-var caspyApp = angular.module('caspyApp');
+var mod = angular.module('caspy.currency', ['caspy.api']);
 
-caspyApp.controller('CurrencyController',
+mod.controller('CurrencyController',
     ['$scope', '$http', 'caspyAPI',
     function($scope, $http, caspyAPI) {
         caspyAPI.endpoint('currency', function(endpoint) {
