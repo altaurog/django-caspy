@@ -1,7 +1,8 @@
-var mod = angular.module('caspy.api', []);
+(function(){
+var mod = angular.module('caspy.api', ['caspy.server']);
 
 mod.factory('caspyAPI',
-    ['$http', function($http) {
+    ['$http', 'Constants', function($http, Constants) {
         var api = {
             root: null,
 
@@ -13,7 +14,7 @@ mod.factory('caspyAPI',
                 if (api.root)
                     api.resolve(name, cb);
                 else
-                    $http.get(apiRootUrl).success(function(data) {
+                    $http.get(Constants.apiRootUrl).success(function(data) {
                         api.root = data;
                         api.resolve(name, cb);
                     });
@@ -22,4 +23,4 @@ mod.factory('caspyAPI',
         return api;
     }]
 );
-
+})();

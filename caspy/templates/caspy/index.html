@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load assets %}
 <!doctype html>
-<html lang="en" ng-app="caspyApp">
+<html lang="en" ng-app="caspy">
     <head>
         <meta charset="utf-8">
         <title>Caspy</title>
@@ -20,8 +20,13 @@
         {% endverbatim %}
         <script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
         <script>
-            var apiRootUrl = "{% url 'api-root' %}";
-            angular.module('caspyApp', ['caspy.currency']);
+            /* inject a constant object */
+            (function(){
+                angular.module('caspy.server', [])
+                    .constant('Constants', Object.freeze({
+                        'apiRootUrl': '{% url "api-root" %}'
+                    }));
+            })();
         </script>
         {% assets "js_all" %}
         <script src="{{ ASSET_URL }}"></script>

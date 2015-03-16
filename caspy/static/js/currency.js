@@ -1,3 +1,4 @@
+(function(){
 var mod = angular.module('caspy.currency', ['caspy.api']);
 
 mod.controller('CurrencyController',
@@ -10,3 +11,4 @@ mod.controller('CurrencyController',
         });
     }]
 );
+})();
