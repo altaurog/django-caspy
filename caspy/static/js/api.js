@@ -2,22 +2,27 @@
 var mod = angular.module('caspy.api', ['caspy.server']);
 
 mod.factory('caspyAPI',
-    ['$http', 'Constants', function($http, Constants) {
+    ['$q', '$http', 'Constants', function($q, $http, Constants) {
         var api = {
             root: null,
 
-            resolve: function(name, cb) {
-                cb(api.root[name]);
+            resolve: function(name) {
+                var d = $q.defer();
+                if (typeof api.root[name] === 'undefined')
+                    d.reject(new Error(name + ' endpoint not available'));
+                else
+                    d.resolve(api.root[name]);
+                return d.promise;
             },
 
-            endpoint: function(name, cb) {
+            get_endpoint: function(name) {
                 if (api.root)
-                    api.resolve(name, cb);
-                else
-                    $http.get(Constants.apiRootUrl).success(function(data) {
-                        api.root = data;
-                        api.resolve(name, cb);
-                    });
+                    return api.resolve(name);
+                return $http.get(Constants.apiRootUrl)
+                    .then(function(response) {
+                            api.root = response.data;
+                            return api.resolve(name);
+                    })
             }
         };
         return api;
