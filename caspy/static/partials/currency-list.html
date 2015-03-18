@@ -1,9 +1,11 @@
-<div>
-    <ul>
-        <li ng-repeat="currency in currencies">
-            <span>{{ currency.code }}</span>
-            <span>{{ currency.long_name }}</span>
-            <span>({{ currency.symbol }})</span>
-        </li>
-    </ul>
-</div>
+<ul>
+    <li ng-repeat="currency in currencies">
+        <span>
+            <a href="#/currency/{{ currency.code }}/">
+                {{ currency.code }}
+            </a>
+        </span>
+        <span>{{ currency.long_name }}</span>
+        <span>({{ currency.symbol }})</span>
+    </li>
+</ul>

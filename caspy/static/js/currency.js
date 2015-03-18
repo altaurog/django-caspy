@@ -13,4 +13,17 @@ mod.controller('CurrencyController',
             });
     }]
 );
+
+mod.controller('CurrencyDetailController',
+    ['$scope', '$http', '$routeParams','caspyAPI',
+    function($scope, $http, $routeParams, caspyAPI) {
+        caspyAPI.get_endpoint('currency', $routeParams.code)
+            .then($http.get)
+            .then(function(response) {
+                $scope.currency = response.data;
+            }).catch(function(response) {
+                console.log(response);
+            });
+    }]
+);
 })();

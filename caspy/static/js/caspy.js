@@ -10,6 +10,10 @@ mod.config(['$routeProvider', 'Constants',
                 templateUrl: proot + 'currency-list.html',
                 controller: 'CurrencyController'
             })
+            .when('/currency/:code/', {
+                templateUrl: proot + 'currency-detail.html',
+                controller: 'CurrencyDetailController'
+            })
             .otherwise({
                 redirectTo: '/currency/'
             });
