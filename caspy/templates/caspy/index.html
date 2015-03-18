@@ -5,31 +5,23 @@
     <head>
         <meta charset="utf-8">
         <title>Caspy</title>
-    </head>
-    <body>
-        {% verbatim %}
-        <div ng-controller="CurrencyController">
-            <ul>
-                <li ng-repeat="currency in currencies">
-                    <span>{{ currency.code }}</span>
-                    <span>{{ currency.long_name }}</span>
-                    <span>({{ currency.symbol }})</span>
-                </li>
-            </ul>
-        </div>
-        {% endverbatim %}
         <script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+        <script src="{% static 'bower_components/angular-route/angular-route.min.js' %}"></script>
         <script>
             /* inject a constant object */
             (function(){
                 angular.module('caspy.server', [])
                     .constant('Constants', Object.freeze({
-                        'apiRootUrl': '{% url "api-root" %}'
+                        'apiRootUrl': '{% url "api-root" %}',
+                        'partialsRoot': '{% static 'partials/' %}'
                     }));
             })();
         </script>
         {% assets "js_all" %}
         <script src="{{ ASSET_URL }}"></script>
         {% endassets %}
+    </head>
+    <body>
+        <div ng-view></div>
     </body>
 </html>
