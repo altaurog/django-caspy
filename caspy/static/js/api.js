@@ -14,15 +14,11 @@ mod.factory('caspyAPI',
             root: null
             , resources: {}
 
-            , resolve: function(name) {
-                var d = $q.defer();
-                if (typeof api.root[name] === 'undefined') {
-                    d.reject(new Error(name + ' endpoint not available'));
-                }
-                else {
-                    d.resolve(api.root[name]);
-                }
-                return d.promise;
+            , get_resource: function(name) {
+                if (typeof api.resources[name] !== 'undefined')
+                    return api.resources[name];
+                return api.resources[name] = api.get_endpoint(name)
+                        .then(api.build_resource);
             }
 
             , get_endpoint: function(name) {
@@ -35,15 +31,19 @@ mod.factory('caspyAPI',
                     })
             }
 
-            , get_resource: function(name) {
-                if (typeof api.resources[name] !== 'undefined')
-                    return api.resources[name];
-                return api.resources[name] = api.get_endpoint(name)
-                        .then(api.build_resource);
-            }
-
             , build_resource: function(endpoint) {
                 return $resource(endpoint);
+            }
+
+            , resolve: function(name) {
+                var d = $q.defer();
+                if (typeof api.root[name] === 'undefined') {
+                    d.reject(new Error(name + ' endpoint not available'));
+                }
+                else {
+                    d.resolve(api.root[name]);
+                }
+                return d.promise;
             }
 
         };
