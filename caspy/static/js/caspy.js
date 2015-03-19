@@ -23,6 +23,17 @@ mod.config(['$routeProvider', 'Constants',
                   templateUrl: proot + 'book-edit.html'
                 , controller: 'BookEditController'
             })
+            .when('/book/:book_id/', {
+                  templateUrl: proot + 'book-detail.html'
+                , controller: 'BookDetailController'
+                , resolve: {
+                        book: ['$route', 'BookService',
+                            function($route, BookService) {
+                                var book_id = $route.current.params.book_id;
+                                return BookService.get(book_id);
+                            }]
+                    }
+            })
             .when('/currency/', {
                   templateUrl: proot + 'currency-list.html'
                 , controller: 'CurrencyController'

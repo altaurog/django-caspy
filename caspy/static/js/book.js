@@ -15,6 +15,17 @@ mod.controller('BookController',
     }]
 );
 
+mod.controller('BookDetailController',
+    ['$scope', '$location', 'BookService', 'book',
+    function($scope, $location, BookService, book) {
+        $scope.book = book;
+        $scope.del = function(){
+            return BookService.del($scope.book.book_id)
+                .then(function() { $location.path('/book/'); });
+        };
+    }]
+);
+
 mod.controller('BookEditController',
     ['$scope', '$location', 'BookService',
     function($scope, $location, BookService) {
