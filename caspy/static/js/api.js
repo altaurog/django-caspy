@@ -41,9 +41,7 @@ mod.factory('caspyAPI',
             }
 
             , build_resource: function(endpoint) {
-                var d = $q.defer();
-                d.resolve($resource(endpoint + ':item/'));
-                return d.promise;
+                return $resource(endpoint + ':item/');
             }
 
         };
