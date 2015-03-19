@@ -1,4 +1,7 @@
-import functools
+try:
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -9,9 +12,12 @@ from . import serializers
 
 @api_view(('GET',))
 def api_root(request, format=None):
-    rev = functools.partial(reverse, request=request, format=format)
+    def rev(viewname, **kwargs):
+        url = reverse(viewname, kwargs=kwargs, request=request, format=format)
+        return unquote(url)
+
     return Response({
-        'currency': rev('api-currency-list'),
+        'currency': rev('api-currency-detail', pk=':code'),
     })
 
 

@@ -43,7 +43,7 @@ mod.factory('caspyAPI',
             }
 
             , build_resource: function(endpoint) {
-                return $resource(endpoint + ':item/');
+                return $resource(endpoint);
             }
 
         };

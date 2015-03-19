@@ -8,7 +8,7 @@ urlpatterns = patterns('',  # noqa
     url(r'^currency/$',
         views.CurrencyList.as_view(),
         name='api-currency-list'),
-    url(r'^currency/(?P<pk>[A-Z]+)/$',
+    url(r'^currency/(?P<pk>[A-Z]+|:code)/$',
         views.CurrencyDetail.as_view(),
         name='api-currency-detail'),
 )

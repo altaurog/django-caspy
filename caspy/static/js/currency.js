@@ -16,7 +16,7 @@ mod.controller('CurrencyDetailController',
     function($scope, $routeParams, caspyAPI) {
         caspyAPI.get_resource('currency')
             .then(function(resource) {
-                $scope.currency = resource.get({item: $routeParams.code});
+                $scope.currency = resource.get({code: $routeParams.code});
             });
     }]
 );
