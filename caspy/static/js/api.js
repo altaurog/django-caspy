@@ -7,6 +7,38 @@ mod.config(['$resourceProvider',
     }]
 );
 
+function ResourceWrapper(promise, pk) {
+    this.resource = promise;
+
+    this.param = function(id) {
+        var p = {}
+        p[pk] = id;
+        return p;
+    }
+
+    this.rc = function (fcn) { return this.resource.then(fcn); }
+
+    this.all = function() {
+        return this.rc(function(res) { return res.query(); });
+    }
+
+    this.get = function(id) {
+        var p = this.param(id)
+        return this.rc(function(res) { return res.get(p); });
+    }
+
+    this.save = function(obj) {
+        return this.rc(function(res) { return res.save(obj); });
+    }
+
+    this.del = function(id) {
+        var p = this.param(id)
+        return this.rc(function(res) { return res.delete(p); });
+    }
+}
+
+mod.factory('ResourceWrapper', function() { return ResourceWrapper; });
+
 mod.factory('caspyAPI',
     ['$q', '$http', '$resource', 'Constants',
     function($q, $http, $resource, Constants) {

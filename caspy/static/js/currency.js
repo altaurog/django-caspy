@@ -1,25 +1,10 @@
 (function(){
 var mod = angular.module('caspy.currency', ['caspy.api']);
 
-mod.factory('CurrencyService', ['$q', 'caspyAPI',
-    function($q, caspyAPI) {
-        var cs;
+mod.factory('CurrencyService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         var res = caspyAPI.get_resource('currency');
-        function rc(fcn) { return res.then(fcn); }
-        return cs = {
-              all: function() {
-                return rc(function(res) { return res.query(); });
-                }
-            , get: function(code) {
-                return rc(function(res) { return res.get({code: code}); });
-                }
-            , save: function(currency) {
-                return rc(function(res) { return res.save(currency); });
-                }
-            , del: function(code) {
-                return rc(function(res) { return res.delete({code: code}); });
-                }
-            };
+        return new ResourceWrapper(res, 'code');
     }]
 );
 

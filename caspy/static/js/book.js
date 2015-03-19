@@ -1,25 +1,10 @@
 (function(){
 var mod = angular.module('caspy.book', ['caspy.api']);
 
-mod.factory('BookService', ['$q', 'caspyAPI',
-    function($q, caspyAPI) {
-        var cs;
+mod.factory('BookService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         var res = caspyAPI.get_resource('book');
-        function rc(fcn) { return res.then(fcn); }
-        return cs = {
-              all: function() {
-                return rc(function(res) { return res.query(); });
-                }
-            , get: function(id) {
-                return rc(function(res) { return res.get({id: id}); });
-                }
-            , save: function(book) {
-                return rc(function(res) { return res.save(book); });
-                }
-            , del: function(id) {
-                return rc(function(res) { return res.delete({id: id}); });
-                }
-            };
+        return new ResourceWrapper(res, 'book_id');
     }]
 );
 
