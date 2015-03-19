@@ -22,20 +22,16 @@ mod.factory('CurrencyService', ['$q', 'caspyAPI',
 );
 
 mod.controller('CurrencyController',
-    ['$scope', 'CurrencyService',
-    function($scope, CurrencyService) {
-        CurrencyService.all().then(function(data) {
-            $scope.currencies = data;
-        });
+    ['$scope', 'currencies',
+    function($scope, currencies) {
+        $scope.currencies = currencies;
     }]
 );
 
 mod.controller('CurrencyDetailController',
-    ['$scope', '$routeParams','CurrencyService',
-    function($scope, $routeParams, CurrencyService) {
-        CurrencyService.get($routeParams.code).then(function(data) {
-            $scope.currency = data;
-        });
+    ['$scope', 'currency',
+    function($scope, currency) {
+        $scope.currency = currency;
     }]
 );
 })();
