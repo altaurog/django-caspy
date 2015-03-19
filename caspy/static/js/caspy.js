@@ -6,6 +6,9 @@ mod.config(['$routeProvider', 'Constants',
     function($routeProvider, Constants){
         var proot = Constants.partialsRoot;
         $routeProvider
+            .when('/menu/', {
+                  templateUrl: proot + 'menu.html'
+            })
             .when('/currency/', {
                   templateUrl: proot + 'currency-list.html'
                 , controller: 'CurrencyController'
@@ -32,7 +35,7 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .otherwise({
-                redirectTo: '/currency/'
+                redirectTo: '/menu/'
             });
     }]);
 })();
