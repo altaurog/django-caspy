@@ -11,9 +11,9 @@ mod.factory('caspyAPI',
     ['$q', '$http', '$resource', 'Constants',
     function($q, $http, $resource, Constants) {
         var api = {
-            root: null,
+            root: null
 
-            resolve: function(name, item) {
+            , resolve: function(name, item) {
                 var d = $q.defer();
                 if (typeof api.root[name] === 'undefined') {
                     d.reject(new Error(name + ' endpoint not available'));
@@ -25,9 +25,9 @@ mod.factory('caspyAPI',
                         d.resolve(api.root[name]);
                 }
                 return d.promise;
-            },
+            }
 
-            get_endpoint: function(name, item) {
+            , get_endpoint: function(name, item) {
                 if (api.root)
                     return api.resolve(name, item);
                 return $http.get(Constants.apiRootUrl)
@@ -35,14 +35,14 @@ mod.factory('caspyAPI',
                             api.root = response.data;
                             return api.resolve(name, item);
                     })
-            },
+            }
 
-            get_resource: function(name) {
+            , get_resource: function(name) {
                 return api.get_endpoint(name)
                         .then(api.build_resource);
-            },
+            }
 
-            build_resource: function(endpoint) {
+            , build_resource: function(endpoint) {
                 var d = $q.defer();
                 d.resolve($resource(endpoint + ':item/'));
                 return d.promise;
