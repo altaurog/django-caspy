@@ -36,7 +36,7 @@ mod.controller('CurrencyDetailController',
         $scope.currency = currency;
         $scope.del = function(){
             return CurrencyService.del($scope.currency.code)
-                .then(function() { $location.path('#/currency/'); });
+                .then(function() { $location.path('/currency/'); });
         };
     }]
 );
@@ -46,7 +46,7 @@ mod.controller('CurrencyEditController',
     function($scope, $location, CurrencyService) {
         $scope.save = function() {
             return CurrencyService.save($scope.currency)
-                .then(function() { $location.path('#/currency/'); });
+                .then(function() { $location.path('/currency/'); });
         };
     }]
 );

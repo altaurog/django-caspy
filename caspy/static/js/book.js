@@ -35,7 +35,7 @@ mod.controller('BookEditController',
     function($scope, $location, BookService) {
         $scope.save = function() {
             return BookService.save($scope.book)
-                .then(function() { $location.path('#/book/'); });
+                .then(function() { $location.path('/book/'); });
         };
     }]
 );
