@@ -36,7 +36,9 @@ mod.factory('caspyAPI',
             }
 
             , get_resource: function(name) {
-                return api.get_endpoint(name)
+                if (typeof api.resources[name] !== 'undefined')
+                    return api.resources[name];
+                return api.resources[name] = api.get_endpoint(name)
                         .then(api.build_resource);
             }
 
