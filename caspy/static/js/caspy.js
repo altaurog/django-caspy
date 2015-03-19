@@ -16,6 +16,10 @@ mod.config(['$routeProvider', 'Constants',
                             }]
                     }
             })
+            .when('/currency/new/', {
+                  templateUrl: proot + 'currency-edit.html'
+                , controller: 'CurrencyEditController'
+            })
             .when('/currency/:code/', {
                   templateUrl: proot + 'currency-detail.html'
                 , controller: 'CurrencyDetailController'
