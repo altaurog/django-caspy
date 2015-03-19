@@ -1,7 +1,7 @@
 try:
-    from urllib.parse import unquote
+    from urllib.parse import unquote  # python3
 except ImportError:
-    from urllib import unquote
+    from urllib import unquote  # python2
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
