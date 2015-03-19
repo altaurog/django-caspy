@@ -1,8 +1,15 @@
 (function(){
-var mod = angular.module('caspy.api', ['caspy.server']);
+var mod = angular.module('caspy.api', ['ngResource', 'caspy.server']);
+
+mod.config(['$resourceProvider', 
+    function($resourceProvider) {
+        $resourceProvider.defaults.stripTrailingSlashes = false;
+    }]
+);
 
 mod.factory('caspyAPI',
-    ['$q', '$http', 'Constants', function($q, $http, Constants) {
+    ['$q', '$http', '$resource', 'Constants',
+    function($q, $http, $resource, Constants) {
         var api = {
             root: null,
 
@@ -28,7 +35,19 @@ mod.factory('caspyAPI',
                             api.root = response.data;
                             return api.resolve(name, item);
                     })
+            },
+
+            get_resource: function(name) {
+                return api.get_endpoint(name)
+                        .then(api.build_resource);
+            },
+
+            build_resource: function(endpoint) {
+                var d = $q.defer();
+                d.resolve($resource(endpoint + ':item/'));
+                return d.promise;
             }
+
         };
         return api;
     }]

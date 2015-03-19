@@ -2,27 +2,21 @@
 var mod = angular.module('caspy.currency', ['caspy.api']);
 
 mod.controller('CurrencyController',
-    ['$scope', '$http', 'caspyAPI',
-    function($scope, $http, caspyAPI) {
-        caspyAPI.get_endpoint('currency')
-            .then($http.get)
-            .then(function(response) {
-                $scope.currencies = response.data;
-            }).catch(function(response) {
-                console.log(response);
+    ['$scope', 'caspyAPI',
+    function($scope, caspyAPI) {
+        caspyAPI.get_resource('currency')
+            .then(function(resource) {
+                $scope.currencies = resource.query();
             });
     }]
 );
 
 mod.controller('CurrencyDetailController',
-    ['$scope', '$http', '$routeParams','caspyAPI',
-    function($scope, $http, $routeParams, caspyAPI) {
-        caspyAPI.get_endpoint('currency', $routeParams.code)
-            .then($http.get)
-            .then(function(response) {
-                $scope.currency = response.data;
-            }).catch(function(response) {
-                console.log(response);
+    ['$scope', '$routeParams','caspyAPI',
+    function($scope, $routeParams, caspyAPI) {
+        caspyAPI.get_resource('currency')
+            .then(function(resource) {
+                $scope.currency = resource.get({item: $routeParams.code});
             });
     }]
 );
