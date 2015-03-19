@@ -1,6 +1,6 @@
 (function(){
 var mod = angular.module('caspy',
-    ['ngRoute', 'caspy.server', 'caspy.currency']);
+    ['ngRoute', 'caspy.server', 'caspy.currency', 'caspy.book']);
 
 mod.config(['$routeProvider', 'Constants',
     function($routeProvider, Constants){
@@ -8,6 +8,20 @@ mod.config(['$routeProvider', 'Constants',
         $routeProvider
             .when('/menu/', {
                   templateUrl: proot + 'menu.html'
+            })
+            .when('/book/', {
+                  templateUrl: proot + 'book-list.html'
+                , controller: 'BookController'
+                , resolve: {
+                        books: ['BookService',
+                            function(BookService) {
+                                return BookService.all();
+                            }]
+                    }
+            })
+            .when('/book/new/', {
+                  templateUrl: proot + 'book-edit.html'
+                , controller: 'BookEditController'
             })
             .when('/currency/', {
                   templateUrl: proot + 'currency-list.html'

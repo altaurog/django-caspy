@@ -50,4 +50,5 @@ mod.controller('CurrencyEditController',
         };
     }]
 );
+
 })();
