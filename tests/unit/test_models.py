@@ -6,7 +6,7 @@ from caspy import models
 class TestCurrency:
     def test_str(self):
         "String representation should be currency code"
-        cur_obj = models.Currency(code='USD')
+        cur_obj = models.Currency(cur_code='USD')
         assert str(cur_obj) == 'USD'
 
 

@@ -4,7 +4,7 @@ var mod = angular.module('caspy.currency', ['caspy.api']);
 mod.factory('CurrencyService', ['ResourceWrapper', 'caspyAPI',
     function(ResourceWrapper, caspyAPI) {
         var res = caspyAPI.get_resource('currency');
-        return new ResourceWrapper(res, 'code');
+        return new ResourceWrapper(res, 'cur_code');
     }]
 );
 
@@ -20,7 +20,7 @@ mod.controller('CurrencyDetailController',
     function($scope, $location, CurrencyService, currency) {
         $scope.currency = currency;
         $scope.del = function(){
-            return CurrencyService.del($scope.currency.code)
+            return CurrencyService.del($scope.currency.cur_code)
                 .then(function() { $location.path('/currency/'); });
         };
     }]

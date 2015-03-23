@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db()
 class TestCurrency:
     mgr = models.Currency.objects
     currency_data = {
-            'code': 'MM',
+            'cur_code': 'MM',
             'shortcut': 'M',
             'symbol': 'M',
             'long_name': 'Monopoly Money',
@@ -18,7 +18,7 @@ class TestCurrency:
         self.mgr.create(**self.currency_data)
         assert self.mgr.filter(**self.currency_data).exists()
 
-    unique_fields = ('code', 'shortcut', 'long_name')
+    unique_fields = ('cur_code', 'shortcut', 'long_name')
 
     @pytest.mark.parametrize('dupfield', unique_fields)
     def test_uniquness(self, dupfield):

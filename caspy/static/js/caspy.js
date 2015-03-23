@@ -48,14 +48,14 @@ mod.config(['$routeProvider', 'Constants',
                   templateUrl: proot + 'currency-edit.html'
                 , controller: 'CurrencyEditController'
             })
-            .when('/currency/:code/', {
+            .when('/currency/:cur_code/', {
                   templateUrl: proot + 'currency-detail.html'
                 , controller: 'CurrencyDetailController'
                 , resolve: {
                         currency: ['$route', 'CurrencyService',
                             function($route, CurrencyService) {
-                                var code = $route.current.params.code;
-                                return CurrencyService.get(code);
+                                var cur_code = $route.current.params.cur_code;
+                                return CurrencyService.get(cur_code);
                             }]
                     }
             })

@@ -3,8 +3,7 @@ from django.utils import timezone
 
 
 class Currency(models.Model):
-    code = models.CharField(max_length=8, primary_key=True,
-                            db_column='currency_code')
+    cur_code = models.CharField(max_length=8, primary_key=True)
     shortcut = models.CharField(max_length=1)
     symbol = models.CharField(max_length=24)
     long_name = models.CharField(max_length=128)
@@ -13,7 +12,7 @@ class Currency(models.Model):
         unique_together = [['shortcut'], ['long_name']]
 
     def __str__(self):
-        return self.code
+        return self.cur_code
 
 
 class Book(models.Model):
