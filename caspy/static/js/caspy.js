@@ -10,7 +10,7 @@ mod.config(['$routeProvider', 'Constants',
                   templateUrl: proot + 'menu.html'
             })
             .when('/book/', {
-                  templateUrl: proot + 'book-list.html'
+                  templateUrl: proot + 'book/book-list.html'
                 , controller: 'BookController'
                 , resolve: {
                         books: ['BookService',
@@ -20,11 +20,11 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/book/new/', {
-                  templateUrl: proot + 'book-edit.html'
+                  templateUrl: proot + 'book/book-edit.html'
                 , controller: 'BookEditController'
             })
             .when('/book/:book_id/', {
-                  templateUrl: proot + 'book-detail.html'
+                  templateUrl: proot + 'book/book-detail.html'
                 , controller: 'BookDetailController'
                 , resolve: {
                         book: ['$route', 'BookService',
@@ -35,7 +35,7 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/currency/', {
-                  templateUrl: proot + 'currency-list.html'
+                  templateUrl: proot + 'currency/currency-list.html'
                 , controller: 'CurrencyController'
                 , resolve: {
                         currencies: ['CurrencyService',
@@ -45,11 +45,11 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/currency/new/', {
-                  templateUrl: proot + 'currency-edit.html'
+                  templateUrl: proot + 'currency/currency-edit.html'
                 , controller: 'CurrencyEditController'
             })
             .when('/currency/:cur_code/', {
-                  templateUrl: proot + 'currency-detail.html'
+                  templateUrl: proot + 'currency/currency-detail.html'
                 , controller: 'CurrencyDetailController'
                 , resolve: {
                         currency: ['$route', 'CurrencyService',
