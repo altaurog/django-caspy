@@ -2,15 +2,27 @@
 var mod = angular.module('caspy',
     ['ngRoute', 'caspy.server', 'caspy.currency', 'caspy.book']);
 
-mod.config(['$routeProvider', 'Constants',
-    function($routeProvider, Constants){
-        var proot = Constants.partialsRoot;
+mod.config(['$httpProvider', '$routeProvider', 'Constants',
+    function($httpProvider, $routeProvider, Constants){
+        // tell angular where to find template partials
+        $httpProvider.interceptors.push(function($q) {
+            return {
+                request: function(request) {
+                    request.url = request.url.replace(
+                                    /^partials\//,
+                                    Constants.partialsRoot
+                                );
+                    return request || $q.when(request);
+                }
+            };
+        });
+
         $routeProvider
             .when('/menu/', {
-                  templateUrl: proot + 'menu.html'
+                  templateUrl: 'partials/menu.html'
             })
             .when('/book/', {
-                  templateUrl: proot + 'book/book-list.html'
+                  templateUrl: 'partials/book/book-list.html'
                 , controller: 'BookController'
                 , resolve: {
                         books: ['BookService',
@@ -20,11 +32,11 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/book/new/', {
-                  templateUrl: proot + 'book/book-edit.html'
+                  templateUrl: 'partials/book/book-edit.html'
                 , controller: 'BookEditController'
             })
             .when('/book/:book_id/', {
-                  templateUrl: proot + 'book/book-detail.html'
+                  templateUrl: 'partials/book/book-detail.html'
                 , controller: 'BookDetailController'
                 , resolve: {
                         book: ['$route', 'BookService',
@@ -35,7 +47,7 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/currency/', {
-                  templateUrl: proot + 'currency/currency-list.html'
+                  templateUrl: 'partials/currency/currency-list.html'
                 , controller: 'CurrencyController'
                 , resolve: {
                         currencies: ['CurrencyService',
@@ -45,11 +57,11 @@ mod.config(['$routeProvider', 'Constants',
                     }
             })
             .when('/currency/new/', {
-                  templateUrl: proot + 'currency/currency-edit.html'
+                  templateUrl: 'partials/currency/currency-edit.html'
                 , controller: 'CurrencyEditController'
             })
             .when('/currency/:cur_code/', {
-                  templateUrl: proot + 'currency/currency-detail.html'
+                  templateUrl: 'partials/currency/currency-detail.html'
                 , controller: 'CurrencyDetailController'
                 , resolve: {
                         currency: ['$route', 'CurrencyService',
