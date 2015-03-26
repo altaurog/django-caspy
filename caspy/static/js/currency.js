@@ -12,6 +12,10 @@ mod.controller('CurrencyController',
     ['$scope', 'currencies',
     function($scope, currencies) {
         $scope.currencies = currencies;
+
+        $scope.select = function(currency) {
+            $scope.currency = currency;
+        };
     }]
 );
 
