@@ -8,6 +8,15 @@ mod.config(['$resourceProvider',
 );
 
 function ResourceWrapper(promise, pk) {
+    // Provides a little glue
+    // ------------------------
+    // API endpoints are retrieved in request to API root, which is
+    // included in Constants module, in script tag on the base page.
+    // This class wraps a promise which carries the $resource object
+    // instantiated upon receipt of the endpoint.
+    // It also wraps the various api methods and simplifies the calls
+    // by constructing the correct arguments when a url containing the
+    // object id is necessary.
     this.resource = promise;
 
     this.param = function(id) {
@@ -27,8 +36,13 @@ function ResourceWrapper(promise, pk) {
         return this.rc(function(res) { return res.get(p); });
     }
 
-    this.save = function(obj) {
-        return this.rc(function(res) { return res.save(obj); });
+    this.create = function(obj) {
+        return this.rc(function(res) { return res.create(obj); });
+    }
+
+    this.update = function(obj_pk, obj) {
+        var p = this.param(obj_pk);
+        return this.rc(function(res) { return res.update(p, obj); });
     }
 
     this.del = function(id) {
@@ -42,8 +56,14 @@ mod.factory('ResourceWrapper', function() { return ResourceWrapper; });
 mod.factory('caspyAPI',
     ['$q', '$http', '$resource', 'Constants',
     function($q, $http, $resource, Constants) {
+        // Load API root endpoints and construct $resource objects
+        // necessary for interacting with backend.
         var api = {
             root: null
+            , actions: {
+                  'create': { method: 'POST' }
+                , 'update': { method: 'PUT' }
+            }
             , resources: {}
 
             , get_resource: function(name) {
@@ -64,7 +84,7 @@ mod.factory('caspyAPI',
             }
 
             , build_resource: function(endpoint) {
-                return $resource(endpoint);
+                return $resource(endpoint, {}, api.actions);
             }
 
             , resolve: function(name) {
