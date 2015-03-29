@@ -1,16 +1,18 @@
 <ul>
-    <a href="#/currency/new/">Add a currency</a>
+    <a href="#"
+        ng-click="add(); $event.preventDefault()"
+        >Add a currency</a>
     <li ng-repeat="currency in currencies">
         <span>
             <a href="#"
                 ng-click="select(currency); $event.preventDefault()">
-                {{ currency.cur_code }}
+                {{ ::currency.cur_code }}
             </a>
         </span>
-        <span>{{ currency.long_name }}</span>
-        <span>({{ currency.symbol }})</span>
+        <span>{{ ::currency.long_name }}</span>
+        <span>({{ ::currency.symbol }})</span>
     </li>
 </ul>
 <div ng-show="currency"
-    ng-include="'partials/currency/currency-detail.html'">
+    ng-include="'partials/currency/currency-edit.html'">
 </div>

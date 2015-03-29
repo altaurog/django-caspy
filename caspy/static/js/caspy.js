@@ -55,6 +55,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                                 return CurrencyService.all();
                             }]
                     }
+                , reloadOnSearch: false
             })
             .when('/currency/new/', {
                   templateUrl: 'partials/currency/currency-edit.html'
