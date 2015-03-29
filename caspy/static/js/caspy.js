@@ -68,7 +68,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                         currency: ['$route', 'CurrencyService',
                             function($route, CurrencyService) {
                                 var cur_code = $route.current.params.cur_code;
-                                return CurrencyService.get(cur_code);
+                                return CurrencyService.get(cur_code).$promise;
                             }]
                     }
             })
