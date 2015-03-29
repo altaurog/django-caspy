@@ -23,7 +23,7 @@ function ResourceWrapper(promise, pk) {
     }
 
     this.get = function(id) {
-        var p = this.param(id)
+        var p = this.param(id);
         return this.rc(function(res) { return res.get(p); });
     }
 
@@ -32,7 +32,7 @@ function ResourceWrapper(promise, pk) {
     }
 
     this.del = function(id) {
-        var p = this.param(id)
+        var p = this.param(id);
         return this.rc(function(res) { return res.delete(p); });
     }
 }
