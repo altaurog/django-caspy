@@ -17,6 +17,11 @@ function ResourceWrapper(promise, pk) {
     // It also wraps the various api methods and simplifies the calls
     // by constructing the correct arguments when a url containing the
     // object id is necessary.
+    // It also extracts and returns the $promise from some of the
+    // responses where we normally might want to perform additional
+    // actions only after the request is completed, since the $resource 
+    // methods return an empty object immediately, which causes
+    // funny behavior if we try something like update().then(get()).
     this.resource = promise;
 
     this.param = function(id) {
@@ -37,17 +42,17 @@ function ResourceWrapper(promise, pk) {
     }
 
     this.create = function(obj) {
-        return this.rc(function(res) { return res.create(obj); });
+        return this.rc(function(res) { return res.create(obj).$promise; });
     }
 
     this.update = function(obj_pk, obj) {
         var p = this.param(obj_pk);
-        return this.rc(function(res) { return res.update(p, obj); });
+        return this.rc(function(res) { return res.update(p, obj).$promise; });
     }
 
     this.del = function(id) {
         var p = this.param(id);
-        return this.rc(function(res) { return res.delete(p); });
+        return this.rc(function(res) { return res.delete(p).$promise; });
     }
 }
 
