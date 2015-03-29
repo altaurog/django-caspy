@@ -34,6 +34,12 @@ mod.controller('CurrencyController',
             $scope.edit_code = '';
         }
 
+        $scope.close = function() {
+            $scope.currency = null;
+            $scope.edit_code = null;
+            $location.hash('');
+        }
+
         $scope.save = function() {
             var p;
             if ($scope.edit_code)
