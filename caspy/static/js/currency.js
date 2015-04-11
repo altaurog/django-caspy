@@ -64,4 +64,11 @@ mod.controller('CurrencyController',
     }]
 );
 
+mod.directive('currency', function() {
+    return {
+          scope: { item: '=' }
+        , templateUrl: 'partials/currency/currency-item.html'
+    };
+});
+
 })();

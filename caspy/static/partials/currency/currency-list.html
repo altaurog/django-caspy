@@ -1,14 +1,7 @@
 <ul>
     <button ng-click="add()">Add a currency</button>
     <li ng-repeat="currency in currencies">
-        <span>
-            <a href="#"
-                ng-click="select(currency); $event.preventDefault()">
-                {{ ::currency.cur_code }}
-            </a>
-        </span>
-        <span>{{ ::currency.long_name }}</span>
-        <span>({{ ::currency.symbol }})</span>
+        <currency item="currency">
     </li>
 </ul>
 <div ng-show="currency"
