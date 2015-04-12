@@ -1,25 +1,5 @@
 <table>
-    <tr>
-        <th>Code</th>
-        <td>
-            {{ edit_code }}
-            <input type="text"
-                ng-if="edit_code === ''"
-                ng-model="currency.cur_code"/>
-        </td>
-    </tr>
-    <tr>
-        <th>Name</th>
-        <td><input type="text" ng-model="currency.long_name"/></td>
-    </tr>
-    <tr>
-        <th>Symbol</th>
-        <td><input type="text" ng-model="currency.symbol"/></td>
-    </tr>
-    <tr>
-        <th>Shortcut</th>
-        <td><input type="text" ng-model="currency.shortcut"/></td>
-    </tr>
+    <tr field-edit ng-repeat="field in fields"/>
 </table>
 <button ng-click="close()">Close</button>
 <button ng-click="delete()" ng-show="edit_code">Delete</button>

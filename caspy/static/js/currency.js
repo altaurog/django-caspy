@@ -12,6 +12,13 @@ mod.controller('CurrencyController',
     ['$scope', '$route', '$location', 'CurrencyService', 'currencies',
     function($scope, $route, $location, CurrencyService, currencies) {
         $scope.currencies = currencies;
+        $scope.fields = [
+              {name: 'cur_code', long_name: 'Code', pk: true}
+            , {name: 'long_name', long_name: 'Name'}
+            , {name: 'symbol'}
+            , {name: 'shortcut'}
+        ];
+
         var selected = $location.hash();
         if (selected) {
             currencies.$promise.then(function(data) {
@@ -68,6 +75,35 @@ mod.directive('currency', function() {
     return {
           scope: { item: '=' }
         , templateUrl: 'partials/currency/currency-item.html'
+    };
+});
+
+function capFirst(word) {
+    return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+}
+
+function titleCase(str) {
+    return str.replace(/\w\S*/g, capFirst);
+}
+
+function displayName(field) {
+    if ('undefined' === typeof field.long_name)
+        return titleCase(field.name);
+    return field.long_name;
+}
+
+mod.directive('fieldEdit', function() {
+    return {
+          templateUrl: 'partials/generic/field-edit.html'
+        , controller: ['$scope', function($scope) {
+            $scope.readonly = false;
+            $scope.displayname = displayName($scope.field);
+            if ($scope.field.pk === true) {
+                $scope.$watch ('edit_code', function(edit_code, _) {
+                    $scope.readonly = (edit_code !== '');
+                });
+            }
+        }],
     };
 });
 
