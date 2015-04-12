@@ -64,25 +64,4 @@ mod.controller('CurrencyController',
     }]
 );
 
-mod.controller('CurrencyDetailController',
-    ['$scope', '$location', 'CurrencyService', 'currency',
-    function($scope, $location, CurrencyService, currency) {
-        $scope.currency = currency;
-        $scope.del = function(){
-            return CurrencyService.del($scope.currency.cur_code)
-                .then(function() { $location.path('/currency/'); });
-        };
-    }]
-);
-
-mod.controller('CurrencyEditController',
-    ['$scope', '$location', 'CurrencyService',
-    function($scope, $location, CurrencyService) {
-        $scope.save = function() {
-            return CurrencyService.save($scope.currency)
-                .then(function() { $location.path('/currency/'); });
-        };
-    }]
-);
-
 })();

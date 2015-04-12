@@ -31,21 +31,6 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                             }]
                     }
             })
-            .when('/book/new/', {
-                  templateUrl: 'partials/book/book-edit.html'
-                , controller: 'BookEditController'
-            })
-            .when('/book/:book_id/', {
-                  templateUrl: 'partials/book/book-detail.html'
-                , controller: 'BookDetailController'
-                , resolve: {
-                        book: ['$route', 'BookService',
-                            function($route, BookService) {
-                                var book_id = $route.current.params.book_id;
-                                return BookService.get(book_id);
-                            }]
-                    }
-            })
             .when('/currency/', {
                   templateUrl: 'partials/currency/currency-list.html'
                 , controller: 'CurrencyController'
@@ -56,21 +41,6 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                             }]
                     }
                 , reloadOnSearch: false
-            })
-            .when('/currency/new/', {
-                  templateUrl: 'partials/currency/currency-edit.html'
-                , controller: 'CurrencyEditController'
-            })
-            .when('/currency/:cur_code/', {
-                  templateUrl: 'partials/currency/currency-detail.html'
-                , controller: 'CurrencyDetailController'
-                , resolve: {
-                        currency: ['$route', 'CurrencyService',
-                            function($route, CurrencyService) {
-                                var cur_code = $route.current.params.cur_code;
-                                return CurrencyService.get(cur_code).$promise;
-                            }]
-                    }
             })
             .otherwise({
                 redirectTo: '/menu/'
