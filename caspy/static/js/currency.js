@@ -39,9 +39,9 @@ mod.directive('list', function() {
                 var pk = $scope.fields.filter(isPk)[0].name;
 
                 $scope.select = function(item) {
-                    $scope.edititem = item;
+                    $scope.edititem = angular.copy(item);
                     if (item !== null)
-                        $scope.edit_code = item[pk];
+                        $scope.edit_code = $scope.edititem[pk];
                     else
                         $scope.edit_code = null;
                 };
