@@ -1,13 +1,5 @@
-<a href="#/book/new/">Add new book</a>
-<ul ng-show="books.length">
-    <li ng-repeat="book in books">
-        <span>
-            <a href="#/book/{{ book.book_id }}/">
-                {{ book.name }}
-            </a>
-        </span>
-        <span>({{ book.created_at }})</span>
-    </li>
-</ul>
-<div ng-hide="books.length">No books yet.</div>
+<div list items="books" fields="fields"
+    rest-service="dataservice"
+    item-template="partials/book/book-item.html"
+    />
 

@@ -9,9 +9,14 @@ mod.factory('BookService', ['ResourceWrapper', 'caspyAPI',
 );
 
 mod.controller('BookController',
-    ['$scope', 'books',
-    function($scope, books) {
+    ['$scope', 'BookService', 'books',
+    function($scope, BookService, books) {
+        $scope.dataservice = BookService;
         $scope.books = books;
+        $scope.fields = [
+              {name: 'book_id', pk: true}
+            , {name: 'name'}
+        ];
     }]
 );
 
