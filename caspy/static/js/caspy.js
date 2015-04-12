@@ -1,6 +1,6 @@
 (function(){
 var mod = angular.module('caspy',
-    ['ngRoute', 'caspy.server', 'caspy.currency', 'caspy.book']);
+    ['ngRoute', 'generic', 'caspy.server', 'caspy.currency', 'caspy.book']);
 
 mod.config(['$httpProvider', '$routeProvider', 'Constants',
     function($httpProvider, $routeProvider, Constants){
