@@ -9,8 +9,9 @@ mod.factory('CurrencyService', ['ResourceWrapper', 'caspyAPI',
 );
 
 mod.controller('CurrencyController',
-    ['$scope', '$route', '$location', 'CurrencyService', 'currencies',
-    function($scope, $route, $location, CurrencyService, currencies) {
+    ['$scope', 'CurrencyService', 'currencies',
+    function($scope, CurrencyService, currencies) {
+        $scope.dataservice = CurrencyService;
         $scope.currencies = currencies;
         $scope.fields = [
               {name: 'cur_code', long_name: 'Code', pk: true}
@@ -18,63 +19,74 @@ mod.controller('CurrencyController',
             , {name: 'symbol'}
             , {name: 'shortcut'}
         ];
-
-        var selected = $location.hash();
-        if (selected) {
-            currencies.$promise.then(function(data) {
-                angular.forEach(data, function(currency, i) {
-                    if (currency.cur_code === selected) {
-                        $scope.select(currency);
-                    }
-                });
-            });
-        }
-
-        $scope.select = function(currency) {
-            $location.hash(currency.cur_code);
-            $scope.currency = currency;
-            $scope.edit_code = currency.cur_code;
-        };
-
-        $scope.add = function() {
-            $scope.currency = {};
-            $scope.edit_code = '';
-        }
-
-        $scope.close = function() {
-            $scope.currency = null;
-            $scope.edit_code = null;
-            $location.hash('');
-        }
-
-        $scope.save = function() {
-            var p;
-            if ($scope.edit_code)
-                p = CurrencyService.update($scope.edit_code, $scope.currency);
-            else
-                p = CurrencyService.create($scope.currency);
-            p.then(function(obj) {
-                $location.hash('');
-                $route.reload();
-            });
-        };
-
-        $scope.delete = function() {
-            if ($scope.edit_code) {
-                CurrencyService.del($scope.edit_code)
-                    .then(function(obj) {
-                        $location.hash('');
-                        $route.reload();
-                    });
-            }
-        };
     }]
 );
 
-mod.directive('currency', function() {
+mod.directive('list', function() {
+    function isPk(field) {
+        return field.pk;
+    }
+    return {
+          templateUrl: 'partials/generic/list.html'
+        , scope: {items: '=', fields: '=', restService: '='}
+        , compile: function($elem, $attrs) {
+            // copy item template url into our own template
+            $elem.find('list-item').attr('template', $attrs.itemTemplate);
+        }
+        , controller: ['$scope', '$route',
+            function($scope, $route) {
+                var data = $scope.restService;
+                var pk = $scope.fields.filter(isPk)[0].name;
+
+                $scope.select = function(item) {
+                    $scope.edititem = item;
+                    if (item !== null)
+                        $scope.edit_code = item[pk];
+                    else
+                        $scope.edit_code = null;
+                };
+
+                $scope.onclose = function() {
+                    $scope.select(null);
+                };
+
+                $scope.onadd = function(item) {
+                    newitem = {};
+                    newitem[pk] = '';
+                    $scope.select(newitem);
+                };
+
+                function save(edit_code, edititem) {
+                    if (edit_code)
+                        return data.update(edit_code, edititem);
+                    return data.create(edititem);
+                }
+
+                function reload() {
+                    $route.reload();
+                }
+
+                $scope.onsave = function() {
+                    save($scope.edit_code, $scope.edititem).then(reload);
+                }
+
+                function del(edit_code) {
+                    return data.del(edit_code)
+                }
+
+                $scope.ondel = function() {
+                    if ($scope.edit_code)
+                        del($scope.edit_code).then(reload);
+                }
+            }
+        ]
+    };
+});
+
+mod.directive('listItem', function() {
     return {
           scope: { item: '=' }
-        , templateUrl: 'partials/currency/currency-item.html'
+        , templateUrl: function(_, $attrs) { return $attrs.template; }
     };
 });
 
@@ -103,7 +115,7 @@ mod.directive('fieldEdit', function() {
                     $scope.readonly = (edit_code !== '');
                 });
             }
-        }],
+        }]
     };
 });
 

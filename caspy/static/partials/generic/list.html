@@ -1,0 +1,9 @@
+<button ng-click="onadd()">Add a currency</button>
+<ul>
+    <li ng-repeat="item in items">
+        <list-item ng-click="select(item)" item="item"/>
+    </li>
+</ul>
+<div ng-show="edititem"
+    ng-include="'partials/currency/currency-edit.html'">
+</div>
