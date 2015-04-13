@@ -1,5 +1,5 @@
 <table>
-    <tr field-edit ng-repeat="field in fields"/>
+    <tr field-edit ng-repeat="field in fields|filter:fieldvisible"/>
 </table>
 <button ng-click="onclose()">Close</button>
 <button ng-click="ondel()" ng-show="edit_code">Delete</button>

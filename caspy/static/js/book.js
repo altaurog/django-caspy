@@ -14,7 +14,7 @@ mod.controller('BookController',
         $scope.dataservice = BookService;
         $scope.books = books;
         $scope.fields = [
-              {name: 'book_id', pk: true}
+              {name: 'book_id', pk: true, hide: true}
             , {name: 'name'}
         ];
     }]

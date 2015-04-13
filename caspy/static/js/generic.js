@@ -57,6 +57,10 @@ mod.directive('list', function() {
                     if ($scope.edit_code)
                         del($scope.edit_code).then(reload);
                 }
+
+                $scope.fieldvisible = function(field) {
+                    return !field.hide;
+                }
             }
         ]
     };
