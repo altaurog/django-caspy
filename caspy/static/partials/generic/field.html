@@ -1,8 +1,6 @@
 <th>{{ displayname }}</th>
 <td>
-    <span ng-if="readonly">
-        {{ edit_code }}
-    </span>
+    {{ readonly }}
     <input type="text"
         ng-if="!readonly"
         ng-model="edititem[field.name]"></input>

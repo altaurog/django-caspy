@@ -90,11 +90,11 @@ mod.directive('fieldEdit', function() {
     return {
           templateUrl: 'partials/generic/field.html'
         , controller: ['$scope', function($scope) {
-            $scope.readonly = false;
+            $scope.readonly = '';
             $scope.displayname = displayName($scope.field);
             if ($scope.field.pk === true) {
                 $scope.$watch ('edit_code', function(edit_code, _) {
-                    $scope.readonly = (edit_code !== '');
+                    $scope.readonly = edit_code;
                 });
             }
         }]
