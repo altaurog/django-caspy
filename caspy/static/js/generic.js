@@ -82,7 +82,7 @@ function titleCase(str) {
 
 function displayName(field) {
     if ('undefined' === typeof field.long_name)
-        return titleCase(field.name);
+        return titleCase(field.name.replace('_', ' '));
     return field.long_name;
 }
 
