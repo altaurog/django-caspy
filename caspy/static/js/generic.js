@@ -1,10 +1,59 @@
 (function(){
 var mod = angular.module('generic', []);
 
+mod.controller('GenericListController', ['$scope', '$route',
+    function($scope, $route) {
+        var data = $scope.restService;
+        var pk = $scope.fields.filter(function(f) { return f.pk; })[0].name;
+
+        $scope.select = function(item) {
+            $scope.edititem = angular.copy(item);
+            if (item !== null)
+                $scope.edit_code = $scope.edititem[pk];
+            else
+                $scope.edit_code = null;
+        };
+
+        $scope.onclose = function() {
+            $scope.select(null);
+        };
+
+        $scope.onadd = function(item) {
+            newitem = {};
+            newitem[pk] = '';
+            $scope.select(newitem);
+        };
+
+        function save(edit_code, edititem) {
+            if (edit_code)
+                return data.update(edit_code, edititem);
+            return data.create(edititem);
+        }
+
+        function reload() {
+            $route.reload();
+        }
+
+        $scope.onsave = function() {
+            save($scope.edit_code, $scope.edititem).then(reload);
+        }
+
+        function del(edit_code) {
+            return data.del(edit_code)
+        }
+
+        $scope.ondel = function() {
+            if ($scope.edit_code)
+                del($scope.edit_code).then(reload);
+        }
+
+        $scope.fieldvisible = function(field) {
+            return !field.hide;
+        }
+    }]
+);
+
 mod.directive('list', function() {
-    function isPk(field) {
-        return field.pk;
-    }
     return {
           templateUrl: 'partials/generic/list.html'
         , scope: {items: '=', fields: '=', restService: '='}
@@ -12,57 +61,7 @@ mod.directive('list', function() {
             // copy item template url into our own template
             $elem.find('list-item').attr('template', $attrs.itemTemplate);
         }
-        , controller: ['$scope', '$route',
-            function($scope, $route) {
-                var data = $scope.restService;
-                var pk = $scope.fields.filter(isPk)[0].name;
-
-                $scope.select = function(item) {
-                    $scope.edititem = angular.copy(item);
-                    if (item !== null)
-                        $scope.edit_code = $scope.edititem[pk];
-                    else
-                        $scope.edit_code = null;
-                };
-
-                $scope.onclose = function() {
-                    $scope.select(null);
-                };
-
-                $scope.onadd = function(item) {
-                    newitem = {};
-                    newitem[pk] = '';
-                    $scope.select(newitem);
-                };
-
-                function save(edit_code, edititem) {
-                    if (edit_code)
-                        return data.update(edit_code, edititem);
-                    return data.create(edititem);
-                }
-
-                function reload() {
-                    $route.reload();
-                }
-
-                $scope.onsave = function() {
-                    save($scope.edit_code, $scope.edititem).then(reload);
-                }
-
-                function del(edit_code) {
-                    return data.del(edit_code)
-                }
-
-                $scope.ondel = function() {
-                    if ($scope.edit_code)
-                        del($scope.edit_code).then(reload);
-                }
-
-                $scope.fieldvisible = function(field) {
-                    return !field.hide;
-                }
-            }
-        ]
+        , controller: 'GenericListController'
     };
 });
 
