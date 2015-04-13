@@ -1,0 +1,91 @@
+# Account types, inspired by GnuCash
+#
+#### ASSETS ####
+- model: caspy.accounttype
+  pk: 'Asset'
+  fields:
+    sign: false
+    credit_term: decrease
+    debit_term: increase
+
+- model: caspy.accounttype
+  pk: 'Bank Account'
+  fields:
+    sign: false
+    credit_term: withdraw
+    debit_term: deposit
+
+- model: caspy.accounttype
+  pk: 'Cash'
+  fields:
+    sign: false
+    credit_term: spend
+    debit_term: receive
+
+- model: caspy.accounttype
+  pk: 'Accounts Receivable'
+  fields:
+    sign: false
+    credit_term: payment
+    debit_term: invoice
+
+# We will only deal with currency accounts for now.
+# - model: caspy.accounttype
+#   pk: Stock
+#   fields:
+#     sign: false
+#     credit_term: sell
+#     debit_term: buy
+# 
+# - model: caspy.accounttype
+#   pk: Mutual Fund
+#   fields:
+#     sign: false
+#     credit_term: sell
+#     debit_term: buy
+
+#### LIABILITIES ####
+- model: caspy.accounttype
+  pk: 'Liability'
+  fields:
+    sign: true
+    credit_term: increase
+    debit_term: decrease
+
+- model: caspy.accounttype
+  pk: 'Credit Card'
+  fields:
+    sign: true
+    credit_term: charge
+    debit_term: payment
+
+- model: caspy.accounttype
+  pk: 'Accounts Payable'
+  fields:
+    sign: true
+    credit_term: payment
+    debit_term: invoice
+
+#### EQUITY ####
+- model: caspy.accounttype
+  pk: 'Equity'
+  fields:
+    sign: true
+    credit_term: increase
+    debit_term: decrease
+
+#### INCOME ####
+- model: caspy.accounttype
+  pk: 'Income'
+  fields:
+    sign: true
+    credit_term: income
+    debit_term: expense
+
+#### EXPENSE ####
+- model: caspy.accounttype
+  pk: 'Expense'
+  fields:
+    sign: false
+    credit_term: rebate
+    debit_term: expense

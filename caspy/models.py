@@ -32,3 +32,14 @@ class Book(models.Model):
     class Meta:
         ordering = ['created_at']
         unique_together = [['name']]
+
+
+class AccountType(models.Model):
+    account_type = models.CharField(max_length=128, primary_key=True)
+    # (credits increase account balance) <=> (sign == True)
+    sign = models.BooleanField(verbose_name="Credits increase balance", default=False)
+    credit_term = models.CharField(max_length=32)
+    debit_term = models.CharField(max_length=32)
+
+    def __str__(self):
+        return self.account_type

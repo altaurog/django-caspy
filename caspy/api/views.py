@@ -21,3 +21,13 @@ class BookList(generics.ListCreateAPIView):
 class BookDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Book.objects.all()
     serializer_class = serializers.BookSerializer
+
+
+class AccountTypeList(generics.ListCreateAPIView):
+    queryset = models.AccountType.objects.all()
+    serializer_class = serializers.AccountTypeSerializer
+
+
+class AccountTypeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.AccountType.objects.all()
+    serializer_class = serializers.AccountTypeSerializer

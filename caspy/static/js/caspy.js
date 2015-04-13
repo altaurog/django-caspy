@@ -1,6 +1,13 @@
 (function(){
 var mod = angular.module('caspy',
-    ['ngRoute', 'generic', 'caspy.server', 'caspy.currency', 'caspy.book']);
+    ['ngRoute'
+      , 'generic'
+      , 'caspy.server'
+      , 'caspy.currency'
+      , 'caspy.book'
+      , 'caspy.accounttype'
+    ]
+);
 
 mod.config(['$httpProvider', '$routeProvider', 'Constants',
     function($httpProvider, $routeProvider, Constants){
@@ -41,6 +48,16 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                             }]
                     }
                 , reloadOnSearch: false
+            })
+            .when('/accounttype/', {
+                  templateUrl: 'partials/accounttype/accounttype-list.html'
+                , controller: 'AccountTypeController'
+                , resolve: {
+                        accounttypes: ['AccountTypeService',
+                            function(AccountTypeService) {
+                                return AccountTypeService.all();
+                            }]
+                    }
             })
             .otherwise({
                 redirectTo: '/menu/'

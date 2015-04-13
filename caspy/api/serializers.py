@@ -12,3 +12,8 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Book
+
+
+class AccountTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.AccountType
