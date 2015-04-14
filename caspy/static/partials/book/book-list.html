@@ -1,4 +1,3 @@
-<button ng-click="listcontroller.add()">Add</button>
 <ul>
     <li ng-repeat="item in listcontroller.books"
         ng-include="'partials/book/book-item.html'"
@@ -8,4 +7,4 @@
 <div ng-show="listcontroller.edititem"
     ng-include="'partials/generic/edit.html'">
 </div>
-
+<div ng-include="'partials/generic/buttons.html'">
