@@ -15,9 +15,13 @@ mod.controller('AccountTypeController',
         this.dataservice = AccountTypeService;
         this.accounttypes = accounttypes;
         this.pk = 'account_type';
+        var signChoices = [
+            [true, "increase account balance"]
+            , [false, "decrease account balance"]
+        ];
         this.fields = [
               {name: 'account_type', pk: true}
-            , {name: 'sign'}
+            , {name: 'sign', long_name: 'Credits', choices: signChoices}
             , {name: 'credit_term'}
             , {name: 'debit_term'}
         ];

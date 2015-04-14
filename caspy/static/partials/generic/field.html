@@ -1,7 +1,12 @@
 <th>{{ displayname }}</th>
-<td>
-    {{ readonly }}
+<td ng-switch on="display">
+    <span ng-switch-when="readonly">{{ readonly }}</span>
+    <select
+        ng-switch-when="select"
+        ng-model="listcontroller.edititem[field.name]"
+        ng-options="v[0] as v[1] for v in field.choices">
+    </select>
     <input type="text"
-        ng-if="!readonly"
+        ng-switch-default
         ng-model="listcontroller.edititem[field.name]"></input>
 </td>

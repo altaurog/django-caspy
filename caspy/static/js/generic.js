@@ -71,10 +71,13 @@ mod.directive('fieldEdit', function() {
           templateUrl: 'partials/generic/field.html'
         , controller: ['$scope', function($scope) {
             $scope.readonly = '';
+            if ($scope.field.choices)
+                $scope.display = 'select';
             $scope.displayname = displayName($scope.field);
             if ($scope.field.pk === true) {
                 $scope.$watch ('listcontroller.edit_code', function(edit_code, _) {
-                    $scope.readonly = edit_code;
+                    if ($scope.readonly = edit_code)
+                        $scope.display = 'readonly';
                 });
             }
         }]
