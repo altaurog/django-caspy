@@ -14,17 +14,17 @@ mod.controller('GenericListController', ['$route',
                 this.edit_code = null;
         };
 
-        this.onclose = function() {
+        this.close = function() {
             this.select(null);
         };
 
-        this.onadd = function(item) {
+        this.add = function(item) {
             newitem = {};
             newitem[pk] = '';
             this.select(newitem);
         };
 
-        function save(edit_code, edititem) {
+        function _save(edit_code, edititem) {
             if (edit_code)
                 return data.update(edit_code, edititem);
             return data.create(edititem);
@@ -34,17 +34,17 @@ mod.controller('GenericListController', ['$route',
             $route.reload();
         }
 
-        this.onsave = function() {
-            save(this.edit_code, this.edititem).then(reload);
+        this.save = function() {
+            _save(this.edit_code, this.edititem).then(reload);
         }
 
-        function del(edit_code) {
+        function _del(edit_code) {
             return data.del(edit_code)
         }
 
-        this.ondel = function() {
+        this.del = function() {
             if (this.edit_code)
-                del(this.edit_code).then(reload);
+                _del(this.edit_code).then(reload);
         }
 
         this.fieldvisible = function(field) {
