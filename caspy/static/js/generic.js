@@ -1,27 +1,27 @@
 (function(){
 var mod = angular.module('generic', []);
 
-mod.controller('GenericListController', ['$scope', '$route',
-    function($scope, $route) {
-        var data = $scope.restService;
-        var pk = $scope.fields.filter(function(f) { return f.pk; })[0].name;
+mod.controller('GenericListController', ['$route',
+    function($route) {
+        var data = this.restService;
+        var pk = this.fields.filter(function(f) { return f.pk; })[0].name;
 
-        $scope.select = function(item) {
-            $scope.edititem = angular.copy(item);
+        this.select = function(item) {
+            this.edititem = angular.copy(item);
             if (item !== null)
-                $scope.edit_code = $scope.edititem[pk];
+                this.edit_code = this.edititem[pk];
             else
-                $scope.edit_code = null;
+                this.edit_code = null;
         };
 
-        $scope.onclose = function() {
-            $scope.select(null);
+        this.onclose = function() {
+            this.select(null);
         };
 
-        $scope.onadd = function(item) {
+        this.onadd = function(item) {
             newitem = {};
             newitem[pk] = '';
-            $scope.select(newitem);
+            this.select(newitem);
         };
 
         function save(edit_code, edititem) {
@@ -34,20 +34,20 @@ mod.controller('GenericListController', ['$scope', '$route',
             $route.reload();
         }
 
-        $scope.onsave = function() {
-            save($scope.edit_code, $scope.edititem).then(reload);
+        this.onsave = function() {
+            save(this.edit_code, this.edititem).then(reload);
         }
 
         function del(edit_code) {
             return data.del(edit_code)
         }
 
-        $scope.ondel = function() {
-            if ($scope.edit_code)
-                del($scope.edit_code).then(reload);
+        this.ondel = function() {
+            if (this.edit_code)
+                del(this.edit_code).then(reload);
         }
 
-        $scope.fieldvisible = function(field) {
+        this.fieldvisible = function(field) {
             return !field.hide;
         }
     }]
@@ -62,6 +62,8 @@ mod.directive('list', function() {
             $elem.find('list-item').attr('template', $attrs.itemTemplate);
         }
         , controller: 'GenericListController'
+        , controllerAs: 'listcontroller'
+        , bindToController: true
     };
 });
 
@@ -93,7 +95,7 @@ mod.directive('fieldEdit', function() {
             $scope.readonly = '';
             $scope.displayname = displayName($scope.field);
             if ($scope.field.pk === true) {
-                $scope.$watch ('edit_code', function(edit_code, _) {
+                $scope.$watch ('listcontroller.edit_code', function(edit_code, _) {
                     $scope.readonly = edit_code;
                 });
             }

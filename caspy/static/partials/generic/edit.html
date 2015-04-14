@@ -1,6 +1,7 @@
 <table>
-    <tr field-edit ng-repeat="field in fields|filter:fieldvisible"/>
+    <tr field-edit
+        ng-repeat="field in listcontroller.fields|filter:listcontroller.fieldvisible"/>
 </table>
-<button ng-click="onclose()">Close</button>
-<button ng-click="ondel()" ng-show="edit_code">Delete</button>
-<button ng-click="onsave()">Save</button>
+<button ng-click="listcontroller.onclose()">Close</button>
+<button ng-click="listcontroller.ondel()" ng-show="edit_code">Delete</button>
+<button ng-click="listcontroller.onsave()">Save</button>
