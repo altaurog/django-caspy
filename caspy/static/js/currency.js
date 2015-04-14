@@ -1,5 +1,5 @@
 (function(){
-var mod = angular.module('caspy.currency', ['caspy.api']);
+var mod = angular.module('caspy.currency', ['caspy.api', 'generic']);
 
 mod.factory('CurrencyService', ['ResourceWrapper', 'caspyAPI',
     function(ResourceWrapper, caspyAPI) {
@@ -9,11 +9,13 @@ mod.factory('CurrencyService', ['ResourceWrapper', 'caspyAPI',
 );
 
 mod.controller('CurrencyController',
-    ['$scope', 'CurrencyService', 'currencies',
-    function($scope, CurrencyService, currencies) {
-        $scope.dataservice = CurrencyService;
-        $scope.currencies = currencies;
-        $scope.fields = [
+    ['$injector', 'ListControllerMixin', 'CurrencyService', 'currencies',
+    function($injector, ListControllerMixin, CurrencyService, currencies) {
+        $injector.invoke(ListControllerMixin, this);
+        this.dataservice = CurrencyService;
+        this.currencies = currencies;
+        this.pk = 'cur_code';
+        this.fields = [
               {name: 'cur_code', long_name: 'Code', pk: true}
             , {name: 'long_name', long_name: 'Name'}
             , {name: 'symbol'}

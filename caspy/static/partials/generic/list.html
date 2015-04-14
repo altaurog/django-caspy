@@ -1,9 +1,0 @@
-<button ng-click="listcontroller.add()">Add</button>
-<ul>
-    <li ng-repeat="item in listcontroller.items">
-        <list-item ng-click="listcontroller.select(item)" item="item"/>
-    </li>
-</ul>
-<div ng-show="listcontroller.edititem"
-    ng-include="'partials/generic/edit.html'">
-</div>

@@ -31,6 +31,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
             .when('/book/', {
                   templateUrl: 'partials/book/book-list.html'
                 , controller: 'BookController'
+                , controllerAs: 'listcontroller'
                 , resolve: {
                         books: ['BookService',
                             function(BookService) {
@@ -41,6 +42,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
             .when('/currency/', {
                   templateUrl: 'partials/currency/currency-list.html'
                 , controller: 'CurrencyController'
+                , controllerAs: 'listcontroller'
                 , resolve: {
                         currencies: ['CurrencyService',
                             function(CurrencyService) {
@@ -52,6 +54,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
             .when('/accounttype/', {
                   templateUrl: 'partials/accounttype/accounttype-list.html'
                 , controller: 'AccountTypeController'
+                , controllerAs: 'listcontroller'
                 , resolve: {
                         accounttypes: ['AccountTypeService',
                             function(AccountTypeService) {

@@ -1,5 +1,11 @@
-<div list items="books" fields="fields"
-    rest-service="dataservice"
-    item-template="partials/book/book-item.html"
-    />
+<button ng-click="listcontroller.add()">Add</button>
+<ul>
+    <li ng-repeat="item in listcontroller.books"
+        ng-include="'partials/book/book-item.html'"
+        ng-click="listcontroller.select(item)">
+    </li>
+</ul>
+<div ng-show="listcontroller.edititem"
+    ng-include="'partials/generic/edit.html'">
+</div>
 

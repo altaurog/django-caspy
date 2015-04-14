@@ -1,5 +1,11 @@
-<div list items="accounttypes" fields="fields"
-    rest-service="dataservice"
-    item-template="partials/accounttype/accounttype-item.html"
-    />
+<button ng-click="listcontroller.add()">Add</button>
+<ul>
+    <li ng-repeat="item in listcontroller.accounttypes"
+        ng-include="'partials/accounttype/accounttype-item.html'"
+        ng-click="listcontroller.select(item)">
+    </li>
+</ul>
+<div ng-show="listcontroller.edititem"
+    ng-include="'partials/generic/edit.html'">
+</div>
 

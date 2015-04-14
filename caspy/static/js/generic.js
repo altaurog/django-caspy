@@ -1,15 +1,12 @@
 (function(){
 var mod = angular.module('generic', []);
 
-mod.controller('GenericListController', ['$route',
-    function($route) {
-        var data = this.restService;
-        var pk = this.fields.filter(function(f) { return f.pk; })[0].name;
-
+mod.factory('ListControllerMixin', function() {
+    function mixin($route) {
         this.select = function(item) {
             this.edititem = angular.copy(item);
             if (item !== null)
-                this.edit_code = this.edititem[pk];
+                this.edit_code = this.edititem[this.pk];
             else
                 this.edit_code = null;
         };
@@ -20,58 +17,39 @@ mod.controller('GenericListController', ['$route',
 
         this.add = function(item) {
             newitem = {};
-            newitem[pk] = '';
+            newitem[this.pk] = '';
             this.select(newitem);
         };
 
-        function _save(edit_code, edititem) {
+        this._save = function(edit_code, edititem) {
             if (edit_code)
-                return data.update(edit_code, edititem);
-            return data.create(edititem);
+                return this.dataservice.update(edit_code, edititem);
+            return this.dataservice.create(edititem);
         }
 
-        function reload() {
+        this.reload = function() {
             $route.reload();
         }
 
         this.save = function() {
-            _save(this.edit_code, this.edititem).then(reload);
+            this._save(this.edit_code, this.edititem).then(this.reload);
         }
 
-        function _del(edit_code) {
-            return data.del(edit_code)
+        this._del = function(edit_code) {
+            return this.dataservice.del(edit_code)
         }
 
         this.del = function() {
             if (this.edit_code)
-                _del(this.edit_code).then(reload);
+                this._del(this.edit_code).then(this.reload);
         }
 
         this.fieldvisible = function(field) {
             return !field.hide;
         }
-    }]
-);
-
-mod.directive('list', function() {
-    return {
-          templateUrl: 'partials/generic/list.html'
-        , scope: {items: '=', fields: '=', restService: '='}
-        , compile: function($elem, $attrs) {
-            // copy item template url into our own template
-            $elem.find('list-item').attr('template', $attrs.itemTemplate);
-        }
-        , controller: 'GenericListController'
-        , controllerAs: 'listcontroller'
-        , bindToController: true
-    };
-});
-
-mod.directive('listItem', function() {
-    return {
-          scope: { item: '=' }
-        , templateUrl: function(_, $attrs) { return $attrs.template; }
-    };
+    }
+    mixin.$inject = ['$route'];
+    return mixin;
 });
 
 function capFirst(word) {

@@ -1,5 +1,5 @@
 (function(){
-var mod = angular.module('caspy.accounttype', ['caspy.api']);
+var mod = angular.module('caspy.accounttype', ['caspy.api', 'generic']);
 
 mod.factory('AccountTypeService', ['ResourceWrapper', 'caspyAPI',
     function(ResourceWrapper, caspyAPI) {
@@ -9,11 +9,13 @@ mod.factory('AccountTypeService', ['ResourceWrapper', 'caspyAPI',
 );
 
 mod.controller('AccountTypeController',
-    ['$scope', 'AccountTypeService', 'accounttypes',
-    function($scope, AccountTypeService, accounttypes) {
-        $scope.dataservice = AccountTypeService;
-        $scope.accounttypes = accounttypes;
-        $scope.fields = [
+    ['$injector', 'ListControllerMixin', 'AccountTypeService', 'accounttypes',
+    function($injector, ListControllerMixin, AccountTypeService, accounttypes) {
+        $injector.invoke(ListControllerMixin, this);
+        this.dataservice = AccountTypeService;
+        this.accounttypes = accounttypes;
+        this.pk = 'account_type';
+        this.fields = [
               {name: 'account_type', pk: true}
             , {name: 'sign'}
             , {name: 'credit_term'}
