@@ -29,6 +29,9 @@ class Book(models.Model):
         self.set_created_at()
         super(Book, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         ordering = ['created_at']
         unique_together = [['name']]
