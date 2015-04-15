@@ -50,6 +50,7 @@ class AccountType(models.Model):
 
 
 class Account(models.Model):
+    account_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
     book = models.ForeignKey(Book)
     account_type = models.ForeignKey(AccountType)
