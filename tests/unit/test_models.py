@@ -25,3 +25,9 @@ class TestBook:
         book_obj = models.Book(name='Test Book', created_at=before)
         book_obj.set_created_at()
         assert book_obj.created_at == before
+
+
+class TestAccountType:
+    def test_str(self):
+        at_obj = models.AccountType(account_type='Income')
+        assert str(at_obj) == 'Income'
