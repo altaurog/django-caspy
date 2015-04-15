@@ -24,7 +24,8 @@ class BookFactory(factory.DjangoModelFactory):
 
 
 class AccountTypeFactory(factory.DjangoModelFactory):
-    account_type = factory.Iterator(['Credit Card', 'Bank Account', 'Income', 'Expense'])
+    account_type = factory.Iterator(
+                        ['Credit Card', 'Bank Account', 'Income', 'Expense'])
     sign = factory.Iterator([True, False])
     credit_term = factory.Iterator(['charge', 'withdraw', 'income', 'credit'])
     debit_term = factory.Iterator(['payment', 'deposit', 'income', 'debit'])
