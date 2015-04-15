@@ -43,3 +43,27 @@ class TestBook:
         models.Book.objects.create(name=name)
         with pytest.raises(IntegrityError):
             models.Book.objects.create(name=name)
+
+
+class TestAccountType:
+    mgr = models.AccountType.objects
+    data = {
+            'account_type': 'Income',
+            'sign': True,
+            'credit_term': 'income',
+            'debit_term': 'expense',
+        }
+
+    def test_create_accounttype(self):
+        self.mgr.create(**self.data)
+        assert self.mgr.filter(**self.data).exists()
+
+    def test_uniqueness(self):
+        self.mgr.create(**self.data)
+        with pytest.raises(IntegrityError):
+            self.mgr.create(
+                    account_type='Income',
+                    sign=False,
+                    credit_term='credit',
+                    debit_term='debit',
+                )
