@@ -2,3 +2,4 @@ mock
 pytest
 pytest-cov
 pytest-django
+factory_boy
