@@ -44,3 +44,17 @@ class AccountType(models.Model):
 
     def __str__(self):
         return self.account_type
+
+
+class Account(models.Model):
+    name = models.CharField(max_length=64)
+    book = models.ForeignKey(Book)
+    account_type = models.ForeignKey(AccountType)
+    currency = models.ForeignKey(Currency)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = [['name', 'book']]

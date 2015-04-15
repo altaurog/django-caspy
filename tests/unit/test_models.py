@@ -31,3 +31,9 @@ class TestAccountType:
     def test_str(self):
         at_obj = models.AccountType(account_type='Income')
         assert str(at_obj) == 'Income'
+
+
+class TestAccount:
+    def test_str(self):
+        account_obj = models.Account(name='Salary')
+        assert str(account_obj) == 'Salary'
