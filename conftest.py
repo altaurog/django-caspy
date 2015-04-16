@@ -21,4 +21,5 @@ def pytest_configure():
         },
 
         USE_TZ = True,
+        MIDDLEWARE_CLASSES = [],
     )
