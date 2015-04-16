@@ -31,3 +31,13 @@ class AccountTypeList(generics.ListCreateAPIView):
 class AccountTypeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.AccountType.objects.all()
     serializer_class = serializers.AccountTypeSerializer
+
+
+class AccountList(generics.ListCreateAPIView):
+    queryset = models.Account.objects.all()
+    serializer_class = serializers.AccountSerializer
+
+
+class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Account.objects.all()
+    serializer_class = serializers.AccountSerializer

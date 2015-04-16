@@ -27,6 +27,7 @@ def api_root(request):
         'currency': rev('api-currency-detail'),
         'book': rev('api-book-detail'),
         'accounttype': rev('api-accounttype-detail'),
+        'account': rev('api-account-detail'),
     })
 
 
@@ -52,4 +53,10 @@ urlpatterns = patterns('',  # noqa
     url(r'^accounttype/(?P<pk>[\w ]+(?#:account_type))/$',
         views.AccountTypeDetail.as_view(),
         name='api-accounttype-detail'),
+    url(r'^account/$',
+        views.AccountList.as_view(),
+        name='api-account-list'),
+    url(r'^account/(?P<pk>\d+(?#:account))/$',
+        views.AccountDetail.as_view(),
+        name='api-account-detail'),
 )
