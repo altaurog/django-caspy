@@ -47,6 +47,11 @@ mod.factory('ListControllerMixin', function() {
         this.fieldvisible = function(field) {
             return !field.hide;
         }
+
+        this.assign = function (name, promise) {
+            var ref = this;
+            promise.then(function(data) { ref[name] = data; });
+        }
     }
     mixin.$inject = ['$route'];
     return mixin;

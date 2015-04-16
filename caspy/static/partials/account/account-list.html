@@ -1,0 +1,11 @@
+<ul>
+    <li ng-repeat="item in listcontroller.accounts"
+        ng-include="'partials/account/account-item.html'"
+        ng-click="listcontroller.select(item)">
+    </li>
+</ul>
+<div ng-show="listcontroller.edititem"
+    ng-include="'partials/generic/edit.html'">
+</div>
+<div ng-include="'partials/generic/buttons.html'">
+

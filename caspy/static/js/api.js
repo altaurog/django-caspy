@@ -71,11 +71,12 @@ mod.factory('caspyAPI',
             }
             , resources: {}
 
-            , get_resource: function(name) {
-                if (typeof api.resources[name] !== 'undefined')
-                    return api.resources[name];
-                return api.resources[name] = api.get_endpoint(name)
-                        .then(api.build_resource);
+            , get_resource: function(name, params) {
+                var ip = params || {};
+                function build_res(endpoint) {
+                    return api.build_resource(endpoint, ip);
+                }
+                return api.get_endpoint(name).then(build_res);
             }
 
             , get_endpoint: function(name) {
@@ -88,8 +89,8 @@ mod.factory('caspyAPI',
                     })
             }
 
-            , build_resource: function(endpoint) {
-                return $resource(endpoint, {}, api.actions);
+            , build_resource: function(endpoint, params) {
+                return $resource(endpoint, params, api.actions);
             }
 
             , resolve: function(name) {

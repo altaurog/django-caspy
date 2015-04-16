@@ -6,6 +6,7 @@ var mod = angular.module('caspy',
       , 'caspy.currency'
       , 'caspy.book'
       , 'caspy.accounttype'
+      , 'caspy.account'
     ]
 );
 
@@ -61,6 +62,11 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                                 return AccountTypeService.all();
                             }]
                     }
+            })
+            .when('/book/:book_id/account/', {
+                  templateUrl: 'partials/account/account-list.html'
+                , controller: 'AccountController'
+                , controllerAs: 'listcontroller'
             })
             .otherwise({
                 redirectTo: '/menu/'
