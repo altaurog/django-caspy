@@ -22,3 +22,8 @@ class AccountTypeSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Account
+
+class AnnotatedAccountSerializer(AccountSerializer):
+    path = serializers.CharField(read_only=True)
+    parent_id = serializers.PrimaryKeyRelatedField(read_only=True, allow_null=True)
+
