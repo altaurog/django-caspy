@@ -1,6 +1,6 @@
 from datetime import timedelta
 from django.utils import timezone
-from caspy import models
+from caspy import models, closure
 
 
 class TestCurrency:
@@ -41,3 +41,29 @@ class TestAccount:
     def test_str(self):
         account_obj = models.Account(name='Salary')
         assert str(account_obj) == 'Salary'
+
+class Node:
+    def __init__(self, pk, parent_id, depth):
+        self.pk = pk
+        self.parent_id = parent_id
+        self.depth = depth
+
+    def __repr__(self): return 'Node(%s)' % self.pk
+
+class TestClosure:
+    def test_make_paths(self):
+        a = Node(0, None, 0)  # a - b - c
+        b = Node(1, 0, 1)     #  \   \
+        c = Node(2, 1, 2)     #   d   e
+        d = Node(3, 0, 1)
+        e = Node(4, 1, 2)
+        objects = [e, c, d, b, a]
+        paths = closure.make_paths(objects)
+        expected = set((
+                (a,),
+                (a, b),
+                (a, d),
+                (a, b, c),
+                (a, b, e),
+            ))
+        assert set(map(tuple, paths)) == expected

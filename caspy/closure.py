@@ -40,13 +40,14 @@ def register_signal_listeners(model, path_model):
 
 class TreeManager(models.Manager):
     def attach(self, lower, upper):
-        db_table = self.model._path_model._meta.db_table
-        query = """
-            INSERT INTO {0} (upper_id, lower_id, length)
-            SELECT u.upper_id, l.lower_id, u.length + l.length + 1
-            FROM {0} u, {0} l
-            WHERE u.lower_id = %s AND l.upper_id = %s
-            """.format(db_table)
+        query = self._query_format("""
+            INSERT INTO {path_table} (upper_id, lower_id, length)
+            SELECT upper.upper_id,
+                lower.lower_id,
+                upper.length + lower.length + 1
+            FROM {path_table} upper, {path_table} lower
+            WHERE upper.lower_id = %s AND lower.upper_id = %s
+            """)
         cursor = connection.cursor()
         cursor.execute(query, [upper.pk, lower.pk])
         result = cursor.rowcount
@@ -54,35 +55,84 @@ class TreeManager(models.Manager):
         return result
 
     def detach(self, lower):
-        db_table = self.model._path_model._meta.db_table
-        query = """
-            DELETE FROM {0}
-            WHERE {0}.id in (
-                SELECT path.id FROM {0} path, {0} u, {0} l
-                WHERE u.lower_id = %s AND u.length > 0
-                AND l.upper_id = %s
-                AND path.upper_id = u.upper_id
-                AND path.lower_id = l.lower_id
+        query = self._query_format("""
+            DELETE FROM {path_table}
+            WHERE {path_table}.id in (
+                SELECT path.id
+                FROM {path_table} path,
+                    {path_table} upper,
+                    {path_table} lower
+                WHERE upper.lower_id = %s AND upper.length > 0
+                AND lower.upper_id = %s
+                AND path.upper_id = upper.upper_id
+                AND path.lower_id = lower.lower_id
             )
-            """.format(db_table)
+            """)
         cursor = connection.cursor()
         cursor.execute(query, [lower.pk, lower.pk])
         result = cursor.rowcount
         cursor.close()
         return result
 
-    def paths(self, qset=None):
-        nodes = list((qset or self)
-                     .annotate(depth=models.Max('upper_set__length'))
-                     .order_by('depth'))
-        bypk = {n.pk: [n] for n in nodes}
-        path_qset = self.model._path_model.objects.filter(length=1)
-        if qset:
-            path_qset = path_qset.filter(lower__in=qset)
-        for a in path_qset:
-            bypk[a.lower_id][0].parent = a.upper_id
-        for n in nodes:
-            if n.depth == 0:
-                continue
-            bypk[n.pk] = bypk.get(n.parent, []) + bypk[n.pk]
-        return [bypk[n.pk] for n in nodes]
+    def paths(self):
+        return make_paths(self.path_annotated())
+
+    def path_annotated(self):
+        query = self._query_format("""
+            SELECT {select}
+                , max(dpath.length) AS depth
+                , ppath.upper_id as parent_id
+            FROM {table}
+            LEFT OUTER JOIN {path_table} dpath
+                ON ({table}.{pk} = dpath.lower_id)
+            LEFT OUTER JOIN {path_table} ppath
+                ON ({table}.{pk} = ppath.lower_id
+                    AND ppath.length = 1)
+            GROUP BY {select}, ppath.upper_id
+            """)
+        return self.raw(query)
+
+    def _query_format(self, query):
+        return query.format(**self._query_format_kwargs())
+
+    def _query_format_kwargs(self):
+        table = self._table()
+        columns = self._columns()
+        return {
+            'table': table,
+            'columns': columns,
+            'pk': self._pk(),
+            'path_table': self._path_table(),
+            'select': ', '.join('%s.%s' % (table, c) for c in columns),
+        }
+
+    def _path_table(self):
+        return self.model._path_model._meta.db_table
+
+    def _table(self):
+        return self.model._meta.db_table
+
+    def _columns(self):
+        return [db_column(f) for f in self._fields()]
+
+    def _pk(self):
+        for f in self._fields():
+            if f.primary_key:
+                return db_column(f)
+
+    def _fields(self):
+        return self.model._meta.local_fields
+
+
+def db_column(field):
+    return field.column or field.name
+
+
+def make_paths(objects):
+    nodes = sorted(objects, key=lambda o: o.depth)
+    bypk = {n.pk: [n] for n in nodes}
+    for n in nodes:
+        if n.depth == 0:
+            continue
+        bypk[n.pk] = bypk.get(n.parent_id, []) + bypk[n.pk]
+    return [bypk[n.pk] for n in nodes]

@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from . import closure
+
 
 class Currency(models.Model):
     cur_code = models.CharField(max_length=8, primary_key=True)
@@ -57,8 +59,14 @@ class Account(models.Model):
     currency = models.ForeignKey(Currency)
     description = models.CharField(max_length=255)
 
+    objects = models.Manager()
+    tree = closure.TreeManager()
+
     def __str__(self):
         return self.name
 
     class Meta:
         unique_together = [['name', 'book']]
+
+
+AccountPath = closure.path_model(Account)

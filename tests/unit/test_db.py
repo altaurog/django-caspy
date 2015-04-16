@@ -75,9 +75,12 @@ class TestAccount:
 
 
 class TestClosureTable:
+    treemgr = testapp.models.Thing.tree
+    pathmgr = testapp.models.ThingPath.objects
+
     def test_self_path_created(self):
         a = factories.ThingFactory()
-        assert testapp.models.ThingPath.objects.filter(
+        assert self.pathmgr.filter(
                     upper=a, lower=a, length=0,
                 ).exists()
 
@@ -86,56 +89,79 @@ class TestClosureTable:
 
     def test_attach_leaf(self):
         a, b = factories.ThingFactory.create_batch(2)
-        assert testapp.models.Thing.tree.attach(b, a) == 1
-        assert testapp.models.ThingPath.objects.filter(
+        assert self.treemgr.attach(b, a) == 1
+        assert self.pathmgr.filter(
                     upper=a, lower=b, length=1,
                 ).exists()
 
     def test_attach_branch(self):
         a, b, c = factories.ThingFactory.create_batch(3)
-        assert testapp.models.Thing.tree.attach(c, b) == 1
-        assert testapp.models.Thing.tree.attach(b, a) == 2
-        assert testapp.models.ThingPath.objects.filter(
+        assert self.treemgr.attach(c, b) == 1
+        assert self.treemgr.attach(b, a) == 2
+        assert self.pathmgr.filter(
                     upper=a, lower=c, length=2,
                 ).exists()
 
+    def test_path_table(self):
+        assert self.treemgr._path_table() == 'testapp_thingpath'
+
+    def test_table(self):
+        assert self.treemgr._table() == 'testapp_thing'
+
+    def test_columns(self):
+        assert self.treemgr._columns() == ['id', 'name']
+
+    def test_pk(self):
+        assert self.treemgr._pk() == 'id'
+
+    def test_kwargs(self):
+        expected = {
+                'table': 'testapp_thing',
+                'columns': ['id', 'name'],
+                'pk': 'id',
+                'path_table': 'testapp_thingpath',
+                'select': 'testapp_thing.id, testapp_thing.name',
+            }
+        assert self.treemgr._query_format_kwargs() == expected
+
+    def test_path_annotated(self):
+        a, b, c = factories.ThingFactory.create_batch(3)
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
+        paths = list(self.treemgr.path_annotated())
+        paths.sort(key=lambda o: o.name)
+        assert [o.depth for o in paths] == [0, 1, 2]
+        assert [o.parent_id for o in paths] == [None, a.id, b.id]
+
     def test_get_paths(self):
         a, b, c = factories.ThingFactory.create_batch(3)
-        testapp.models.Thing.tree.attach(c, b)
-        testapp.models.Thing.tree.attach(b, a)
-        paths = testapp.models.Thing.tree.paths()
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
+        paths = self.treemgr.paths()
         assert paths == [[a], [a, b], [a, b, c]]
-
-    def test_get_paths_with_qset(self):
-        a, b, c = factories.ThingFactory.create_batch(3)
-        testapp.models.Thing.tree.attach(c, b)
-        testapp.models.Thing.tree.attach(b, a)
-        qset = testapp.models.Thing.objects.exclude(name=a.name)
-        paths = testapp.models.Thing.tree.paths(qset)
-        assert paths == [[b], [b, c]]
 
     def test_detach_leaf(self):
         a, b = factories.ThingFactory.create_batch(2)
-        testapp.models.Thing.tree.attach(b, a)
-        assert testapp.models.Thing.tree.detach(b) == 1
-        assert not testapp.models.ThingPath.objects.filter(
+        self.treemgr.attach(b, a)
+        assert self.treemgr.detach(b) == 1
+        assert not self.pathmgr.filter(
                     upper=a, lower=b, length=1,
                 ).exists()
 
     def test_detach_branch(self):
         a, b, c = factories.ThingFactory.create_batch(3)
-        testapp.models.Thing.tree.attach(c, b)
-        testapp.models.Thing.tree.attach(b, a)
-        assert testapp.models.Thing.tree.detach(b) == 2
-        assert not testapp.models.ThingPath.objects.filter(
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
+        assert self.treemgr.detach(b) == 2
+        assert not self.pathmgr.filter(
                     upper=a, lower=c, length=2,
                 ).exists()
 
     def test_delete_middle_node(self):
         a, b, c = factories.ThingFactory.create_batch(3)
-        testapp.models.Thing.tree.attach(c, b)
-        testapp.models.Thing.tree.attach(b, a)
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
         b.delete()
-        assert not testapp.models.ThingPath.objects.filter(
+        assert not self.pathmgr.filter(
                     upper=a, lower=c, length=2,
                 ).exists()
