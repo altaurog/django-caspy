@@ -1,5 +1,6 @@
 import factory
 from caspy import models
+from .models import Thing
 
 
 def letterstr(size, extra=''):
@@ -46,3 +47,11 @@ class AccountFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Account
+
+
+class ThingFactory(factory.DjangoModelFactory):
+    "Dummy model factory for testing closure table"
+    name = factory.Sequence(letterstr(1))
+
+    class Meta:
+        model = Thing
