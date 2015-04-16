@@ -2,7 +2,7 @@ import pytest
 from django.db.utils import IntegrityError
 from django.forms.models import model_to_dict
 from caspy import models
-import factories
+from testapp import factories
 
 pytestmark = pytest.mark.django_db()
 
