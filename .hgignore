@@ -1,4 +1,5 @@
 syntax:glob
+env.ini
 .coverage
 *.sassc
 *.sqlite3
