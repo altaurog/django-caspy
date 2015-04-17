@@ -1,13 +1,20 @@
+# vim:fileencoding=utf-8
+from __future__ import unicode_literals
 from datetime import timedelta
 from django.utils import timezone
 from caspy import models, closure
+
+try:
+    to_string = unicode  # 2
+except NameError:
+    to_string = str
 
 
 class TestCurrency:
     def test_str(self):
         "String representation should be currency code"
         cur_obj = models.Currency(cur_code='USD')
-        assert str(cur_obj) == 'USD'
+        assert to_string(cur_obj) == 'USD'
 
 
 class TestBook:
@@ -28,19 +35,31 @@ class TestBook:
 
     def test_str(self):
         book_obj = models.Book(name='Test Book')
-        assert str(book_obj) == 'Test Book'
+        assert to_string(book_obj) == 'Test Book'
+
+    def test_unicode(self):
+        book_obj = models.Book(name='שנת 2015')
+        assert to_string(book_obj) == 'שנת 2015'
 
 
 class TestAccountType:
     def test_str(self):
         at_obj = models.AccountType(account_type='Income')
-        assert str(at_obj) == 'Income'
+        assert to_string(at_obj) == 'Income'
+
+    def test_unicode(self):
+        at_obj = models.AccountType(account_type='הוצאות')
+        assert to_string(at_obj) == 'הוצאות'
 
 
 class TestAccount:
     def test_str(self):
         account_obj = models.Account(name='Salary')
-        assert str(account_obj) == 'Salary'
+        assert to_string(account_obj) == 'Salary'
+
+    def test_unicode(self):
+        account_obj = models.Account(name='משכורת')
+        assert to_string(account_obj) == 'משכורת'
 
 class Node:
     def __init__(self, pk, parent_id, depth):
