@@ -43,5 +43,8 @@ class AccountList(views.APIView):
 
 
 class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Account.objects.all()
     serializer_class = serializers.AccountSerializer
+
+    def get_queryset(self):
+        book_id = self.kwargs['book_id']
+        return models.Account.objects.filter(book=book_id)
