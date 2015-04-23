@@ -51,6 +51,27 @@ class AccountType(models.Model):
         return self.account_type
 
 
+class AccountTreeManager(closure.TreeManager):
+    def path_name(self, path):
+        return '::'.join([a.name for a in path])
+
+    def path_parent(self, path):
+        if len(path) > 1:
+            return path[-2].account_id
+
+    def annotate(self, path):
+        account = path[-1]
+        account.path = self.path_name(path)
+        account.parent_id = self.path_parent(path)
+        return account
+
+    def load(self, *args, **kwargs):
+        return map(self.annotate, self.paths(*args, **kwargs))
+
+    def load_book(self, book_id):
+        return self.load('WHERE book_id = %s', [book_id])
+
+
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
@@ -60,7 +81,7 @@ class Account(models.Model):
     description = models.CharField(max_length=255)
 
     objects = models.Manager()
-    tree = closure.TreeManager()
+    tree = AccountTreeManager()
 
     def __str__(self):
         return self.name

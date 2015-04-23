@@ -53,7 +53,7 @@ urlpatterns = patterns('',  # noqa
     url(r'^accounttype/(?P<pk>[\w ]+(?#:account_type))/$',
         views.AccountTypeDetail.as_view(),
         name='api-accounttype-detail'),
-    url(r'^account/$',
+    url(r'^book/(?P<book_id>\d+)/account/$',
         views.AccountList.as_view(),
         name='api-account-list'),
     url(r'^account/(?P<pk>\d+(?#:account))/$',

@@ -61,21 +61,60 @@ class TestAccount:
         account_obj = models.Account(name='משכורת')
         assert to_string(account_obj) == 'משכורת'
 
-class Node:
-    def __init__(self, pk, parent_id, depth):
-        self.pk = pk
-        self.parent_id = parent_id
-        self.depth = depth
 
-    def __repr__(self): return 'Node(%s)' % self.pk
+class TestAccountTree:
+    tree = models.Account.tree
+
+    class Node:
+        def __init__(self, account_id, name):
+            self.account_id = account_id
+            self.name = name
+
+    def setup(self):
+        self.a = self.Node(0, 'A')
+        self.b = self.Node(1, 'B')
+        self.c = self.Node(2, 'C')
+
+    def test_path_name(self):
+        assert self.tree.path_name([self.a]) == 'A'
+        assert self.tree.path_name([self.a, self.b]) == 'A::B'
+        assert self.tree.path_name([self.a, self.b, self.c]) == 'A::B::C'
+
+    def test_path_parent(self):
+        assert self.tree.path_parent([self.a]) == None
+        assert self.tree.path_parent([self.a, self.b]) == 0
+        assert self.tree.path_parent([self.a, self.b, self.c]) == 1
+
+    def test_annotate(self):
+        a = self.tree.annotate([self.a])
+        assert a is self.a
+        assert a.parent_id == None
+        assert a.path == 'A'
+        b = self.tree.annotate([self.a, self.b])
+        assert b is self.b
+        assert b.parent_id == 0
+        assert b.path == 'A::B'
+        c = self.tree.annotate([self.a, self.b, self.c])
+        assert c is self.c
+        assert c.parent_id == 1
+        assert c.path == 'A::B::C'
+
 
 class TestClosure:
+    class Node:
+        def __init__(self, pk, parent_id, depth):
+            self.pk = pk
+            self.parent_id = parent_id
+            self.depth = depth
+
+        def __repr__(self): return 'Node(%s)' % self.pk
+
     def test_make_paths(self):
-        a = Node(0, None, 0)  # a - b - c
-        b = Node(1, 0, 1)     #  \   \
-        c = Node(2, 1, 2)     #   d   e
-        d = Node(3, 0, 1)
-        e = Node(4, 1, 2)
+        a = self.Node(0, None, 0)  # a - b - c
+        b = self.Node(1, 0, 1)     #  \   \
+        c = self.Node(2, 1, 2)     #   d   e
+        d = self.Node(3, 0, 1)
+        e = self.Node(4, 1, 2)
         objects = [e, c, d, b, a]
         paths = closure.make_paths(objects)
         expected = set((

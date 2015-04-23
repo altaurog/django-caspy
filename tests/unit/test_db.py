@@ -73,6 +73,19 @@ class TestAccount:
         with pytest.raises(IntegrityError):
             factories.AccountFactory(name=name, book=book)
 
+    def test_load(self):
+        kwargs = {
+            'book': factories.BookFactory(),
+            'account_type': factories.AccountTypeFactory(account_type='Income'),
+            'currency': factories.CurrencyFactory(cur_code='USD'),
+        }
+        income = factories.AccountFactory(name='Income', **kwargs)
+        salary = factories.AccountFactory(name='Salary', **kwargs)
+        models.Account.tree.attach(salary, income)
+        accounts = sorted(models.Account.tree.load(), key=lambda a: a.name)
+        assert [a.path for a in accounts] == ['Income', 'Income::Salary']
+        assert [a.parent_id for a in accounts] == [None, income.account_id]
+
 
 class TestClosureTable:
     treemgr = testapp.models.Thing.tree
