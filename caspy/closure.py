@@ -116,7 +116,7 @@ class TreeManager(models.Manager):
         return self.model._meta.db_table
 
     def _columns(self):
-        return [db_column(f) for f in self._fields()]
+        return list(map(db_column, self._fields()))
 
     def _pk(self):
         for f in self._fields():
