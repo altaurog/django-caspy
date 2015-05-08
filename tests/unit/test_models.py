@@ -88,7 +88,7 @@ class TestAccountTree:
     def test_annotate(self):
         a = self.tree.annotate([self.a])
         assert a is self.a
-        assert a.parent_id == None
+        assert a.parent_id is None
         assert a.path == 'A'
         b = self.tree.annotate([self.a, self.b])
         assert b is self.b
@@ -110,11 +110,15 @@ class TestClosure:
         def __repr__(self): return 'Node(%s)' % self.pk
 
     def test_make_paths(self):
-        a = self.Node(0, None, 0)  # a - b - c
-        b = self.Node(1, 0, 1)     #  \   \
-        c = self.Node(2, 1, 2)     #   d   e
+        a = self.Node(0, None, 0)
+        b = self.Node(1, 0, 1)
+        c = self.Node(2, 1, 2)
         d = self.Node(3, 0, 1)
         e = self.Node(4, 1, 2)
+        # The tree looks like this:
+        #    a - b - c
+        #     \   \
+        #      d   e
         objects = [e, c, d, b, a]
         paths = closure.make_paths(objects)
         expected = set((

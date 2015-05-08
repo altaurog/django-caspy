@@ -76,8 +76,9 @@ class TestAccount:
     def test_load(self):
         kwargs = {
             'book': factories.BookFactory(),
-            'account_type': factories.AccountTypeFactory(account_type='Income'),
             'currency': factories.CurrencyFactory(cur_code='USD'),
+            'account_type': factories.AccountTypeFactory(
+                                            account_type='Income'),
         }
         income = factories.AccountFactory(name='Income', **kwargs)
         salary = factories.AccountFactory(name='Salary', **kwargs)
@@ -133,7 +134,9 @@ class TestClosureTable:
                 'columns': ['id', 'name', 'tgroup'],
                 'pk': 'id',
                 'path_table': 'testapp_thingpath',
-                'select': 'testapp_thing.id, testapp_thing.name, testapp_thing.tgroup',
+                'select': ('testapp_thing.id, '
+                           'testapp_thing.name, '
+                           'testapp_thing.tgroup'),
             }
         assert self.treemgr._query_format_kwargs() == expected
 
