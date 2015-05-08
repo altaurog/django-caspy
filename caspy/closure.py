@@ -74,10 +74,10 @@ class TreeManager(models.Manager):
         cursor.close()
         return result
 
-    def paths(self):
-        return make_paths(self.path_annotated())
+    def paths(self, *args, **kwargs):
+        return make_paths(self.path_annotated(*args, **kwargs))
 
-    def path_annotated(self):
+    def path_annotated(self, where='WHERE 1 = 1', params=None):
         query = self._query_format("""
             SELECT {select}
                 , max(dpath.length) AS depth
@@ -88,12 +88,15 @@ class TreeManager(models.Manager):
             LEFT OUTER JOIN {path_table} ppath
                 ON ({table}.{pk} = ppath.lower_id
                     AND ppath.length = 1)
+            {where}
             GROUP BY {select}, ppath.upper_id
-            """)
-        return self.raw(query)
+            """, where=where)
+        return self.raw(query, params)
 
-    def _query_format(self, query):
-        return query.format(**self._query_format_kwargs())
+    def _query_format(self, query, **kwargs):
+        kwargs = kwargs.copy()
+        kwargs.update(self._query_format_kwargs())
+        return query.format(**kwargs)
 
     def _query_format_kwargs(self):
         table = self._table()

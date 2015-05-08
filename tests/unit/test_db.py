@@ -109,7 +109,7 @@ class TestClosureTable:
         assert self.treemgr._table() == 'testapp_thing'
 
     def test_columns(self):
-        assert self.treemgr._columns() == ['id', 'name']
+        assert self.treemgr._columns() == ['id', 'name', 'tgroup']
 
     def test_pk(self):
         assert self.treemgr._pk() == 'id'
@@ -117,10 +117,10 @@ class TestClosureTable:
     def test_kwargs(self):
         expected = {
                 'table': 'testapp_thing',
-                'columns': ['id', 'name'],
+                'columns': ['id', 'name', 'tgroup'],
                 'pk': 'id',
                 'path_table': 'testapp_thingpath',
-                'select': 'testapp_thing.id, testapp_thing.name',
+                'select': 'testapp_thing.id, testapp_thing.name, testapp_thing.tgroup',
             }
         assert self.treemgr._query_format_kwargs() == expected
 
@@ -138,6 +138,16 @@ class TestClosureTable:
         self.treemgr.attach(c, b)
         self.treemgr.attach(b, a)
         paths = self.treemgr.paths()
+        assert paths == [[a], [a, b], [a, b, c]]
+
+    def test_get_paths_with_where(self):
+        a, b, c = factories.ThingFactory.create_batch(3)
+        e, f, g = factories.ThingFactory.create_batch(3, tgroup=2)
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
+        self.treemgr.attach(g, f)
+        self.treemgr.attach(f, e)
+        paths = self.treemgr.paths('WHERE tgroup = %s', [1])
         assert paths == [[a], [a, b], [a, b, c]]
 
     def test_detach_leaf(self):

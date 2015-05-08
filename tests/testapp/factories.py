@@ -52,6 +52,7 @@ class AccountFactory(factory.DjangoModelFactory):
 class ThingFactory(factory.DjangoModelFactory):
     "Dummy model factory for testing closure table"
     name = factory.Sequence(letterstr(1))
+    tgroup = 1
 
     class Meta:
         model = Thing
