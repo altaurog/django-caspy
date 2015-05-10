@@ -1,4 +1,4 @@
-from rest_framework import generics, response, views
+from rest_framework import generics, response, status, views
 from .. import models
 from . import serializers
 
@@ -40,6 +40,16 @@ class AccountList(views.APIView):
         accounts = models.Account.tree.load_book(int(book_id))
         serializer = self.serializer_class(accounts, many=True)
         return response.Response(serializer.data)
+
+    def post(self, request, book_id, format=None):
+        data = request.data.copy()
+        data['book'] = book_id
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors,
+                                 status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccountDetail(generics.RetrieveUpdateDestroyAPIView):

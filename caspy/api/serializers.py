@@ -26,5 +26,22 @@ class AccountSerializer(serializers.ModelSerializer):
 
 class AnnotatedAccountSerializer(AccountSerializer):
     path = serializers.CharField(read_only=True)
-    parent_id = serializers.PrimaryKeyRelatedField(read_only=True,
-                                                   allow_null=True)
+    parent_id = serializers.IntegerField(allow_null=True)
+
+    def validate(self, data):
+        book_id = data['book']
+        parent_id = data.pop('parent_id')
+        try:
+            qargs = {'account_id': parent_id, 'book': book_id}
+            data['parent'] = models.Account.objects.get(**qargs)
+            return data
+        except models.Account.DoesNotExist:
+            raise serializers.ValidationError('Invalid parent account id')
+
+    def create(self, validated_data):
+        parent = validated_data.pop('parent')
+        child = super(AnnotatedAccountSerializer, self).create(validated_data)
+        models.Account.tree.attach(child, parent)
+        return child
+
+
