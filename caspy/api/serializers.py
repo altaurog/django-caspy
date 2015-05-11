@@ -31,6 +31,8 @@ class AnnotatedAccountSerializer(AccountSerializer):
     def validate(self, data):
         book_id = data['book']
         parent_id = data.pop('parent_id')
+        if parent_id == None:
+            return data
         try:
             qargs = {'account_id': parent_id, 'book': book_id}
             data['parent'] = models.Account.objects.get(**qargs)
@@ -39,9 +41,10 @@ class AnnotatedAccountSerializer(AccountSerializer):
             raise serializers.ValidationError('Invalid parent account id')
 
     def create(self, validated_data):
-        parent = validated_data.pop('parent')
+        parent = validated_data.pop('parent', None)
         child = super(AnnotatedAccountSerializer, self).create(validated_data)
-        models.Account.tree.attach(child, parent)
+        if parent is not None:
+            models.Account.tree.attach(child, parent)
         return child
 
 

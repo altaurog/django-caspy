@@ -44,6 +44,7 @@ class AccountList(views.APIView):
     def post(self, request, book_id, format=None):
         data = request.data.copy()
         data['book'] = book_id
+        data.setdefault('parent_id', None)
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             account = serializer.save()
