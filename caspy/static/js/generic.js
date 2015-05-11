@@ -1,7 +1,7 @@
 (function(){
 var mod = angular.module('generic', []);
 
-mod.factory('ListControllerMixin', function() {
+mod.factory('ListControllerMixin', ['$q', function($q) {
     function mixin($route) {
         this.select = function(item) {
             this.edititem = angular.copy(item);
@@ -53,15 +53,28 @@ mod.factory('ListControllerMixin', function() {
             promise.then(function(data) { ref[name] = data; });
         }
 
-        this.fieldcompare = function(a, b) { return a.i - b.i; };
+        this.choiceFields = function(cflist) {
+            var ref = this;
+            var promises = cflist.map(function(cf) {
+                var i = cf[0];
+                var name = cf[1];
+                var promise = cf[2];
+                return promise.then(function(data) {
+                    ref.fields.push({i: i, name: name, choices: data});
+                });
+            });
+            $q.all(promises).then(function() { ref.sortFields(); });
+        };
+
+        this.fieldCompare = function(a, b) { return a.i - b.i; };
 
         this.sortFields = function() {
-            this.fields.sort(this.fieldcompare);
+            this.fields.sort(this.fieldCompare);
         };
     }
     mixin.$inject = ['$route'];
     return mixin;
-});
+}]);
 
 function capFirst(word) {
     return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();

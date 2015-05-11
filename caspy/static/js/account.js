@@ -28,12 +28,14 @@ mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
 mod.controller('AccountController'
     ,['$injector'
     , '$routeParams'
+    , '$q'
     , 'ListControllerMixin'
     , 'AccountService'
     , 'AccountTypeService'
     , 'CurrencyService'
     , function($injector
              , $routeParams
+             , $q
              , ListControllerMixin
              , AccountService
              , AccountTypeService
@@ -49,19 +51,11 @@ mod.controller('AccountController'
             , {i: 0, name: 'name'}
             , {i: 2, name: 'description'}
         ];
-        var ref = this;
-        this.dataservice.choices().then(function(data) {
-            ref.fields.push({i: 1, name: 'parent_id', choices: data});
-            ref.sortFields();
-        });
-        AccountTypeService.choices().then(function(data) {
-            ref.fields.push({i: 3, name: 'account_type', choices: data});
-            ref.sortFields();
-        });
-        CurrencyService.choices().then(function(data) {
-            ref.fields.push({i: 4, name: 'currency', choices: data});
-            ref.sortFields();
-        });
+        this.choiceFields([
+              [1, 'parent_id', this.dataservice.choices()]
+            , [3, 'account_type', AccountTypeService.choices()]
+            , [4, 'currency', CurrencyService.choices()]
+        ]);
     }]
 );
 
