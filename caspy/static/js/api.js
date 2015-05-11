@@ -28,32 +28,32 @@ function ResourceWrapper(promise, pk) {
         var p = {}
         p[pk] = id;
         return p;
-    }
+    };
 
-    this.rc = function (fcn) { return this.resource.then(fcn); }
+    this.rc = function (fcn) { return this.resource.then(fcn); };
 
     this.all = function() {
         return this.rc(function(res) { return res.query(); });
-    }
+    };
 
     this.get = function(id) {
         var p = this.param(id);
         return this.rc(function(res) { return res.get(p); });
-    }
+    };
 
     this.create = function(obj) {
         return this.rc(function(res) { return res.create(obj).$promise; });
-    }
+    };
 
     this.update = function(obj_pk, obj) {
         var p = this.param(obj_pk);
         return this.rc(function(res) { return res.update(p, obj).$promise; });
-    }
+    };
 
     this.del = function(id) {
         var p = this.param(id);
         return this.rc(function(res) { return res.delete(p).$promise; });
-    }
+    };
 }
 
 mod.factory('ResourceWrapper', function() { return ResourceWrapper; });

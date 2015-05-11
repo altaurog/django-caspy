@@ -25,33 +25,33 @@ mod.factory('ListControllerMixin', ['$q', function($q) {
             if (edit_code)
                 return this.dataservice.update(edit_code, edititem);
             return this.dataservice.create(edititem);
-        }
+        };
 
         this.reload = function() {
             $route.reload();
-        }
+        };
 
         this.save = function() {
             this._save(this.edit_code, this.edititem).then(this.reload);
-        }
+        };
 
         this._del = function(edit_code) {
             return this.dataservice.del(edit_code)
-        }
+        };
 
         this.del = function() {
             if (this.edit_code)
                 this._del(this.edit_code).then(this.reload);
-        }
+        };
 
         this.fieldvisible = function(field) {
             return !field.hide;
-        }
+        };
 
         this.assign = function (name, promise) {
             var ref = this;
             promise.then(function(data) { ref[name] = data; });
-        }
+        };
 
         this.choiceFields = function(cflist) {
             var ref = this;
