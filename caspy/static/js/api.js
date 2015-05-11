@@ -7,56 +7,74 @@ mod.config(['$resourceProvider',
     }]
 );
 
-function ResourceWrapper(promise, pk) {
-    // Provides a little glue
-    // ------------------------
-    // API endpoints are retrieved in request to API root, which is
-    // included in Constants module, in script tag on the base page.
-    // This class wraps a promise which carries the $resource object
-    // instantiated upon receipt of the endpoint.
-    // It also wraps the various api methods and simplifies the calls
-    // by constructing the correct arguments when a url containing the
-    // object id is necessary.
-    // It also extracts and returns the $promise from some of the
-    // responses where we normally might want to perform additional
-    // actions only after the request is completed, since the $resource 
-    // methods return an empty object immediately, which causes
-    // funny behavior if we try something like update().then(get()).
-    this.resource = promise;
+function ResourceWrapperFactory($q) {
+    return function ResourceWrapper(promise, pk, makeChoice) {
+        // Provides a little glue
+        // ------------------------
+        // API endpoints are retrieved in request to API root, which is
+        // included in Constants module, in script tag on the base page.
+        // This class wraps a promise which carries the $resource object
+        // instantiated upon receipt of the endpoint.
+        // It also wraps the various api methods and simplifies the calls
+        // by constructing the correct arguments when a url containing the
+        // object id is necessary.
+        // It also extracts and returns the $promise from some of the
+        // responses where we normally might want to perform additional
+        // actions only after the request is completed, since the $resource 
+        // methods return an empty object immediately, which causes
+        // funny behavior if we try something like update().then(get()).
+        this.resource = promise;
 
-    this.param = function(id) {
-        var p = {}
-        p[pk] = id;
-        return p;
-    };
+        this.param = function(id) {
+            var p = {}
+            p[pk] = id;
+            return p;
+        };
 
-    this.rc = function (fcn) { return this.resource.then(fcn); };
+        this.rc = function (fcn) { return this.resource.then(fcn); };
 
-    this.all = function() {
-        return this.rc(function(res) { return res.query(); });
-    };
+        this.all = function() {
+            return this.rc(function(res) { return res.query(); });
+        };
 
-    this.get = function(id) {
-        var p = this.param(id);
-        return this.rc(function(res) { return res.get(p); });
-    };
+        this.get = function(id) {
+            var p = this.param(id);
+            return this.rc(function(res) { return res.get(p); });
+        };
 
-    this.create = function(obj) {
-        return this.rc(function(res) { return res.create(obj).$promise; });
-    };
+        this.create = function(obj) {
+            return this.rc(function(res) { return res.create(obj).$promise; });
+        };
 
-    this.update = function(obj_pk, obj) {
-        var p = this.param(obj_pk);
-        return this.rc(function(res) { return res.update(p, obj).$promise; });
-    };
+        this.update = function(obj_pk, obj) {
+            var p = this.param(obj_pk);
+            return this.rc(function(res) { return res.update(p, obj).$promise; });
+        };
 
-    this.del = function(id) {
-        var p = this.param(id);
-        return this.rc(function(res) { return res.delete(p).$promise; });
-    };
+        this.del = function(id) {
+            var p = this.param(id);
+            return this.rc(function(res) { return res.delete(p).$promise; });
+        };
+
+        if (typeof makeChoice !== 'undefined') {
+            var ref = this;
+            this.choices = function() {
+                var d = $q.defer();
+                this.all().then(function(all) {
+                    // the resource calls immediately return
+                    // an empty object with a promise
+                    all.$promise.then(
+                        function(data) { d.resolve(data.map(makeChoice)); },
+                        function(message) { d.reject(message); }
+                    );
+                });
+                return d.promise;
+            };
+        }
+    }
 }
 
-mod.factory('ResourceWrapper', function() { return ResourceWrapper; });
+mod.factory('ResourceWrapper', ['$q', ResourceWrapperFactory]);
 
 mod.factory('caspyAPI',
     ['$q', '$http', '$resource', 'Constants',

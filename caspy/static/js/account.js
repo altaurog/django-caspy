@@ -4,23 +4,11 @@ var mod = angular.module('caspy.account', ['caspy.api', 'generic']);
 mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
     function($q, ResourceWrapper, caspyAPI) {
         return function(book_id) {
-            var res = caspyAPI.get_resource('book_account', {'book_id': book_id});
-            var as = new ResourceWrapper(res, 'account_id');
-            as.choice = function(account) {
+            function makeChoice(account) {
                 return [account.account_id, account.path];
             };
-
-            as.choices = function() {
-                var d = $q.defer();
-                this.all().then(function(all) {
-                    all.$promise.then(
-                        function(data) { d.resolve(data.map(as.choice)); },
-                        function(message) { d.reject(message); }
-                    );
-                });
-                return d.promise;
-            }
-            return as;
+            var res = caspyAPI.get_resource('book_account', {'book_id': book_id});
+            return new ResourceWrapper(res, 'account_id', makeChoice);
         };
     }]
 );
