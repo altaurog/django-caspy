@@ -1,10 +1,26 @@
 (function(){
 var mod = angular.module('caspy.accounttype', ['caspy.api', 'generic']);
 
-mod.factory('AccountTypeService', ['ResourceWrapper', 'caspyAPI',
-    function(ResourceWrapper, caspyAPI) {
+mod.factory('AccountTypeService', ['$q', 'ResourceWrapper', 'caspyAPI',
+    function($q, ResourceWrapper, caspyAPI) {
         var res = caspyAPI.get_resource('accounttype');
-        return new ResourceWrapper(res, 'account_type');
+        var ats = new ResourceWrapper(res, 'account_type');
+
+        ats.choice = function(accounttype) {
+            return [accounttype.account_type, accounttype.account_type];
+        };
+
+        ats.choices = function() {
+            var d = $q.defer();
+            this.all().then(function(all) {
+                all.$promise.then(
+                    function(data) { d.resolve(data.map(ats.choice)); },
+                    function(message) { d.reject(message); }
+                );
+            });
+            return d.promise;
+        }
+        return ats;
     }]
 );
 

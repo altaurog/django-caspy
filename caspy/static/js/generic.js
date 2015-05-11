@@ -52,6 +52,12 @@ mod.factory('ListControllerMixin', function() {
             var ref = this;
             promise.then(function(data) { ref[name] = data; });
         }
+
+        this.fieldcompare = function(a, b) { return a.i - b.i; };
+
+        this.sortFields = function() {
+            this.fields.sort(this.fieldcompare);
+        };
     }
     mixin.$inject = ['$route'];
     return mixin;
