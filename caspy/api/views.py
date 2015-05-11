@@ -46,7 +46,8 @@ class AccountList(views.APIView):
         data['book'] = book_id
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
-            serializer.save()
+            account = serializer.save()
+            data['account_id'] = account.account_id
             return response.Response(data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors,
                                  status=status.HTTP_400_BAD_REQUEST)
