@@ -40,7 +40,7 @@ mod.controller('AccountController'
             , {i: 2, name: 'description'}
         ];
         this.choiceFields([
-              [1, 'parent_id', this.dataservice.choices()]
+              [1, 'parent_id', this.dataservice.choices(), [null, '']]
             , [3, 'account_type', AccountTypeService.choices()]
             , [4, 'currency', CurrencyService.choices()]
         ]);

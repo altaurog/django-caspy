@@ -59,7 +59,10 @@ mod.factory('ListControllerMixin', ['$q', function($q) {
                 var i = cf[0];
                 var name = cf[1];
                 var promise = cf[2];
+                var empty = cf[3];
                 return promise.then(function(data) {
+                    if (typeof empty !== 'undefined')
+                        data.unshift(empty);
                     ref.fields.push({i: i, name: name, choices: data});
                 });
             });
