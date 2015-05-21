@@ -54,9 +54,21 @@ class AccountList(views.APIView):
                                  status=status.HTTP_400_BAD_REQUEST)
 
 
-class AccountDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = serializers.AccountSerializer
+class AccountDetail(views.APIView):
+    serializer_class = serializers.AnnotatedAccountSerializer
 
     def get_queryset(self):
         book_id = self.kwargs['book_id']
         return models.Account.objects.filter(book=book_id)
+
+    def put(self, request, book_id, pk, format=None):
+        qargs = {'pk': pk, 'book': book_id}
+        account = models.Account.objects.get(**qargs)
+        data = request.data.copy()
+        data['book'] = book_id
+        serializer = self.serializer_class(account, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors,
+                                 status=status.HTTP_400_BAD_REQUEST)

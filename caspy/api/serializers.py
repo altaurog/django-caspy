@@ -47,4 +47,18 @@ class AnnotatedAccountSerializer(AccountSerializer):
             models.Account.tree.attach(child, parent)
         return child
 
+    def update(self, instance, validated_data):
+        new_parent = validated_data.pop('parent', None)
+        super(AnnotatedAccountSerializer, self).update(instance, validated_data)
+        tree = models.Account.tree
+        old_parent_id = tree.parent_id(instance)
+        if new_parent is None:
+            if old_parent_id is not None:
+                tree.detach(instance)
+        else:
+            if old_parent_id != new_parent.account_id:
+                if old_parent_id is not None:
+                    tree.detach(instance)
+                tree.attach(instance, new_parent)
+        return instance
 
