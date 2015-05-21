@@ -149,6 +149,12 @@ class TestClosureTable:
         assert [o.depth for o in paths] == [0, 1, 2]
         assert [o.parent_id for o in paths] == [None, a.id, b.id]
 
+    def test_get_parent_id(self):
+        a, b = factories.ThingFactory.create_batch(2)
+        self.treemgr.attach(b, a)
+        assert self.treemgr.parent_id(a) is None
+        assert self.treemgr.parent_id(b) == a.id
+
     def test_get_paths(self):
         a, b, c = factories.ThingFactory.create_batch(3)
         self.treemgr.attach(c, b)

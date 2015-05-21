@@ -77,6 +77,20 @@ class TreeManager(models.Manager):
     def paths(self, *args, **kwargs):
         return make_paths(self.path_annotated(*args, **kwargs))
 
+    def parent_id(self, lower):
+        query = self._query_format("""
+            SELECT upper_id
+            FROM {path_table}
+            WHERE lower_id = %s
+            AND length = 1
+            """)
+        cursor = connection.cursor()
+        cursor.execute(query, [lower.pk])
+        data = cursor.fetchone()
+        cursor.close()
+        if data is not None:
+            return data[0]
+
     def path_annotated(self, where='WHERE 1 = 1', params=None):
         query = self._query_format("""
             SELECT {select}
