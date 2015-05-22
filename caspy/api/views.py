@@ -57,13 +57,12 @@ class AccountList(views.APIView):
 class AccountDetail(views.APIView):
     serializer_class = serializers.AnnotatedAccountSerializer
 
-    def get_queryset(self):
-        book_id = self.kwargs['book_id']
-        return models.Account.objects.filter(book=book_id)
+    def get_account(self, request, book_id, pk):
+        qargs = {'pk': pk, 'book': book_id}
+        return models.Account.objects.get(**qargs)
 
     def put(self, request, book_id, pk, format=None):
-        qargs = {'pk': pk, 'book': book_id}
-        account = models.Account.objects.get(**qargs)
+        account = self.get_account(request, book_id, pk)
         data = request.data.copy()
         data['book'] = book_id
         serializer = self.serializer_class(account, data=data)
@@ -72,3 +71,8 @@ class AccountDetail(views.APIView):
             return response.Response(data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors,
                                  status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, book_id, pk, format=None):
+        account = self.get_account(request, book_id, pk)
+        account.delete()
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
