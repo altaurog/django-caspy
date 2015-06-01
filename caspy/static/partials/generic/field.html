@@ -6,6 +6,12 @@
         ng-model="listcontroller.edititem[field.name]"
         ng-options="v[0] as v[1] for v in field.choices">
     </select>
+    <span ng-switch-when="autocomplete">
+      <span mass-autocomplete>
+        <input ng-model="listcontroller.edititem[field.name]"
+               mass-autocomplete-item="field.autocomplete">
+      </span>
+    </span>
     <input type="text"
         ng-switch-default
         ng-model="listcontroller.edititem[field.name]"></input>
