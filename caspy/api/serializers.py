@@ -31,7 +31,7 @@ class AnnotatedAccountSerializer(AccountSerializer):
     def validate(self, data):
         book_id = data['book']
         parent_id = data.pop('parent_id')
-        if parent_id == None:
+        if parent_id is None:
             return data
         try:
             qargs = {'account_id': parent_id, 'book': book_id}
@@ -49,7 +49,8 @@ class AnnotatedAccountSerializer(AccountSerializer):
 
     def update(self, instance, validated_data):
         new_parent = validated_data.pop('parent', None)
-        super(AnnotatedAccountSerializer, self).update(instance, validated_data)
+        super(AnnotatedAccountSerializer, self).update(instance,
+                                                       validated_data)
         tree = models.Account.tree
         old_parent_id = tree.parent_id(instance)
         if new_parent is None:
@@ -61,4 +62,3 @@ class AnnotatedAccountSerializer(AccountSerializer):
                     tree.detach(instance)
                 tree.attach(instance, new_parent)
         return instance
-

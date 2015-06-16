@@ -4,7 +4,7 @@ from .models import Thing
 
 
 def letterstr(size, extra=''):
-    return lambda n: size * chr(65 + n) + extra
+    return lambda n: size * chr(65 + n % 25) + extra
 
 
 class CurrencyFactory(factory.DjangoModelFactory):
