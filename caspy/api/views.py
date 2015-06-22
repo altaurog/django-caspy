@@ -37,24 +37,31 @@ class CurrencyDetail(views.APIView):
 
 
 class BookList(views.APIView):
+    def _serialize(self, o, many=False):
+        return serializers.BookSerializer(o, many=many).data
+
     def get(self, request, format=None):
         objects = query.book.all()
-        ser = serializers.BookSerializer(objects, many=True)
-        return response.Response(ser.data)
+        data = self._serialize(objects, many=True)
+        return response.Response(data)
 
     def post(self, request, format=None):
         ser = serializers.BookSerializer(data=request.data)
         ser.is_valid()
         obj = ser.save()
         query.book.save(obj)
-        return response.Response(obj.dict(), status=status.HTTP_201_CREATED)
+        data = self._serialize(obj)
+        return response.Response(data, status=status.HTTP_201_CREATED)
 
 
 class BookDetail(views.APIView):
+    def _serialize(self, o, many=False):
+        return serializers.BookSerializer(o, many=many).data
+
     def get(self, request, pk, format=None):
         obj = query.book.get(pk)
-        ser = serializers.BookSerializer(obj)
-        return response.Response(ser.data)
+        data = self._serialize(obj)
+        return response.Response(data)
 
     def put(self, request, pk, format=None):
         obj = query.book.get(pk)
@@ -62,7 +69,8 @@ class BookDetail(views.APIView):
         ser.is_valid()
         updated = ser.save()
         query.book.save(updated)
-        return response.Response(updated.dict())
+        data = self._serialize(updated)
+        return response.Response(data)
 
     def delete(self, request, pk, format=None):
         query.book.delete(pk)
