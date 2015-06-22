@@ -4,7 +4,7 @@ from caspy import query, models
 from caspy.domain import models as dm
 from testapp import factories
 
-pytestmark = pytest.mark.django_db(transaction=True)
+pytestmark = pytest.mark.django_db()
 
 
 class BaseTestQuery:

@@ -6,7 +6,7 @@ from caspy import models
 import testapp.models
 from testapp import factories
 
-pytestmark = pytest.mark.django_db(transaction=True)
+pytestmark = pytest.mark.django_db()
 
 
 class TestCurrency:
