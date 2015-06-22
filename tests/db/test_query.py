@@ -114,7 +114,7 @@ class TestBookQuery(BaseTestQuery):
 
 class TestAccountTypeQuery(BaseTestQuery):
     count = 4
-    query_obj = query.accountttype
+    query_obj = query.accounttype
     domain_model = dm.AccountType
     factory_class = factories.AccountTypeFactory
     orm_filter = models.AccountType.objects.filter

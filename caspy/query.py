@@ -25,4 +25,4 @@ class BaseQuery:
 
 currency = BaseQuery(models.Currency)
 book = BaseQuery(models.Book)
-accountttype = BaseQuery(models.AccountType)
+accounttype = BaseQuery(models.AccountType)
