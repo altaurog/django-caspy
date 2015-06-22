@@ -23,6 +23,7 @@ syntax:regexp
 ^.tox/
 ^dist/
 ^build/
+^htmlcov/
 ^node_modules/
 ^caspy/static/bower_components/
 ^\w+.egg-info/
