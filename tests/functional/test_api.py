@@ -1,3 +1,7 @@
+try:
+    from itertools import izip_longest as zip_longest  # 2
+except ImportError:
+    from itertools import zip_longest  # 3
 from operator import itemgetter, attrgetter
 import pytest
 from django.core.urlresolvers import reverse
@@ -12,7 +16,6 @@ class _TestEndpointMixin():
     _api_root_data = None
 
     def test_list_get(self):
-        self.test = 'test_list_get'
         response = self.client.get(self._list_endpoint())
         assert response.status_code == 200
         pairs = list(self._pair(response.data, self.db_objs))
@@ -20,7 +23,6 @@ class _TestEndpointMixin():
             self.check_match(pd, db_o)
 
     def test_list_post(self):
-        self.test = 'test_list_post'
         data = self.new_pd()
         qset = self._qset(**data)
         assert not qset.exists()
@@ -30,7 +32,6 @@ class _TestEndpointMixin():
         assert qset.exists()
 
     def test_item_get(self):
-        self.test = 'test_item_get'
         for db_o in self.db_objs:
             url = self._item_endpoint(db_o.pk)
             response = self.client.get(url)
@@ -38,7 +39,6 @@ class _TestEndpointMixin():
             self.check_match(response.data, db_o)
 
     def test_item_put(self):
-        self.test = 'test_item_put'
         for i, db_o in enumerate(self.db_objs):
             url = self._item_endpoint(db_o.pk)
             data = self.modified(i, db_o.pk)
@@ -50,7 +50,6 @@ class _TestEndpointMixin():
             assert qset.exists()
 
     def test_item_delete(self):
-        self.test = 'test_item_delete'
         for db_o in self.db_objs:
             url = self._item_endpoint(db_o.pk)
             qset = self._qset(pk=db_o.pk)
@@ -79,7 +78,7 @@ class _TestEndpointMixin():
         "sort and pair db objects with python dicts"
         spdl = sorted(pdl, key=itemgetter(self.pk))
         sdbl = sorted(dbl, key=attrgetter(self.pk))
-        return zip(spdl, sdbl)
+        return zip_longest(spdl, sdbl)
 
     def _qset(self, **qargs):
         return self.orm_filter(**qargs)

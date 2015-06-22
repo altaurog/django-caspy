@@ -1,23 +1,37 @@
 from rest_framework import serializers
 from caspy import models
+from caspy.domain import models as dm
 
 
-class CurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Currency
+class DomainModelSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        return self._domain_model(**validated_data)
+
+    def update(self, instance, validated_data):
+        return instance.copy(**validated_data)
 
 
-class BookSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
+class CurrencySerializer(DomainModelSerializer):
+    _domain_model = dm.Currency
+    cur_code = serializers.CharField(max_length=8)
+    shortcut = serializers.CharField(max_length=1)
+    symbol = serializers.CharField(max_length=24)
+    long_name = serializers.CharField(max_length=128)
 
-    class Meta:
-        model = models.Book
+
+class BookSerializer(DomainModelSerializer):
+    _domain_model = dm.Book
+    book_id = serializers.IntegerField(required=False)
+    name = serializers.CharField(max_length=64)
+    created_at = serializers.DateTimeField(required=False)
 
 
-class AccountTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AccountType
-
+class AccountTypeSerializer(DomainModelSerializer):
+    _domain_model = dm.AccountType
+    account_type = serializers.CharField(max_length=128)
+    sign = serializers.BooleanField()
+    credit_term = serializers.CharField(max_length=32)
+    debit_term = serializers.CharField(max_length=32)
 
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:

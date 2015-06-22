@@ -6,7 +6,7 @@ from . import closure
 
 class Currency(models.Model):
     cur_code = models.CharField(max_length=8, primary_key=True)
-    shortcut = models.CharField(max_length=1)
+    shortcut = models.CharField(max_length=1, null=True)
     symbol = models.CharField(max_length=24)
     long_name = models.CharField(max_length=128)
 
