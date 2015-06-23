@@ -1,5 +1,6 @@
 from caspy.domain import command, models
 
+
 class TestBook:
     def test_prepare_new_book(self):
         empty_book = models.Book()

@@ -33,6 +33,7 @@ class AccountTypeSerializer(DomainModelSerializer):
     credit_term = serializers.CharField(max_length=32)
     debit_term = serializers.CharField(max_length=32)
 
+
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Account
