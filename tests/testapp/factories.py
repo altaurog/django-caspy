@@ -1,10 +1,15 @@
+from datetime import datetime, timedelta
 import factory
-from caspy import models
+from caspy import models, time
 from .models import Thing
 
 
 def letterstr(size, extra=''):
     return lambda n: size * chr(65 + n % 25) + extra
+
+
+def datetimeseq(n):
+    return time.utc.localize(datetime(2015, 1, 1) + timedelta(minutes=10) * n)
 
 
 class CurrencyFactory(factory.DjangoModelFactory):
@@ -19,6 +24,7 @@ class CurrencyFactory(factory.DjangoModelFactory):
 
 class BookFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'Test Book %d' % n)
+    created_at = factory.Sequence(datetimeseq)
 
     class Meta:
         model = models.Book

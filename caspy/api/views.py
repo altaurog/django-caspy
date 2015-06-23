@@ -1,5 +1,6 @@
 from rest_framework import response, status, views
-from .. import models, query
+from ..domain import command
+from .. import models, query, time
 from . import serializers
 
 
@@ -48,7 +49,7 @@ class BookList(views.APIView):
     def post(self, request, format=None):
         ser = serializers.BookSerializer(data=request.data)
         ser.is_valid()
-        obj = ser.save()
+        obj = command.prepare_book(ser.save(), time.utcnow())
         query.book.save(obj)
         data = self._serialize(obj)
         return response.Response(data, status=status.HTTP_201_CREATED)
