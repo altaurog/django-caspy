@@ -14,16 +14,16 @@ class DomainModelSerializer(serializers.Serializer):
 class CurrencySerializer(DomainModelSerializer):
     _domain_model = dm.Currency
     cur_code = serializers.CharField(max_length=8)
-    shortcut = serializers.CharField(max_length=1)
-    symbol = serializers.CharField(max_length=24)
-    long_name = serializers.CharField(max_length=128)
+    shortcut = serializers.CharField(max_length=1, required=False)
+    symbol = serializers.CharField(max_length=24, required=False)
+    long_name = serializers.CharField(max_length=128, required=False)
 
 
 class BookSerializer(DomainModelSerializer):
     _domain_model = dm.Book
-    book_id = serializers.IntegerField(required=False)
+    book_id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=64)
-    created_at = serializers.DateTimeField(required=False)
+    created_at = serializers.DateTimeField(read_only=True)
 
 
 class AccountTypeSerializer(DomainModelSerializer):
@@ -32,6 +32,15 @@ class AccountTypeSerializer(DomainModelSerializer):
     sign = serializers.BooleanField()
     credit_term = serializers.CharField(max_length=32)
     debit_term = serializers.CharField(max_length=32)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Hack to make required BooleanField work
+        (MergeDict seems to cause the problem)
+        """
+        if 'data' in kwargs:
+            kwargs['data'] = dict(kwargs['data'].items())
+        super(AccountTypeSerializer, self).__init__(*args, **kwargs)
 
 
 class AccountSerializer(serializers.ModelSerializer):

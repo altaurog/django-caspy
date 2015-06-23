@@ -20,7 +20,9 @@ class ListView(BaseAPIView):
 
     def post(self, request, format=None):
         ser = self.serializer_class(data=request.data)
-        ser.is_valid()
+        if not ser.is_valid():
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
         obj = self.create(ser)
         self.query_obj.save(obj)
         data = self.serialize(obj)

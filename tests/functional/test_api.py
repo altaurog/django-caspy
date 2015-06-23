@@ -2,14 +2,20 @@ try:
     from itertools import izip_longest as zip_longest  # 2
 except ImportError:
     from itertools import zip_longest  # 3
+from datetime import datetime
 from operator import itemgetter, attrgetter
 import pytest
 from django.core.urlresolvers import reverse
 from rest_framework.test import APIClient
-from caspy import models
+from rest_framework.fields import DateTimeField
+from caspy import models, time
 from testapp import factories
 
 pytestmark = pytest.mark.django_db(transaction=True)
+
+
+def format_datetime(dt):
+    return DateTimeField().to_representation(dt)
 
 
 class _TestEndpointMixin():
@@ -123,6 +129,21 @@ class TestCurrencyEndpoint(_TestEndpointMixin):
                 'long_name': 'Modified Currency %d' % i,
             }
 
+    @pytest.mark.parametrize('field', ('cur_code',))
+    def test_missing_required_fields(self, field):
+        data = self.new_pd()
+        del data[field]
+        response = self.client.post(self._list_endpoint(), data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field is required.' in response.data[field]
+
+    @pytest.mark.parametrize('field', ('shortcut', 'symbol', 'long_name',))
+    def test_missing_optional_fields(self, field):
+        data = self.new_pd()
+        del data[field]
+        response = self.client.post(self._list_endpoint(), data)
+        assert response.status_code == 201
 
 class TestBookEndpoint(_TestEndpointMixin):
     count = 3
@@ -147,9 +168,27 @@ class TestBookEndpoint(_TestEndpointMixin):
 
     def modified(self, i, pk):
         return {
-                'book_id': pk,
                 'name': 'Functional Test Book %d' % i,
             }
+
+    @pytest.mark.parametrize('field', ('name',))
+    def test_missing_required_fields(self, field):
+        data = self.new_pd()
+        del data[field]
+        response = self.client.post(self._list_endpoint(), data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field is required.' in response.data[field]
+
+    def test_post_read_only_fields(self):
+        data = self.new_pd()
+        data['book_id'] = 10
+        data['created_at'] = time.utc.localize(datetime(2015, 6, 20, 8, 20))
+        response = self.client.post(self._list_endpoint(), data)
+        assert response.status_code == 201
+        assert response.data['book_id'] != data['book_id']
+        created_at = format_datetime(data['created_at'])
+        assert response.data['created_at'] != created_at
 
 
 class TestAccountTypeEndpoint(_TestEndpointMixin):
@@ -184,3 +223,14 @@ class TestAccountTypeEndpoint(_TestEndpointMixin):
                 'credit_term': 'decrease',
                 'debit_term': 'increase',
             }
+
+    required_fields = ('account_type', 'sign', 'credit_term', 'debit_term')
+
+    @pytest.mark.parametrize('field', required_fields)
+    def test_missing_required_fields(self, field):
+        data = self.new_pd()
+        del data[field]
+        response = self.client.post(self._list_endpoint(), data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field is required.' in response.data[field]

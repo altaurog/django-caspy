@@ -6,8 +6,8 @@ from . import closure
 class Currency(models.Model):
     cur_code = models.CharField(max_length=8, primary_key=True)
     shortcut = models.CharField(max_length=1, null=True)
-    symbol = models.CharField(max_length=24)
-    long_name = models.CharField(max_length=128)
+    symbol = models.CharField(max_length=24, null=True)
+    long_name = models.CharField(max_length=128, null=True)
 
     class Meta:
         unique_together = [['shortcut'], ['long_name']]
