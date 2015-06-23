@@ -4,111 +4,80 @@ from .. import models, query, time
 from . import serializers
 
 
-class CurrencyList(views.APIView):
-    def get(self, request, format=None):
-        objects = query.currency.all()
-        ser = serializers.CurrencySerializer(objects, many=True)
-        return response.Response(ser.data)
-
-    def post(self, request, format=None):
-        ser = serializers.CurrencySerializer(data=request.data)
-        ser.is_valid()
-        obj = ser.save()
-        query.currency.save(obj)
-        return response.Response(obj.dict(), status=status.HTTP_201_CREATED)
+class BaseAPIView(views.APIView):
+    def serialize(self, o, many=False):
+        return self.serializer(o, many=many).data
 
 
-class CurrencyDetail(views.APIView):
-    def get(self, request, pk, format=None):
-        obj = query.currency.get(pk)
-        ser = serializers.CurrencySerializer(obj)
-        return response.Response(ser.data)
-
-    def put(self, request, pk, format=None):
-        obj = query.currency.get(pk)
-        ser = serializers.CurrencySerializer(obj, data=request.data)
-        ser.is_valid()
-        updated = ser.save()
-        query.currency.save(updated)
-        return response.Response(updated.dict())
-
-    def delete(self, request, pk, format=None):
-        query.currency.delete(pk)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class BookList(views.APIView):
-    def _serialize(self, o, many=False):
-        return serializers.BookSerializer(o, many=many).data
+class ListView(BaseAPIView):
+    def create(self, ser):
+        return ser.save()
 
     def get(self, request, format=None):
-        objects = query.book.all()
-        data = self._serialize(objects, many=True)
+        objects = self.query.all()
+        data = self.serialize(objects, many=True)
         return response.Response(data)
 
     def post(self, request, format=None):
-        ser = serializers.BookSerializer(data=request.data)
+        ser = self.serializer(data=request.data)
         ser.is_valid()
-        obj = command.prepare_book(ser.save(), time.utcnow())
-        query.book.save(obj)
-        data = self._serialize(obj)
+        obj = self.create(ser)
+        self.query.save(obj)
+        data = self.serialize(obj)
         return response.Response(data, status=status.HTTP_201_CREATED)
 
 
-class BookDetail(views.APIView):
-    def _serialize(self, o, many=False):
-        return serializers.BookSerializer(o, many=many).data
-
+class DetailView(BaseAPIView):
     def get(self, request, pk, format=None):
-        obj = query.book.get(pk)
-        data = self._serialize(obj)
+        obj = self.query.get(pk)
+        data = self.serialize(obj)
         return response.Response(data)
 
     def put(self, request, pk, format=None):
-        obj = query.book.get(pk)
-        ser = serializers.BookSerializer(obj, data=request.data)
+        obj = self.query.get(pk)
+        ser = self.serializer(obj, data=request.data)
         ser.is_valid()
         updated = ser.save()
-        query.book.save(updated)
-        data = self._serialize(updated)
+        self.query.save(updated)
+        data = self.serialize(updated)
         return response.Response(data)
 
     def delete(self, request, pk, format=None):
-        query.book.delete(pk)
+        self.query.delete(pk)
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class AccountTypeList(views.APIView):
-    def get(self, request, format=None):
-        objects = query.accounttype.all()
-        ser = serializers.AccountTypeSerializer(objects, many=True)
-        return response.Response(ser.data)
-
-    def post(self, request, format=None):
-        ser = serializers.AccountTypeSerializer(data=request.data)
-        ser.is_valid()
-        obj = ser.save()
-        query.accounttype.save(obj)
-        return response.Response(obj.dict(), status=status.HTTP_201_CREATED)
+class CurrencyList(ListView):
+    query = query.currency
+    serializer = serializers.CurrencySerializer
 
 
-class AccountTypeDetail(views.APIView):
-    def get(self, request, pk, format=None):
-        obj = query.accounttype.get(pk)
-        ser = serializers.AccountTypeSerializer(obj)
-        return response.Response(ser.data)
+class CurrencyDetail(DetailView):
+    query = query.currency
+    serializer = serializers.CurrencySerializer
 
-    def put(self, request, pk, format=None):
-        obj = query.accounttype.get(pk)
-        ser = serializers.AccountTypeSerializer(obj, data=request.data)
-        ser.is_valid()
-        updated = ser.save()
-        query.accounttype.save(updated)
-        return response.Response(updated.dict())
 
-    def delete(self, request, pk, format=None):
-        query.accounttype.delete(pk)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+class BookList(ListView):
+    query = query.book
+    serializer = serializers.BookSerializer
+
+    def create(self, ser):
+        return command.prepare_book(ser.save(), time.utcnow())
+
+
+class BookDetail(DetailView):
+    query = query.book
+    serializer = serializers.BookSerializer
+
+
+class AccountTypeList(ListView):
+    query = query.accounttype
+    serializer = serializers.AccountTypeSerializer
+
+
+class AccountTypeDetail(DetailView):
+    query = query.accounttype
+    serializer = serializers.AccountTypeSerializer
 
 
 class AccountList(views.APIView):
