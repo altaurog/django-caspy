@@ -145,6 +145,7 @@ class TestCurrencyEndpoint(_TestEndpointMixin):
         response = self.client.post(self._list_endpoint(), data)
         assert response.status_code == 201
 
+
 class TestBookEndpoint(_TestEndpointMixin):
     count = 3
     name = 'book'
@@ -162,14 +163,10 @@ class TestBookEndpoint(_TestEndpointMixin):
         assert pd['name'] == db_o.name
 
     def new_pd(self):
-        return {
-                'name': 'Functional Test Book',
-            }
+        return {'name': 'Functional Test Book'}
 
     def modified(self, i, pk):
-        return {
-                'name': 'Functional Test Book %d' % i,
-            }
+        return {'name': 'Functional Test Book %d' % i}
 
     @pytest.mark.parametrize('field', ('name',))
     def test_missing_required_fields(self, field):

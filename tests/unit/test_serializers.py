@@ -9,6 +9,7 @@ from caspy.domain import models as dm
 
 class TestCurrencySerializer:
     serializer_class = serializers.CurrencySerializer
+
     def test_dm_to_pd(self):
         obj = dm.Currency(
                 cur_code='USD',
@@ -94,6 +95,7 @@ class TestBookSerializer:
 
 class TestAccountTypeSerializer:
     serializer_class = serializers.AccountTypeSerializer
+
     def test_dm_to_pd(self):
         obj = dm.AccountType(
                 account_type='Asset',
