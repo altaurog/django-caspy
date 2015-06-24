@@ -11,16 +11,24 @@ class BaseQuery:
         return map(self.to_domain, self.qset.all())
 
     def by_pk(self, pk):
-        return self.qset.filter(pk=pk)
+        try:
+            return self.qset.get(pk=pk)
+        except self.qset.model.DoesNotExist:
+            return None
 
     def get(self, pk):
-        return self.to_domain(self.by_pk(pk).get())
+        obj = self.by_pk(pk)
+        if obj is not None:
+            return self.to_domain(obj)
 
     def save(self, obj):
         self.to_orm(obj).save()
 
     def delete(self, pk):
-        self.by_pk(pk).delete()
+        obj = self.by_pk(pk)
+        if obj is not None:
+            obj.delete()
+            return True
 
 
 currency = BaseQuery(models.Currency)

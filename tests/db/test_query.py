@@ -41,8 +41,14 @@ class BaseTestQuery:
         for db_o in self.db_objs:
             qset = self.pk_qset(db_o.pk)
             assert qset.exists()
-            self.query_obj.delete(db_o.pk)
+            assert self.query_obj.delete(db_o.pk)
             assert not qset.exists()
+
+    def test_get_not_exists(self):
+        assert self.query_obj.get('100') is None
+
+    def test_delete_not_exists(self):
+        assert not self.query_obj.delete('100')
 
     def pk_qset(self, pk):
         return self.orm_filter(pk=pk)
