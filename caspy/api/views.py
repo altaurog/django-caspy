@@ -43,7 +43,9 @@ class DetailView(BaseAPIView):
         if obj is None:
             raise Http404('Not found')
         ser = self.serializer_class(obj, data=request.data)
-        ser.is_valid()
+        if not ser.is_valid():
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
         updated = ser.save()
         self.query_obj.save(updated)
         data = self.serialize(updated)
