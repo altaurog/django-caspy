@@ -36,7 +36,8 @@ class AccountTypeSerializer(DomainModelSerializer):
     def __init__(self, *args, **kwargs):
         """
         Hack to make required BooleanField work
-        (MergeDict seems to cause the problem)
+        (When passing a MergeDict to the serializer, it behaves
+        as if the field is present even when it's not.)
         """
         if 'data' in kwargs:
             kwargs['data'] = dict(kwargs['data'].items())
