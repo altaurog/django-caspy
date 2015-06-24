@@ -20,6 +20,7 @@ def format_datetime(dt):
 
 class _TestEndpointMixin():
     _api_root_data = None
+    not_exists_pk = '100'
 
     def test_list_get(self):
         response = self.client.get(self._list_endpoint())
@@ -44,6 +45,12 @@ class _TestEndpointMixin():
             assert response.status_code == 200
             self.check_match(response.data, db_o)
 
+    def test_not_exists_get(self):
+        assert not self._qset(pk=self.not_exists_pk).exists()
+        url = self._item_endpoint(self.not_exists_pk)
+        response = self.client.get(url)
+        assert response.status_code == 404
+
     def test_item_put(self):
         for i, db_o in enumerate(self.db_objs):
             url = self._item_endpoint(db_o.pk)
@@ -55,6 +62,13 @@ class _TestEndpointMixin():
             assert slicedict(response.data, data.keys()) == data
             assert qset.exists()
 
+    def test_not_exists_put(self):
+        assert not self._qset(pk=self.not_exists_pk).exists()
+        data = self.modified(5, self.not_exists_pk)
+        url = self._item_endpoint(self.not_exists_pk)
+        response = self.client.put(url, data)
+        assert response.status_code == 404
+
     def test_item_delete(self):
         for db_o in self.db_objs:
             url = self._item_endpoint(db_o.pk)
@@ -63,6 +77,12 @@ class _TestEndpointMixin():
             response = self.client.delete(url)
             assert response.status_code == 204
             assert not qset.exists()
+
+    def test_not_exists_delete(self):
+        assert not self._qset(pk=self.not_exists_pk).exists()
+        url = self._item_endpoint(self.not_exists_pk)
+        response = self.client.delete(url)
+        assert response.status_code == 404
 
     def _api_root(self):
         if _TestEndpointMixin._api_root_data is None:
@@ -98,6 +118,7 @@ class TestCurrencyEndpoint(_TestEndpointMixin):
     count = 3
     name = 'currency'
     pk = 'cur_code'
+    not_exists_pk = 'SKR'
     factory_class = factories.CurrencyFactory
     orm_filter = models.Currency.objects.filter
 

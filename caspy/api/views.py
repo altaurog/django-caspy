@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import response, status, views
 from ..domain import command
 from .. import models, query, time
@@ -32,11 +33,15 @@ class ListView(BaseAPIView):
 class DetailView(BaseAPIView):
     def get(self, request, pk, format=None):
         obj = self.query_obj.get(pk)
+        if obj is None:
+            raise Http404('Not found')
         data = self.serialize(obj)
         return response.Response(data)
 
     def put(self, request, pk, format=None):
         obj = self.query_obj.get(pk)
+        if obj is None:
+            raise Http404('Not found')
         ser = self.serializer_class(obj, data=request.data)
         ser.is_valid()
         updated = ser.save()
@@ -45,7 +50,8 @@ class DetailView(BaseAPIView):
         return response.Response(data)
 
     def delete(self, request, pk, format=None):
-        self.query_obj.delete(pk)
+        if not self.query_obj.delete(pk):
+            raise Http404('Not found')
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
