@@ -140,11 +140,11 @@ class TestClosureTable:
             }
         assert self.treemgr._query_format_kwargs() == expected
 
-    def test_path_annotated(self):
+    def test_parent_annotated(self):
         a, b, c = factories.ThingFactory.create_batch(3)
         self.treemgr.attach(c, b)
         self.treemgr.attach(b, a)
-        paths = list(self.treemgr.path_annotated())
+        paths = list(self.treemgr.parent_annotated())
         paths.sort(key=lambda o: o.name)
         assert [o.depth for o in paths] == [0, 1, 2]
         assert [o.parent_id for o in paths] == [None, a.id, b.id]
