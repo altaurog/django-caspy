@@ -74,8 +74,10 @@ class TreeManager(models.Manager):
         cursor.close()
         return result
 
-    def one_path(self, pk):
-        return self.filter(lower_set__lower=pk).order_by('-lower_set__length')
+    def one_path(self, pk, **kwargs):
+        return self.filter(
+                    lower_set__lower=pk, **kwargs
+                  ).order_by('-lower_set__length')
 
     def paths(self, *args, **kwargs):
         return make_paths(self.parent_annotated(*args, **kwargs))
