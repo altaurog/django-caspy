@@ -162,6 +162,13 @@ class TestClosureTable:
         paths = self.treemgr.paths()
         assert paths == [[a], [a, b], [a, b, c]]
 
+    def test_get_one_path(self):
+        a, b, c = factories.ThingFactory.create_batch(3)
+        self.treemgr.attach(c, b)
+        self.treemgr.attach(b, a)
+        paths = self.treemgr.one_path(c.pk)
+        assert list(paths) == [a, b, c]
+
     def test_get_paths_with_where(self):
         a, b, c = factories.ThingFactory.create_batch(3)
         e, f, g = factories.ThingFactory.create_batch(3, tgroup=2)
