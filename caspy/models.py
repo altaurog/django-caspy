@@ -61,6 +61,10 @@ class AccountTreeManager(closure.TreeManager):
     def load_book(self, book_id):
         return self.load('WHERE book_id = %s', [book_id])
 
+    def load_one(self, book_id, account_id):
+        path = self.one_path(account_id, book=book_id)
+        return self.annotate(list(path))
+
 
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)

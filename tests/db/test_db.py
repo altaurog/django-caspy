@@ -73,19 +73,34 @@ class TestAccount:
         with pytest.raises(IntegrityError):
             factories.AccountFactory(name=name, book=book)
 
-    def test_load(self):
+
+class TestAccountPath:
+    def setup(self):
+        self.book = factories.BookFactory()
         kwargs = {
-            'book': factories.BookFactory(),
+            'book': self.book,
             'currency': factories.CurrencyFactory(cur_code='USD'),
             'account_type': factories.AccountTypeFactory(
                                             account_type='Income'),
         }
-        income = factories.AccountFactory(name='Income', **kwargs)
-        salary = factories.AccountFactory(name='Salary', **kwargs)
-        models.Account.tree.attach(salary, income)
+        self.income = factories.AccountFactory(name='Income', **kwargs)
+        self.salary = factories.AccountFactory(name='Salary', **kwargs)
+        self.tips = factories.AccountFactory(name='Tips', **kwargs)
+        models.Account.tree.attach(self.salary, self.income)
+        models.Account.tree.attach(self.tips, self.income)
+
+    def test_load(self):
         accounts = sorted(models.Account.tree.load(), key=lambda a: a.name)
-        assert [a.path for a in accounts] == ['Income', 'Income::Salary']
-        assert [a.parent_id for a in accounts] == [None, income.account_id]
+        expected_paths = ['Income', 'Income::Salary', 'Income::Tips']
+        assert [a.path for a in accounts] == expected_paths
+        parent_id = self.income.account_id
+        expected_parents = [None, parent_id, parent_id]
+        assert [a.parent_id for a in accounts] == expected_parents
+
+    def test_load_one(self):
+        account = models.Account.tree.load_one(self.book.pk, self.tips.pk)
+        assert account.path == 'Income::Tips'
+        assert account.parent_id == self.income.pk
 
 
 class TestClosureTable:
