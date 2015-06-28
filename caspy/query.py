@@ -1,11 +1,11 @@
-from . import models, orm
+from . import models, django_orm
 
 
 class BaseQuery:
     def __init__(self, model):
         self.qset = model.objects
-        self.to_domain = orm.orm_to_domain
-        self.to_orm = orm.domain_to_orm
+        self.to_domain = django_orm.orm_to_domain
+        self.to_orm = django_orm.domain_to_orm
 
     def all(self):
         return map(self.to_domain, self.qset.all())

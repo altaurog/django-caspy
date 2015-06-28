@@ -18,5 +18,5 @@ class AccountType(Base):
 
 
 class Account(Base):
-    _fields = ('account_id', 'name', 'book', 'account_type',
-               'currency', 'description')
+    _fields = ('account_id', 'parent_id', 'name', 'path', 'book',
+               'account_type', 'currency', 'description')

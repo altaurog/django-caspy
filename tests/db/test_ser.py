@@ -1,7 +1,7 @@
 from datetime import datetime
 from caspy.domain import models as domain
 from caspy import models as db
-from caspy import orm
+from caspy import django_orm as orm
 
 
 class TestCurrency:
@@ -102,6 +102,8 @@ class TestAccount:
     def test_deep_domain_to_orm(self):
         obj = domain.Account(
                     account_id=10,
+                    parent_id=2,
+                    path='Expense::Education',
                     name='Education',
                     book=self.book,
                     account_type=self.account_type,
@@ -110,13 +112,13 @@ class TestAccount:
                 )
         instance = orm.domain_to_orm(obj)
         assert isinstance(instance, db.Account)
-        assert isinstance(instance.book, db.Book)
-        assert instance.book.book_id == 3
-        assert instance.book.name == 'Test Book'
-        assert isinstance(instance.currency, db.Currency)
-        assert isinstance(instance.account_type, db.AccountType)
+        assert instance.book_id == 3
+        assert instance.parent_id == 2
+        assert instance.currency_id == 'USD'
+        assert instance.account_type_id == 'Expense'
         assert instance.account_id == 10
         assert instance.name == 'Education'
+        assert instance.path == 'Expense::Education'
         assert instance.description == 'Education Expense'
 
     def test_shallow_domain_to_orm(self):
@@ -144,7 +146,7 @@ class TestAccount:
                     book_id=3,
                     account_type_id='Expense',
                     currency_id='USD',
-                    description='Education Expense',
+                    description='Utilities Expense',
                 )
         obj = orm.orm_to_domain(instance)
         assert isinstance(obj, domain.Account)
@@ -153,7 +155,7 @@ class TestAccount:
         assert obj.book == 3
         assert obj.account_type == 'Expense'
         assert obj.currency == 'USD'
-        assert obj.description == 'Education Expense'
+        assert obj.description == 'Utilities Expense'
 
     def test_deep_orm_to_domain(self):
         book = db.Book(book_id=3, name='Test Book')
@@ -165,8 +167,10 @@ class TestAccount:
                     book=book,
                     account_type=account_type,
                     currency=currency,
-                    description='Education Expense',
+                    description='Utilities Expense',
                 )
+        instance.parent_id = 2
+        instance.path = 'Expense::Utilities'
         obj = orm.orm_to_domain(instance)
         assert isinstance(obj, domain.Account)
         assert obj.account_id == 11
@@ -174,4 +178,6 @@ class TestAccount:
         assert obj.book == 3
         assert obj.account_type == 'Expense'
         assert obj.currency == 'NIS'
-        assert obj.description == 'Education Expense'
+        assert obj.description == 'Utilities Expense'
+        assert obj.parent_id == 2
+        assert obj.path == 'Expense::Utilities'
