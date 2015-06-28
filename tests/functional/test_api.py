@@ -188,6 +188,7 @@ class TestCurrencyEndpoint(_TestEndpointMixin):
             assert slicedict(response.data, data.keys()) == data
             assert self._qset(**data).exists()
 
+
 class TestBookEndpoint(_TestEndpointMixin):
     count = 3
     name = 'book'
