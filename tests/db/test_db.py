@@ -141,7 +141,7 @@ class TestClosureTable:
         assert self.treemgr._columns() == ['id', 'name', 'tgroup']
 
     def test_pk(self):
-        assert self.treemgr._pk() == 'id'
+        assert self.treemgr._pk_column() == 'id'
 
     def test_kwargs(self):
         expected = {

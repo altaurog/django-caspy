@@ -49,7 +49,7 @@ class TreeManager(models.Manager):
             WHERE upper.lower_id = %s AND lower.upper_id = %s
             """)
         cursor = connection.cursor()
-        cursor.execute(query, [upper.pk, lower.pk])
+        cursor.execute(query, [pk(upper), pk(lower)])
         result = cursor.rowcount
         cursor.close()
         return result
@@ -69,7 +69,7 @@ class TreeManager(models.Manager):
             )
             """)
         cursor = connection.cursor()
-        cursor.execute(query, [lower.pk, lower.pk])
+        cursor.execute(query, [pk(lower), pk(lower)])
         result = cursor.rowcount
         cursor.close()
         return result
@@ -90,7 +90,7 @@ class TreeManager(models.Manager):
             AND length = 1
             """)
         cursor = connection.cursor()
-        cursor.execute(query, [lower.pk])
+        cursor.execute(query, [pk(lower)])
         data = cursor.fetchone()
         cursor.close()
         if data is not None:
@@ -123,7 +123,7 @@ class TreeManager(models.Manager):
         return {
             'table': table,
             'columns': columns,
-            'pk': self._pk(),
+            'pk': self._pk_column(),
             'path_table': self._path_table(),
             'select': ', '.join('%s.%s' % (table, c) for c in columns),
         }
@@ -137,13 +137,19 @@ class TreeManager(models.Manager):
     def _columns(self):
         return list(map(db_column, self._fields()))
 
-    def _pk(self):
+    def _pk_column(self):
         for f in self._fields():
             if f.primary_key:
                 return db_column(f)
 
     def _fields(self):
         return self.model._meta.local_fields
+
+
+def pk(obj):
+    if isinstance(obj, models.Model):
+        return obj.pk
+    return obj
 
 
 def db_column(field):
