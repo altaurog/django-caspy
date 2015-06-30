@@ -73,6 +73,23 @@ class TestAccount:
         with pytest.raises(IntegrityError):
             factories.AccountFactory(name=name, book=book)
 
+    fkeys = ('book_id', 'currency_id', 'account_type_id')
+
+    @pytest.mark.parametrize('ref', fkeys)
+    def test_foreign_key_constraints(self, ref):
+        book = factories.BookFactory.create()
+        currency = factories.CurrencyFactory.create()
+        account_type = factories.AccountTypeFactory.create()
+        kwargs = {
+                'book_id': book.pk,
+                'currency_id': currency.pk,
+                'account_type_id': account_type.pk,
+                'name': 'Integrity',
+            }
+        kwargs[ref] = 1000
+        with pytest.raises(IntegrityError):
+            models.Account.objects.create(**kwargs)
+
 
 class TestAccountPath:
     def setup(self):
@@ -101,6 +118,12 @@ class TestAccountPath:
         account = models.Account.tree.load_one(self.book.pk, self.tips.pk)
         assert account.path == 'Income::Tips'
         assert account.parent_id == self.income.pk
+
+    def test_load_one_not_exists(self):
+        book_id = self.book.pk
+        account_id = self.tips.pk + 100
+        account = models.Account.tree.load_one(book_id, account_id)
+        assert account is None
 
 
 class TestClosureTable:
