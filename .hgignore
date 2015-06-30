@@ -17,6 +17,7 @@ env.ini
 *.pdf
 *.ps
 *.csv
+*.log
 nohup.out
 
 syntax:regexp
