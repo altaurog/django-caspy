@@ -73,7 +73,8 @@ class AccountTreeManager(closure.TreeManager):
 
     def load_one(self, book_id, account_id):
         path = self.one_path(account_id, book=book_id)
-        return self.annotate(list(path))
+        if path:
+            return self.annotate(list(path))
 
 
 class Account(models.Model):

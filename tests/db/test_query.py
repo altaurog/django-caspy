@@ -142,3 +142,170 @@ class TestAccountTypeQuery(BaseTestQuery):
 
     def modified_domain_object(self, i, pk):
         return self.new_domain_object().copy(account_type=pk)
+
+
+class TestAccountQuery:
+    query_obj = query.account
+
+    def setup(self):
+        self.book = factories.BookFactory()
+        account_type = factories.AccountTypeFactory(account_type='Income')
+        kwargs = {
+            'book': self.book,
+            'currency': factories.CurrencyFactory(cur_code='USD'),
+            'account_type': account_type,
+        }
+        self.income = factories.AccountFactory(name='Income', **kwargs)
+        self.salary = factories.AccountFactory(name='Salary', **kwargs)
+        models.Account.tree.attach(self.salary, self.income)
+        self.tips = factories.AccountFactory(name='Tips',
+                                             account_type=account_type)
+
+    def test_get_book(self):
+        qres = self.query_obj.all(book_id=self.book.book_id)
+        ol = sorted(qres, key=lambda a: a.name)
+        assert len(ol) == 2
+        assert all(isinstance(o, dm.Account) for o in ol)
+        assert ol[0].account_id == self.income.account_id
+        assert ol[0].name == 'Income'
+        assert ol[0].book == self.income.book_id
+        assert ol[0].account_type == self.income.account_type_id
+        assert ol[0].currency == self.income.currency_id
+        assert ol[0].description == 'Income account'
+        assert ol[0].parent_id is None
+        assert ol[0].path == 'Income'
+        assert ol[1].account_id == self.salary.account_id
+        assert ol[1].name == 'Salary'
+        assert ol[1].book == self.salary.book_id
+        assert ol[1].account_type == self.salary.account_type_id
+        assert ol[1].currency == self.salary.currency_id
+        assert ol[1].description == 'Salary account'
+        assert ol[1].parent_id == self.income.pk
+        assert ol[1].path == 'Income::Salary'
+
+    def test_get_one(self):
+        book_id = self.tips.book_id
+        account_id = self.tips.account_id
+        o = self.query_obj.get(book_id, account_id)
+        assert isinstance(o, dm.Account)
+        assert o.account_id == account_id
+        assert o.name == 'Tips'
+        assert o.book == book_id
+        assert o.account_type == self.tips.account_type_id
+        assert o.currency == self.tips.currency_id
+        assert o.description == 'Tips account'
+        assert o.parent_id is None
+        assert o.path == 'Tips'
+
+    def test_get_one_not_exists(self):
+        book_id = self.tips.book_id
+        account_id = self.tips.account_id
+        o = self.query_obj.get(book_id, account_id + 100)
+        assert o is None
+
+    def test_create_no_parent(self):
+        currency = factories.CurrencyFactory()
+        o = dm.Account(
+                    name='Other',
+                    account_type=self.salary.account_type_id,
+                    currency=currency.cur_code,
+                    description='Other description',
+                    book=self.salary.book_id,
+                )
+        qset = models.Account.objects.filter(
+                name=o.name,
+                description=o.description,
+                account_type=self.salary.account_type_id,
+                currency=currency,
+                book=self.salary.book,
+            )
+        assert not qset.exists()
+        self.query_obj.save(o)
+        assert qset.exists()
+
+    def test_create_with_parent(self):
+        currency = factories.CurrencyFactory()
+        o = dm.Account(
+                    name='Example',
+                    account_type=self.salary.account_type_id,
+                    currency=currency.cur_code,
+                    description='Example description',
+                    book=self.salary.book_id,
+                    parent_id=self.salary.account_id,
+                )
+        qset = models.Account.objects.filter(
+                name=o.name,
+                description=o.description,
+                account_type=self.salary.account_type_id,
+                currency=currency,
+                book=self.salary.book,
+            )
+        assert not qset.exists()
+        self.query_obj.save(o)
+        assert qset.exists()
+        o = self.query_obj.get(self.salary.book_id, qset.get().pk)
+        assert o.parent_id == self.salary.account_id
+        assert o.path == 'Income::Salary::Example'
+
+    @pytest.mark.parametrize('field', ('currency', 'book', 'account_type'))
+    def test_create_with_reference_not_exists(self, field):
+        currency = factories.CurrencyFactory()
+        o = dm.Account(
+                    name='Example',
+                    account_type=self.salary.account_type_id,
+                    currency=currency.cur_code,
+                    description='Example description',
+                    book=self.salary.book_id,
+                    parent_id=self.salary.account_id,
+                )
+        setattr(o, field, 1000)
+        with pytest.raises(query.IntegrityError):
+            self.query_obj.save(o)
+
+    def test_update_with_parent(self):
+        account_type = factories.AccountTypeFactory()
+        currency = factories.CurrencyFactory()
+        o = dm.Account(
+                account_id=self.tips.account_id,
+                name='Acme',
+                account_type=account_type.account_type,
+                currency=currency.cur_code,
+                description='Modified description',
+                book=self.salary.book_id,
+                parent_id=self.salary.account_id,
+            )
+        qset = models.Account.objects.filter(
+                account_id=o.account_id,
+                name=o.name,
+                description=o.description,
+                account_type=account_type,
+                currency=currency,
+                book=self.salary.book,
+            )
+        assert not qset.exists()
+        self.query_obj.save(o)
+        assert qset.exists()
+        o = self.query_obj.get(o.book, o.account_id)
+        assert o.path == 'Income::Salary::Acme'
+
+    def test_update_no_parent(self):
+        book_id = self.salary.book_id
+        account_id = self.salary.account_id
+        o = self.query_obj.get(book_id, account_id)
+        assert o.path == 'Income::Salary'
+        o.parent_id = None
+        self.query_obj.save(o)
+        o = self.query_obj.get(o.book, o.account_id)
+        assert o.path == 'Salary'
+
+    def test_delete(self):
+        for instance in (self.salary, self.income, self.tips):
+            qset = models.Account.objects.filter(pk=instance.pk)
+            assert qset.exists()
+            assert self.query_obj.delete(instance.book_id, instance.pk)
+            assert not qset.exists()
+
+    def test_delete_not_exists(self):
+        book_id = self.tips.book_id
+        account_id = self.tips.account_id
+        assert not self.query_obj.delete(book_id, account_id + 100)

@@ -1,8 +1,14 @@
+from django.db import utils
 from . import models, django_orm
 
 
-class BaseQuery:
+class IntegrityError(Exception):
+    pass
+
+
+class BaseQuery(object):
     def __init__(self, model):
+        self.model = model
         self.qset = model.objects
         self.to_domain = django_orm.orm_to_domain
         self.to_orm = django_orm.domain_to_orm
@@ -22,7 +28,9 @@ class BaseQuery:
             return self.to_domain(obj)
 
     def save(self, obj):
-        self.to_orm(obj).save()
+        instance = self.to_orm(obj)
+        instance.save()
+        return instance
 
     def delete(self, pk):
         obj = self.by_pk(pk)
@@ -34,3 +42,32 @@ class BaseQuery:
 currency = BaseQuery(models.Currency)
 book = BaseQuery(models.Book)
 accounttype = BaseQuery(models.AccountType)
+
+
+class AccountQuery(BaseQuery):
+    def all(self, book_id):
+        return map(self.to_domain,  self.model.tree.load_book(book_id))
+
+    def by_pk(self, book_id, account_id):
+        return self.model.tree.load_one(book_id, account_id)
+
+    def get(self, book_id, account_id):
+        instance = self.by_pk(book_id, account_id)
+        if instance is not None:
+            return self.to_domain(instance)
+
+    def save(self, obj):
+        try:
+            instance = super(AccountQuery, self).save(obj)
+            self.model.tree.detach(instance)
+            self.model.tree.attach(instance, obj.parent_id)
+        except utils.IntegrityError as e:
+            raise IntegrityError(str(e))
+
+    def delete(self, book_id, account_id):
+        instance = self.by_pk(book_id, account_id)
+        if instance is not None:
+            instance.delete()
+            return True
+
+account = AccountQuery(models.Account)
