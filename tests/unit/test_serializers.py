@@ -135,3 +135,79 @@ class TestAccountTypeSerializer:
         assert not ser.is_valid()
         assert field in ser.errors
         assert 'This field is required.' in ser.errors[field]
+
+
+class TestAccountSerializer:
+    serializer_class = serializers.AccountSerializer
+
+    def test_dm_to_pd(self):
+        obj = dm.Account(
+                account_id=8,
+                name='Chase Checking',
+                account_type='Asset',
+                currency='NIS',
+                description='Test Account',
+                book=1,
+                parent_id=3,
+                path='Bank::Chase Checking',
+            )
+        ser = self.serializer_class(obj)
+        data = ser.data
+        assert data['account_type'] == 'Asset'
+        assert data['account_id'] == 8
+        assert data['name'] == 'Chase Checking'
+        assert data['account_type'] == 'Asset'
+        assert data['currency'] == 'NIS'
+        assert data['description'] == 'Test Account'
+        assert data['book'] == 1
+        assert data['parent_id'] == 3
+        assert data['path'] == 'Bank::Chase Checking'
+
+    data = {
+            'account_type': 'Equity',
+            'name': 'Equity',
+            'currency': 'USD',
+            'description': 'Equity account',
+            'book': 3,
+            'parent_id': 1,
+        }
+
+    def test_pd_to_dm(self):
+        ser = self.serializer_class(data=self.data)
+        assert ser.is_valid()
+        obj = ser.save()
+        assert isinstance(obj, dm.Account)
+        assert obj.account_type == 'Equity'
+        assert obj.account_id is None
+        assert obj.name == 'Equity'
+        assert obj.currency == 'USD'
+        assert obj.description == 'Equity account'
+        assert obj.book == 3
+        assert obj.parent_id == 1
+        assert obj.path is None
+
+    required = ['account_type', 'name', 'currency', 'book', 'parent_id']
+
+    @pytest.mark.parametrize('field', required)
+    def test_required_fields(self, field):
+        data = self.data.copy()
+        del data[field]
+        ser = self.serializer_class(data=data)
+        assert not ser.is_valid()
+        assert field in ser.errors
+        assert 'This field is required.' in ser.errors[field]
+
+    optional = set(data.keys()).difference(required)
+
+    @pytest.mark.parametrize('field', optional)
+    def test_optional_fields(self, field):
+        data = self.data.copy()
+        del data[field]
+        ser = self.serializer_class(data=data)
+        assert ser.is_valid()
+
+    def test_null_parent_id(self):
+        data = self.data.copy()
+        data['parent_id'] = None
+        ser = self.serializer_class(data=data)
+        assert ser.is_valid()

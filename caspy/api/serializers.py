@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from caspy import models
 from caspy.domain import models as dm
 
 
@@ -44,46 +43,13 @@ class AccountTypeSerializer(DomainModelSerializer):
         super(AccountTypeSerializer, self).__init__(*args, **kwargs)
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Account
-
-
-class AnnotatedAccountSerializer(AccountSerializer):
+class AccountSerializer(DomainModelSerializer):
+    _domain_model = dm.Account
+    account_id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=64)
+    book = serializers.IntegerField()
+    account_type = serializers.CharField(max_length=128)
+    currency = serializers.CharField(max_length=8)
+    description = serializers.CharField(max_length=255, required=False)
     path = serializers.CharField(read_only=True)
     parent_id = serializers.IntegerField(allow_null=True)
-
-    def validate(self, data):
-        book_id = data['book']
-        parent_id = data.pop('parent_id')
-        if parent_id is None:
-            return data
-        try:
-            qargs = {'account_id': parent_id, 'book': book_id}
-            data['parent'] = models.Account.objects.get(**qargs)
-            return data
-        except models.Account.DoesNotExist:
-            raise serializers.ValidationError('Invalid parent account id')
-
-    def create(self, validated_data):
-        parent = validated_data.pop('parent', None)
-        child = super(AnnotatedAccountSerializer, self).create(validated_data)
-        if parent is not None:
-            models.Account.tree.attach(child, parent)
-        return child
-
-    def update(self, instance, validated_data):
-        new_parent = validated_data.pop('parent', None)
-        super(AnnotatedAccountSerializer, self).update(instance,
-                                                       validated_data)
-        tree = models.Account.tree
-        old_parent_id = tree.parent_id(instance)
-        if new_parent is None:
-            if old_parent_id is not None:
-                tree.detach(instance)
-        else:
-            if old_parent_id != new_parent.account_id:
-                if old_parent_id is not None:
-                    tree.detach(instance)
-                tree.attach(instance, new_parent)
-        return instance
