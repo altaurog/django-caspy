@@ -9,13 +9,13 @@ def path_model(model):
     name = model.__name__ + 'Path'
     uniqueness = {'unique_together': [('upper', 'lower')]}
     attrs = {
-        'upper': models.ForeignKey(model, related_name='lower_set'),
-        'lower': models.ForeignKey(model, related_name='upper_set'),
-        'length': models.IntegerField(),
-        'Meta': type('Meta', (object,), uniqueness),
-        '__module__': model.__module__,
-        '__str__': pathstr,
-    }
+            'upper': models.ForeignKey(model, related_name='lower_set'),
+            'lower': models.ForeignKey(model, related_name='upper_set'),
+            'length': models.IntegerField(),
+            'Meta': type('Meta', (object,), uniqueness),
+            '__module__': model.__module__,
+            '__str__': pathstr,
+        }
     path_model = type(name, (models.Model,), attrs)
     model._path_model = path_model
     register_signal_listeners(model, path_model)
@@ -121,12 +121,12 @@ class TreeManager(models.Manager):
         table = self._table()
         columns = self._columns()
         return {
-            'table': table,
-            'columns': columns,
-            'pk': self._pk_column(),
-            'path_table': self._path_table(),
-            'select': ', '.join('%s.%s' % (table, c) for c in columns),
-        }
+                'table': table,
+                'columns': columns,
+                'pk': self._pk_column(),
+                'path_table': self._path_table(),
+                'select': ', '.join('%s.%s' % (table, c) for c in columns),
+            }
 
     def _path_table(self):
         return self.model._path_model._meta.db_table

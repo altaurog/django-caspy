@@ -46,7 +46,7 @@ accounttype = BaseQuery(models.AccountType)
 
 class AccountQuery(BaseQuery):
     def all(self, book_id):
-        return map(self.to_domain,  self.model.tree.load_book(book_id))
+        return map(self.to_domain, self.model.tree.load_book(book_id))
 
     def by_pk(self, book_id, account_id):
         return self.model.tree.load_one(book_id, account_id)

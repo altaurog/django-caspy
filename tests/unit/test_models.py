@@ -59,7 +59,8 @@ class TestClosure:
             self.parent_id = parent_id
             self.depth = depth
 
-        def __repr__(self): return 'Node(%s)' % self.pk
+        def __repr__(self):
+            return 'Node(%s)' % self.pk
 
     def test_make_paths(self):
         a = self.Node(0, None, 0)

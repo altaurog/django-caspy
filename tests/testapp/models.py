@@ -10,6 +10,7 @@ class Thing(models.Model):
     objects = models.Manager()
     tree = closure.TreeManager()
 
-    def __str__(self): return self.name
+    def __str__(self):
+        return self.name
 
 ThingPath = closure.path_model(Thing)

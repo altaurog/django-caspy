@@ -29,11 +29,11 @@ def response(path, endpoints):
 @api_view(('GET',))
 def api_root(request):
     return response(request.path, {
-        'currency': rev('api-currency-detail', 'cur_code'),
-        'accounttype': rev('api-accounttype-detail', 'account_type'),
-        'book': rev('api-book-detail', 'book_id'),
-        'book_account': rev('api-account-detail', 'account_id'),
-    })
+            'currency': rev('api-currency-detail', 'cur_code'),
+            'accounttype': rev('api-accounttype-detail', 'account_type'),
+            'book': rev('api-book-detail', 'book_id'),
+            'book_account': rev('api-account-detail', 'account_id'),
+        })
 
 
 urlpatterns = patterns('',  # noqa
