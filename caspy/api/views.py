@@ -90,46 +90,49 @@ class AccountTypeDetail(DetailView):
     serializer_class = serializers.AccountTypeSerializer
 
 
-class AccountList(views.APIView):
-    serializer_class = serializers.AnnotatedAccountSerializer
+class AccountList(ListView):
+    query_obj = query.account
+    serializer_class = serializers.AccountSerializer
 
     def get(self, request, book_id, format=None):
-        accounts = models.Account.tree.load_book(int(book_id))
-        serializer = self.serializer_class(accounts, many=True)
-        return response.Response(serializer.data)
+        objects = self.query_obj.all(book_id)
+        data = self.serialize(objects, many=True)
+        return response.Response(data)
 
     def post(self, request, book_id, format=None):
-        data = request.data.copy()
-        data['book'] = book_id
-        data.setdefault('parent_id', None)
-        serializer = self.serializer_class(data=data)
-        if serializer.is_valid():
-            account = serializer.save()
-            data['account_id'] = account.account_id
-            return response.Response(data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors,
-                                 status=status.HTTP_400_BAD_REQUEST)
+        ser = self.serializer_class(data=request.data)
+        if not ser.is_valid():
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
+        obj = self.create(ser)
+        self.query_obj.save(obj)
+        data = self.serialize(obj)
+        return response.Response(data, status=status.HTTP_201_CREATED)
 
 
-class AccountDetail(views.APIView):
-    serializer_class = serializers.AnnotatedAccountSerializer
+class AccountDetail(DetailView):
+    query_obj = query.account
+    serializer_class = serializers.AccountSerializer
 
-    def get_account(self, request, book_id, pk):
-        qargs = {'pk': pk, 'book': book_id}
-        return models.Account.objects.get(**qargs)
+    def get(self, request, book_id, pk, format=None):
+        obj = self.query_obj.get(book_id, pk)
+        data = self.serialize(obj)
+        return response.Response(data)
 
     def put(self, request, book_id, pk, format=None):
-        account = self.get_account(request, book_id, pk)
-        data = request.data.copy()
-        data['book'] = book_id
-        serializer = self.serializer_class(account, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors,
-                                 status=status.HTTP_400_BAD_REQUEST)
+        obj = self.query_obj.get(book_id, pk)
+        if obj is None:
+            raise Http404('Not found')
+        ser = self.serializer_class(obj, data=request.data)
+        if not ser.is_valid():
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
+        updated = ser.save()
+        self.query_obj.save(updated)
+        data = self.serialize(updated)
+        return response.Response(data)
 
     def delete(self, request, book_id, pk, format=None):
-        account = self.get_account(request, book_id, pk)
-        account.delete()
+        if not self.query_obj.delete(book_id, pk):
+            raise Http404('Not found')
         return response.Response(status=status.HTTP_204_NO_CONTENT)

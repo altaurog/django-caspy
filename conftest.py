@@ -11,6 +11,10 @@ def pytest_configure():
             'testapp',
         ),
 
+        'REST_FRAMEWORK': {
+            'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+        },
+
         'ROOT_URLCONF': 'caspy.urls',
 
         'DATABASES': {

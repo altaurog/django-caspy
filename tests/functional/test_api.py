@@ -6,6 +6,7 @@ from datetime import datetime
 from operator import itemgetter, attrgetter
 import pytest
 from django.core.urlresolvers import reverse
+from django.db import connection, transaction
 from rest_framework.test import APIClient
 from rest_framework.fields import DateTimeField
 from caspy import models, time
@@ -18,10 +19,38 @@ def format_datetime(dt):
     return DateTimeField().to_representation(dt)
 
 
-class _TestEndpointMixin():
+class EndpointMixin:
     _api_root_data = None
+    def _api_root(self):
+        if EndpointMixin._api_root_data is None:
+            root_url = reverse('api-root')
+            response = self.client.get(root_url)
+            EndpointMixin._api_root_data = response.data
+        return EndpointMixin._api_root_data
+
+    def _endpoint(self, name=None):
+        return self._api_root()[name or self.name]
+
+    def _list_endpoint(self, *args, **kwargs):
+        template = self._endpoint(*args, **kwargs)
+        return template.replace(':{}/'.format(self.pk), '')
+
+    def _item_endpoint(self, pk, *args, **kwargs):
+        template = self._endpoint(*args, **kwargs)
+        return template.replace(':{}'.format(self.pk), str(pk))
+
+    def _pair(self, pdl, dbl):
+        "sort and pair db objects with python dicts"
+        spdl = sorted(pdl, key=itemgetter(self.pk))
+        sdbl = sorted(dbl, key=attrgetter(self.pk))
+        return zip_longest(spdl, sdbl)
+
+    def _qset(self, **qargs):
+        return self.orm_filter(**qargs)
     not_exists_pk = '100'
 
+
+class APIMixin(EndpointMixin):
     def test_list_get(self):
         response = self.client.get(self._list_endpoint())
         assert response.status_code == 200
@@ -84,37 +113,12 @@ class _TestEndpointMixin():
         response = self.client.delete(url)
         assert response.status_code == 404
 
-    def _api_root(self):
-        if _TestEndpointMixin._api_root_data is None:
-            root_url = reverse('api-root')
-            response = self.client.get(root_url)
-            _TestEndpointMixin._api_root_data = response.data
-        return _TestEndpointMixin._api_root_data
-
-    def _endpoint(self, name=None):
-        return self._api_root()[name or self.name]
-
-    def _list_endpoint(self):
-        return self._endpoint().replace(':{}/'.format(self.pk), '')
-
-    def _item_endpoint(self, pk):
-        return self._endpoint().replace(':{}'.format(self.pk), str(pk))
-
-    def _pair(self, pdl, dbl):
-        "sort and pair db objects with python dicts"
-        spdl = sorted(pdl, key=itemgetter(self.pk))
-        sdbl = sorted(dbl, key=attrgetter(self.pk))
-        return zip_longest(spdl, sdbl)
-
-    def _qset(self, **qargs):
-        return self.orm_filter(**qargs)
-
 
 def slicedict(d, keys):
     return {k: d[k] for k in keys}
 
 
-class TestCurrencyEndpoint(_TestEndpointMixin):
+class TestCurrencyEndpoint(APIMixin):
     count = 3
     name = 'currency'
     pk = 'cur_code'
@@ -189,7 +193,7 @@ class TestCurrencyEndpoint(_TestEndpointMixin):
             assert self._qset(**data).exists()
 
 
-class TestBookEndpoint(_TestEndpointMixin):
+class TestBookEndpoint(APIMixin):
     count = 3
     name = 'book'
     pk = 'book_id'
@@ -231,7 +235,7 @@ class TestBookEndpoint(_TestEndpointMixin):
         assert response.data['created_at'] != created_at
 
 
-class TestAccountTypeEndpoint(_TestEndpointMixin):
+class TestAccountTypeEndpoint(APIMixin):
     count = 3
     name = 'accounttype'
     pk = 'account_type'
@@ -274,3 +278,112 @@ class TestAccountTypeEndpoint(_TestEndpointMixin):
         assert response.status_code == 400
         assert field in response.data
         assert 'This field is required.' in response.data[field]
+
+
+class TestAccountEndpoint(EndpointMixin):
+    name = 'book_account'
+    pk = 'account_id'
+    orm_filter = models.Account.objects.filter
+
+    def setup(self):
+        self.client = APIClient()
+        self.book = factories.BookFactory()
+        factories.CurrencyFactory(cur_code='CAD')
+        kwargs = {
+            'book': self.book,
+            'currency': factories.CurrencyFactory(cur_code='USD'),
+            'account_type': factories.AccountTypeFactory(
+                                            account_type='Income'),
+        }
+        self.income = factories.AccountFactory.create(name='Income', **kwargs)
+        self.salary = factories.AccountFactory.create(name='Salary', **kwargs)
+        self.asset = factories.AccountTypeFactory(account_type='Asset')
+        self.other = factories.AccountFactory(
+                                    name='My Bank',
+                                    account_type=self.asset,
+                                )
+
+    def teardown(self):
+        # django's flush doesn't purge db intelligently enough
+        with transaction.commit_on_success():
+            cur = connection.cursor()
+            cur.execute("DELETE FROM caspy_accountpath")
+            cur.execute("DELETE FROM caspy_account")
+            cur.close()
+
+    def test_list_get(self):
+        response = self.client.get(self._list_endpoint(self.book.book_id))
+        assert response.status_code == 200
+        pairs = list(self._pair(response.data, [self.income, self.salary]))
+        for pd, db_o in pairs:
+            self.check_match(pd, db_o)
+
+    def test_list_post(self):
+        data = self.new_pd()
+        qargs = {k: v for k, v in data.items() if k != 'parent_id'}
+        qset = self._qset(**qargs)
+        assert not qset.exists()
+        endpoint = self._list_endpoint(self.other.book.book_id)
+        response = self.client.post(endpoint, data)
+        assert response.status_code == 201
+        assert slicedict(response.data, data.keys()) == data
+        assert qset.exists()
+
+    def test_item_get(self):
+        for db_o in [self.income, self.salary, self.other]:
+            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            response = self.client.get(url)
+            assert response.status_code == 200
+            self.check_match(response.data, db_o)
+
+    def test_item_put(self):
+        for i, db_o in enumerate([self.income, self.salary, self.other]):
+            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            data = self.modified(i, db_o)
+            response = self.client.put(url, data)
+            assert response.status_code == 200
+            assert slicedict(response.data, data.keys()) == data
+            del data['parent_id']
+            assert self._qset(**data).exists()
+
+    def test_item_delete(self):
+        for i, db_o in enumerate([self.income, self.salary, self.other]):
+            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            qset = self._qset(pk=db_o.pk)
+            assert qset.exists()
+            response = self.client.delete(url)
+            assert response.status_code == 204
+            assert not qset.exists()
+
+    def new_pd(self):
+        return {
+                'name': 'Test',
+                'book': self.other.book_id,
+                'account_type': self.other.account_type_id,
+                'currency': self.income.currency_id,
+                'description': 'Test account description',
+                'parent_id': None,
+            }
+
+    def modified(self, i, db_o):
+        return {
+                'account_id': db_o.pk,
+                'name': 'Test Account %d' % i,
+                'book': db_o.book_id,
+                'account_type': db_o.account_type_id,
+                'currency': 'CAD',
+                'description': 'Test Account %d Description' % i,
+                'parent_id': None,
+            }
+
+    def _endpoint(self, book):
+        url_template = super(TestAccountEndpoint, self)._endpoint()
+        return url_template.replace(':book_id', str(book))
+
+    def check_match(self, pd, db_o):
+        assert pd['account_id'] == db_o.account_id
+        assert pd['name'] == db_o.name
+        assert pd['book'] == db_o.book_id
+        assert pd['account_type'] == db_o.account_type_id
+        assert pd['currency'] == db_o.currency_id
+        assert pd['description'] == db_o.description
