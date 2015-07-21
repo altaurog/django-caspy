@@ -100,7 +100,9 @@ class AccountList(ListView):
         return response.Response(data)
 
     def post(self, request, book_id, format=None):
-        ser = self.serializer_class(data=request.data)
+        data = request.data.copy()
+        data['book'] = book_id
+        ser = self.serializer_class(data=data)
         if not ser.is_valid():
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)
@@ -123,7 +125,9 @@ class AccountDetail(DetailView):
         obj = self.query_obj.get(book_id, pk)
         if obj is None:
             raise Http404('Not found')
-        ser = self.serializer_class(obj, data=request.data)
+        data = request.data.copy()
+        data['book'] = book_id
+        ser = self.serializer_class(obj, data=data)
         if not ser.is_valid():
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)

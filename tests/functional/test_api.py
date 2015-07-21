@@ -325,6 +325,7 @@ class TestAccountEndpoint(EndpointMixin):
         assert not qset.exists()
         endpoint = self._list_endpoint(self.other.book.book_id)
         response = self.client.post(endpoint, data)
+        data['book'] = self.other.book_id
         assert response.status_code == 201
         assert slicedict(response.data, data.keys()) == data
         assert qset.exists()
@@ -344,7 +345,7 @@ class TestAccountEndpoint(EndpointMixin):
             assert response.status_code == 200
             assert slicedict(response.data, data.keys()) == data
             del data['parent_id']
-            assert self._qset(**data).exists()
+            assert self._qset(book=db_o.book, **data).exists()
 
     def test_item_delete(self):
         for i, db_o in enumerate([self.income, self.salary, self.other]):
@@ -358,7 +359,6 @@ class TestAccountEndpoint(EndpointMixin):
     def new_pd(self):
         return {
                 'name': 'Test',
-                'book': self.other.book_id,
                 'account_type': self.other.account_type_id,
                 'currency': self.income.currency_id,
                 'description': 'Test account description',
@@ -369,7 +369,6 @@ class TestAccountEndpoint(EndpointMixin):
         return {
                 'account_id': db_o.pk,
                 'name': 'Test Account %d' % i,
-                'book': db_o.book_id,
                 'account_type': db_o.account_type_id,
                 'currency': 'CAD',
                 'description': 'Test Account %d Description' % i,
