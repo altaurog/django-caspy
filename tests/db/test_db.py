@@ -252,3 +252,45 @@ class TestClosureTable:
         assert not self.pathmgr.filter(
                     upper=a, lower=c, length=2,
                 ).exists()
+
+
+class TestTransaction:
+    mgr = models.Transaction.objects
+    def test_create_transaction(self):
+        kwargs = {'date': '2015-07-21'}
+        self.mgr.create(**kwargs)
+        qset = self.mgr.filter(description__isnull=True, **kwargs)
+        assert qset.exists()
+
+    def test_create_with_description(self):
+        kwargs = {'date': '2015-07-21', 'description': 'Test Transaction'}
+        self.mgr.create(**kwargs)
+        qset = self.mgr.filter(**kwargs)
+        assert qset.exists()
+
+    def test_date_not_unique(self):
+        kwargs = {'date': '2015-07-21'}
+        self.mgr.create(**kwargs)
+        self.mgr.create(**kwargs)
+        qset = self.mgr.filter(**kwargs)
+        assert qset.count() == 2
+
+
+class TestSplit:
+    mgr = models.Split.objects
+    def setup(self):
+        self.xact = models.Transaction.objects.create(date='2017-07-22')
+        self.account_a = factories.AccountFactory()
+        self.account_b = factories.AccountFactory()
+
+    def test_create_split(self):
+        kwargs = {
+                'transaction': self.xact,
+                'number': '11-a',
+                'account': self.account_a,
+                'status': 'n',
+                'amount': 47.50,
+            }
+        self.mgr.create(**kwargs)
+        qset = self.mgr.filter(**kwargs)
+        assert qset.exists()

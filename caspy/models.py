@@ -96,3 +96,18 @@ class Account(models.Model):
 
 
 AccountPath = closure.path_model(Account)
+
+
+class Transaction(models.Model):
+    date = models.DateField()
+    description = models.CharField(max_length=128, blank=True, null=True)
+
+
+
+class Split(models.Model):
+    transaction = models.ForeignKey(Transaction)
+    number = models.CharField(max_length=32)
+    description = models.CharField(max_length=128)
+    account = models.ForeignKey(Account)
+    status = models.CharField(max_length=1)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
