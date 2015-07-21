@@ -305,11 +305,10 @@ class TestAccountEndpoint(EndpointMixin):
 
     def teardown(self):
         # django's flush doesn't purge db intelligently enough
-        with transaction.commit_on_success():
-            cur = connection.cursor()
-            cur.execute("DELETE FROM caspy_accountpath")
-            cur.execute("DELETE FROM caspy_account")
-            cur.close()
+        cur = connection.cursor()
+        cur.execute("DELETE FROM caspy_accountpath")
+        cur.execute("DELETE FROM caspy_account")
+        cur.close()
 
     def test_list_get(self):
         response = self.client.get(self._list_endpoint(self.book.book_id))
