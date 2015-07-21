@@ -265,7 +265,7 @@ class TestAccountQuery:
             self.query_obj.save(o)
 
     def test_update_with_parent(self):
-        account_type = factories.AccountTypeFactory()
+        account_type = factories.AccountTypeFactory(account_type='Bank Accont')
         currency = factories.CurrencyFactory()
         o = dm.Account(
                 account_id=self.tips.account_id,
