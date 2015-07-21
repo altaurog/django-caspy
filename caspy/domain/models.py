@@ -20,3 +20,12 @@ class AccountType(Base):
 class Account(Base):
     _fields = ('account_id', 'parent_id', 'name', 'path', 'book',
                'account_type', 'currency', 'description')
+
+
+class Transaction(Base):
+    _fields = ('transaction_id', 'date', 'description', 'splits')
+
+
+class Split(Base):
+    _fields = ('split_id', 'number', 'description', 'account_id',
+               'status', 'amount')

@@ -79,6 +79,33 @@ class AccountAdaptor(BaseAdaptor):
                         )
 
 
+@register
+class TransactionAdaptor(BaseAdaptor):
+    django_model = django_models.Transaction
+    domain_model = domain_models.Transaction
+
+    def to_orm(self, obj):
+        return self.django_model(
+                        transaction_id=obj.transaction_id,
+                        date=obj.date,
+                        description=obj.description,
+                    )
+
+    def to_domain(self, instance):
+        return self.domain_model(
+                        transaction_id=instance.transaction_id,
+                        date=instance.date,
+                        description=instance.description,
+                        splits=[],
+                    )
+
+
+@register
+class SplitAdaptor(BaseAdaptor):
+    django_model = django_models.Split
+    domain_model = domain_models.Split
+
+
 def get_field(obj, field_name=None):
     if not isinstance(obj, domain_models.Base):
         return obj

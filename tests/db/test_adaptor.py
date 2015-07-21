@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 from caspy.domain import models as domain
 from caspy import models as db
 from caspy import django_orm as orm
+import pytest
 
 
 class TestCurrency:
@@ -181,3 +182,75 @@ class TestAccount:
         assert obj.description == 'Utilities Expense'
         assert obj.parent_id == 2
         assert obj.path == 'Expense::Utilities'
+
+
+class TestTransaction:
+    def test_domain_to_orm(self):
+        test_date = date(2015, 7, 21)
+        test_desc = 'Test Transaction Description'
+        obj = domain.Transaction(
+                transaction_id=2,
+                date=test_date,
+                description=test_desc,
+            )
+        instance = orm.domain_to_orm(obj)
+        assert isinstance(instance, db.Transaction)
+        assert instance.transaction_id == 2
+        assert instance.date == test_date
+        assert instance.description == test_desc
+
+    def test_orm_to_domain(self):
+        test_date = date(2015, 7, 20)
+        test_desc = 'Test Transaction ORM to Domain'
+        instance = db.Transaction(
+                transaction_id=4,
+                date=test_date,
+                description=test_desc,
+            )
+        obj = orm.orm_to_domain(instance)
+        assert isinstance(obj, domain.Transaction)
+        assert obj.transaction_id == 4
+        assert obj.date == test_date
+        assert obj.description == test_desc
+        assert obj.splits == []
+
+
+class TestSplit:
+    def test_domain_to_orm(self):
+        obj = domain.Split(
+                split_id=613,
+                number='365',
+                description='Split Desc',
+                account_id=12,
+                status='n',
+                amount='18',
+            )
+        instance = orm.domain_to_orm(obj)
+        assert isinstance(instance, db.Split)
+        assert instance.split_id == 613
+        assert instance.number == '365'
+        assert instance.description == 'Split Desc'
+        assert instance.account_id == 12
+        assert instance.status == 'n'
+        assert instance.amount == '18'
+
+    def test_orm_to_domain(self):
+        instance = db.Split(
+                split_id=248,
+                transaction_id=50,
+                number='120',
+                description='Test Split Desc',
+                account_id=10,
+                status='c',
+                amount='10.37',
+            )
+        obj = orm.orm_to_domain(instance)
+        assert isinstance(instance, db.Split)
+        assert obj.split_id == 248
+        assert obj.number == '120'
+        assert obj.description == 'Test Split Desc'
+        assert obj.account_id == 10
+        assert obj.status == 'c'
+        assert obj.amount == '10.37'
+        with pytest.raises(AttributeError):
+            obj.transaction
