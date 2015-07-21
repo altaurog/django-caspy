@@ -19,7 +19,7 @@ def format_datetime(dt):
     return DateTimeField().to_representation(dt)
 
 
-class EndpointMixin:
+class EndpointMixin(object):
     _api_root_data = None
     def _api_root(self):
         if EndpointMixin._api_root_data is None:
