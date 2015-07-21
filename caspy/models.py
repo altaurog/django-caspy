@@ -99,12 +99,13 @@ AccountPath = closure.path_model(Account)
 
 
 class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
     date = models.DateField()
     description = models.CharField(max_length=128, blank=True, null=True)
 
 
-
 class Split(models.Model):
+    split_id = models.AutoField(primary_key=True)
     transaction = models.ForeignKey(Transaction)
     number = models.CharField(max_length=32)
     description = models.CharField(max_length=128)
