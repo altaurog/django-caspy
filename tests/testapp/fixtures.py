@@ -73,13 +73,13 @@ currency_data = [
 accounttype_data = [
         {
             'account_type': 'Income',
-            'sign': True,
+            'sign': False,
             'credit_term': 'income',
             'debit_term': 'expense',
         },
         {
             'account_type': 'Bank Account',
-            'sign': False,
+            'sign': True,
             'credit_term': 'withdraw',
             'debit_term': 'deposit',
         },

@@ -4,28 +4,28 @@
 - model: caspy.accounttype
   pk: 'Asset'
   fields:
-    sign: false
+    sign: true
     credit_term: decrease
     debit_term: increase
 
 - model: caspy.accounttype
   pk: 'Bank Account'
   fields:
-    sign: false
+    sign: true
     credit_term: withdraw
     debit_term: deposit
 
 - model: caspy.accounttype
   pk: 'Cash'
   fields:
-    sign: false
+    sign: true
     credit_term: spend
     debit_term: receive
 
 - model: caspy.accounttype
   pk: 'Accounts Receivable'
   fields:
-    sign: false
+    sign: true
     credit_term: payment
     debit_term: invoice
 
@@ -33,14 +33,14 @@
 # - model: caspy.accounttype
 #   pk: Stock
 #   fields:
-#     sign: false
+#     sign: true
 #     credit_term: sell
 #     debit_term: buy
 # 
 # - model: caspy.accounttype
 #   pk: Mutual Fund
 #   fields:
-#     sign: false
+#     sign: true
 #     credit_term: sell
 #     debit_term: buy
 
@@ -48,21 +48,21 @@
 - model: caspy.accounttype
   pk: 'Liability'
   fields:
-    sign: true
+    sign: false
     credit_term: increase
     debit_term: decrease
 
 - model: caspy.accounttype
   pk: 'Credit Card'
   fields:
-    sign: true
+    sign: false
     credit_term: charge
     debit_term: payment
 
 - model: caspy.accounttype
   pk: 'Accounts Payable'
   fields:
-    sign: true
+    sign: false
     credit_term: payment
     debit_term: invoice
 
@@ -70,7 +70,7 @@
 - model: caspy.accounttype
   pk: 'Equity'
   fields:
-    sign: true
+    sign: false
     credit_term: increase
     debit_term: decrease
 
@@ -78,7 +78,7 @@
 - model: caspy.accounttype
   pk: 'Income'
   fields:
-    sign: true
+    sign: false
     credit_term: income
     debit_term: expense
 
@@ -86,6 +86,6 @@
 - model: caspy.accounttype
   pk: 'Expense'
   fields:
-    sign: false
+    sign: true
     credit_term: rebate
     debit_term: expense

@@ -41,9 +41,8 @@ class Book(models.Model):
 
 class AccountType(models.Model):
     account_type = models.CharField(max_length=128, primary_key=True)
-    # (credits increase account balance) <=> (sign == True)
-    sign = models.BooleanField(verbose_name="Credits increase balance",
-                               default=False)
+    # (debits increase account balance) <=> (sign == True)
+    sign = models.BooleanField(verbose_name="Debits increase balance")
     credit_term = models.CharField(max_length=32)
     debit_term = models.CharField(max_length=32)
 
@@ -111,4 +110,6 @@ class Split(models.Model):
     description = models.CharField(max_length=128)
     account = models.ForeignKey(Account)
     status = models.CharField(max_length=1)
+    # (amount < 0) is credit, transfer *from* an account
+    # (amount > 0) is debit, transfer *to* an account
     amount = models.DecimalField(max_digits=12, decimal_places=2)
