@@ -3,7 +3,7 @@ from django.db import connection, IntegrityError
 from django.forms.models import model_to_dict
 from caspy import models
 
-from testapp import factories, set_constraints_immediate
+from testapp import factories, fixtures, set_constraints_immediate
 
 pytestmark = pytest.mark.django_db()
 
@@ -120,17 +120,17 @@ class TestSplit:
     mgr = models.Split.objects
 
     def setup(self):
+        instances = fixtures.test_fixture()
+        self.salary = instances['accounts'][1]
         self.xact = models.Transaction.objects.create(date='2017-07-22')
-        self.account_a = factories.AccountFactory()
-        self.account_b = factories.AccountFactory()
 
     def test_create_split(self):
         kwargs = {
                 'transaction': self.xact,
                 'number': '11-a',
-                'account': self.account_a,
+                'account': self.salary,
                 'status': 'n',
-                'amount': 47.50,
+                'amount': -47.50,
             }
         self.mgr.create(**kwargs)
         qset = self.mgr.filter(**kwargs)
