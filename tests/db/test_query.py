@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import pytest
 from django.db import connection
 from caspy import query, models
@@ -312,3 +312,47 @@ class TestAccountQuery:
         book_id = self.tips.book_id
         account_id = self.tips.account_id
         assert not self.query_obj.delete(book_id, account_id + 100)
+
+
+class TestTransactionQuery:
+    query_obj = query.transaction
+
+    def setup(self):
+        instances = fixtures.test_fixture()
+        self.salary = instances['accounts'][1]
+        self.citibank = instances['accounts'][3]
+
+    def test_create_transaction(self):
+        sa = {
+                'number': '101',
+                'account_id': self.salary.account_id,
+                'status': 'n',
+                'amount': -8000,
+                'description': '',
+            }
+        sb = {
+                'number': '1432',
+                'account_id': self.citibank.account_id,
+                'status': 'n',
+                'amount': 8000,
+                'description': '',
+            }
+        xact = {
+                'date': date(2015, 7, 22),
+                'description': 'Payday',
+            }
+        splits = [dm.Split(**sa), dm.Split(**sb)]
+        xact_obj = dm.Transaction(splits=splits, **xact)
+        xact_qset = models.Transaction.objects.filter(**xact)
+        for f, v in xact.items():
+            sa['transaction__' + f] = v
+            sb['transaction__' + f] = v
+        sa_qset = models.Split.objects.filter(**sa)
+        sb_qset = models.Split.objects.filter(**sb)
+        assert not xact_qset.exists()
+        assert not sa_qset.exists()
+        assert not sb_qset.exists()
+        self.query_obj.save(xact_obj)
+        assert xact_qset.exists()
+        assert sa_qset.exists()
+        assert sb_qset.exists()

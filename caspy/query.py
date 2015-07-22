@@ -71,3 +71,16 @@ class AccountQuery(BaseQuery):
             return True
 
 account = AccountQuery(models.Account)
+
+
+class TransactionQuery(BaseQuery):
+    def save(self, obj):
+        instance = super(TransactionQuery, self).save(obj)
+        for s in obj.splits:
+            si = self.to_orm(s)
+            si.transaction = instance
+            si.save()
+        return instance
+
+
+transaction = TransactionQuery(models.Transaction)

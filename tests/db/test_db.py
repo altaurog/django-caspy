@@ -120,18 +120,31 @@ class TestSplit:
     mgr = models.Split.objects
 
     def setup(self):
+        set_constraints_immediate(connection)
         instances = fixtures.test_fixture()
         self.salary = instances['accounts'][1]
         self.xact = models.Transaction.objects.create(date='2017-07-22')
 
     def test_create_split(self):
-        kwargs = {
+        kwargs = self.split_data(description='Test Split')
+        qset = self.mgr.filter(**kwargs)
+        assert not qset.exists()
+        self.mgr.create(**kwargs)
+        assert qset.exists()
+
+    def test_create_split_with_empty_description(self):
+        kwargs = self.split_data(description='')
+        qset = self.mgr.filter(**kwargs)
+        assert not qset.exists()
+        self.mgr.create(**kwargs)
+        assert qset.exists()
+
+    def split_data(self, description):
+        return {
                 'transaction': self.xact,
                 'number': '11-a',
                 'account': self.salary,
                 'status': 'n',
                 'amount': -47.50,
+                'description': description,
             }
-        self.mgr.create(**kwargs)
-        qset = self.mgr.filter(**kwargs)
-        assert qset.exists()
