@@ -1,7 +1,7 @@
 from django.http import Http404
 from rest_framework import response, status, views
 from ..domain import command
-from .. import models, query, time
+from .. import query, time
 from . import serializers
 
 

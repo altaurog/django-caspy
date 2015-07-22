@@ -6,7 +6,7 @@ from datetime import datetime
 from operator import itemgetter, attrgetter
 import pytest
 from django.core.urlresolvers import reverse
-from django.db import connection, transaction
+from django.db import connection
 from rest_framework.test import APIClient
 from rest_framework.fields import DateTimeField
 from caspy import models, time
@@ -21,6 +21,7 @@ def format_datetime(dt):
 
 class EndpointMixin(object):
     _api_root_data = None
+
     def _api_root(self):
         if EndpointMixin._api_root_data is None:
             root_url = reverse('api-root')
