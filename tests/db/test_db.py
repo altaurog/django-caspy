@@ -1,10 +1,10 @@
 import pytest
-from django.db.utils import IntegrityError
+from django.db import connection, IntegrityError
 from django.forms.models import model_to_dict
 from caspy import models
 
 import testapp.models
-from testapp import factories
+from testapp import factories, set_constraints_immediate
 
 pytestmark = pytest.mark.django_db()
 
@@ -51,6 +51,9 @@ class TestAccountType:
 
 
 class TestAccount:
+    def setup(self):
+        set_constraints_immediate(connection)
+
     def test_create_account(self):
         account_obj = factories.AccountFactory()
         data = model_to_dict(account_obj)

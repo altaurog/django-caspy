@@ -1,8 +1,9 @@
 from datetime import datetime
 import pytest
+from django.db import connection
 from caspy import query, models
 from caspy.domain import models as dm
-from testapp import factories
+from testapp import factories, set_constraints_immediate
 
 pytestmark = pytest.mark.django_db()
 
@@ -148,6 +149,7 @@ class TestAccountQuery:
     query_obj = query.account
 
     def setup(self):
+        set_constraints_immediate(connection)
         self.book = factories.BookFactory()
         account_type = factories.AccountTypeFactory(account_type='Income')
         kwargs = {
