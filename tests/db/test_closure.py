@@ -5,6 +5,7 @@ from testapp import factories, fixtures
 
 pytestmark = pytest.mark.django_db()
 
+
 class TestClosureTable:
     treemgr = testapp.models.Thing.tree
     pathmgr = testapp.models.ThingPath.objects
@@ -140,10 +141,12 @@ class TestAccountPath:
 
     def test_load(self):
         accounts = sorted(models.Account.tree.load(), key=lambda a: a.name)
-        expected_paths = ['Asset', 'Income', 'Income::Salary', 'Tips']
+        expected_paths = [
+                'Chase', 'Citibank', 'Income', 'Income::Salary', 'Tips'
+            ]
         assert [a.path for a in accounts] == expected_paths
         parent_id = self.income.account_id
-        expected_parents = [None, None, parent_id, None]
+        expected_parents = [None, None, None, parent_id, None]
         assert [a.parent_id for a in accounts] == expected_parents
 
     def test_load_child(self):
@@ -154,7 +157,7 @@ class TestAccountPath:
     def test_load_leaf(self):
         account = models.Account.tree.load_one(self.book.pk, self.tips.pk)
         assert account.path == 'Tips'
-        assert account.parent_id == None
+        assert account.parent_id is None
 
     def test_load_one_not_exists(self):
         book_id = self.book.pk

@@ -17,23 +17,32 @@ def test_fixture():
     salary = create_account('Salary', income_kwargs)
     models.Account.tree.attach(salary, income)
     tips = create_account('Tips', income_kwargs)
-    asset = models.Account.objects.create(
-            name='Asset',
-            currency = currency_objs[1],
-            book = book_objs[1],
-            account_type = accounttype_objs[1],
+    citibank = models.Account.objects.create(
+            name='Citibank',
+            currency=currency_objs[0],
+            book=book_objs[0],
+            account_type=accounttype_objs[1],
+            description='Citibank Test Account',
+        )
+    chase = models.Account.objects.create(
+            name='Chase',
+            currency=currency_objs[1],
+            book=book_objs[1],
+            account_type=accounttype_objs[1],
         )
     return {
             'currencies': currency_objs,
             'accounttypes': accounttype_objs,
             'books': book_objs,
-            'accounts': [income, salary, tips, asset],
+            'accounts': [income, salary, tips, citibank, chase],
         }
+
 
 def _load(django_model, data):
     objs = [django_model(**d) for d in data]
     django_model.objects.bulk_create(objs)
     return objs
+
 
 def create_account(name, kwargs):
     desc = name + ' Test Account'

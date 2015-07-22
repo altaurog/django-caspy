@@ -155,28 +155,37 @@ class TestAccountQuery:
         self.income = instances['accounts'][0]
         self.salary = instances['accounts'][1]
         self.tips = instances['accounts'][2]
+        self.citibank = instances['accounts'][3]
 
     def test_get_book(self):
         qres = self.query_obj.all(book_id=self.book.book_id)
         ol = sorted(qres, key=lambda a: a.name)
-        assert len(ol) == 3
+        assert len(ol) == 4
         assert all(isinstance(o, dm.Account) for o in ol)
-        assert ol[0].account_id == self.income.account_id
-        assert ol[0].name == 'Income'
-        assert ol[0].book == self.income.book_id
-        assert ol[0].account_type == self.income.account_type_id
-        assert ol[0].currency == self.income.currency_id
-        assert ol[0].description == 'Income Test Account'
+        assert ol[0].account_id == self.citibank.account_id
+        assert ol[0].name == 'Citibank'
+        assert ol[0].book == self.citibank.book_id
+        assert ol[0].account_type == self.citibank.account_type_id
+        assert ol[0].currency == self.citibank.currency_id
+        assert ol[0].description == 'Citibank Test Account'
         assert ol[0].parent_id is None
-        assert ol[0].path == 'Income'
-        assert ol[1].account_id == self.salary.account_id
-        assert ol[1].name == 'Salary'
-        assert ol[1].book == self.salary.book_id
-        assert ol[1].account_type == self.salary.account_type_id
-        assert ol[1].currency == self.salary.currency_id
-        assert ol[1].description == 'Salary Test Account'
-        assert ol[1].parent_id == self.income.pk
-        assert ol[1].path == 'Income::Salary'
+        assert ol[0].path == 'Citibank'
+        assert ol[1].account_id == self.income.account_id
+        assert ol[1].name == 'Income'
+        assert ol[1].book == self.income.book_id
+        assert ol[1].account_type == self.income.account_type_id
+        assert ol[1].currency == self.income.currency_id
+        assert ol[1].description == 'Income Test Account'
+        assert ol[1].parent_id is None
+        assert ol[1].path == 'Income'
+        assert ol[2].account_id == self.salary.account_id
+        assert ol[2].name == 'Salary'
+        assert ol[2].book == self.salary.book_id
+        assert ol[2].account_type == self.salary.account_type_id
+        assert ol[2].currency == self.salary.currency_id
+        assert ol[2].description == 'Salary Test Account'
+        assert ol[2].parent_id == self.income.pk
+        assert ol[2].path == 'Income::Salary'
 
     def test_get_one(self):
         book_id = self.tips.book_id

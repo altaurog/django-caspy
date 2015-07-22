@@ -95,6 +95,7 @@ class TestAccount:
 
 class TestTransaction:
     mgr = models.Transaction.objects
+
     def test_create_transaction(self):
         kwargs = {'date': '2015-07-21'}
         self.mgr.create(**kwargs)
@@ -117,6 +118,7 @@ class TestTransaction:
 
 class TestSplit:
     mgr = models.Split.objects
+
     def setup(self):
         self.xact = models.Transaction.objects.create(date='2017-07-22')
         self.account_a = factories.AccountFactory()
