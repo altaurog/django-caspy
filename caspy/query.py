@@ -76,11 +76,14 @@ account = AccountQuery(models.Account)
 class TransactionQuery(BaseQuery):
     def save(self, obj):
         instance = super(TransactionQuery, self).save(obj)
+        models.Split.objects.bulk_create(self.splits(obj, instance))
+        return instance
+
+    def splits(self, obj, instance):
         for s in obj.splits:
             si = self.to_orm(s)
             si.transaction = instance
-            si.save()
-        return instance
+            yield si
 
 
 transaction = TransactionQuery(models.Transaction)
