@@ -3,7 +3,7 @@ import pytest
 from django.db import connection
 from caspy import query, models
 from caspy.domain import models as dm
-from testapp import factories, set_constraints_immediate
+from testapp import factories, fixtures, set_constraints_immediate
 
 pytestmark = pytest.mark.django_db()
 
@@ -150,30 +150,23 @@ class TestAccountQuery:
 
     def setup(self):
         set_constraints_immediate(connection)
-        self.book = factories.BookFactory()
-        account_type = factories.AccountTypeFactory(account_type='Income')
-        kwargs = {
-            'book': self.book,
-            'currency': factories.CurrencyFactory(cur_code='USD'),
-            'account_type': account_type,
-        }
-        self.income = factories.AccountFactory(name='Income', **kwargs)
-        self.salary = factories.AccountFactory(name='Salary', **kwargs)
-        models.Account.tree.attach(self.salary, self.income)
-        self.tips = factories.AccountFactory(name='Tips',
-                                             account_type=account_type)
+        instances = fixtures.test_fixture()
+        self.book = instances['books'][0]
+        self.income = instances['accounts'][0]
+        self.salary = instances['accounts'][1]
+        self.tips = instances['accounts'][2]
 
     def test_get_book(self):
         qres = self.query_obj.all(book_id=self.book.book_id)
         ol = sorted(qres, key=lambda a: a.name)
-        assert len(ol) == 2
+        assert len(ol) == 3
         assert all(isinstance(o, dm.Account) for o in ol)
         assert ol[0].account_id == self.income.account_id
         assert ol[0].name == 'Income'
         assert ol[0].book == self.income.book_id
         assert ol[0].account_type == self.income.account_type_id
         assert ol[0].currency == self.income.currency_id
-        assert ol[0].description == 'Income account'
+        assert ol[0].description == 'Income Test Account'
         assert ol[0].parent_id is None
         assert ol[0].path == 'Income'
         assert ol[1].account_id == self.salary.account_id
@@ -181,7 +174,7 @@ class TestAccountQuery:
         assert ol[1].book == self.salary.book_id
         assert ol[1].account_type == self.salary.account_type_id
         assert ol[1].currency == self.salary.currency_id
-        assert ol[1].description == 'Salary account'
+        assert ol[1].description == 'Salary Test Account'
         assert ol[1].parent_id == self.income.pk
         assert ol[1].path == 'Income::Salary'
 
@@ -195,14 +188,13 @@ class TestAccountQuery:
         assert o.book == book_id
         assert o.account_type == self.tips.account_type_id
         assert o.currency == self.tips.currency_id
-        assert o.description == 'Tips account'
+        assert o.description == 'Tips Test Account'
         assert o.parent_id is None
         assert o.path == 'Tips'
 
     def test_get_one_not_exists(self):
         book_id = self.tips.book_id
-        account_id = self.tips.account_id
-        o = self.query_obj.get(book_id, account_id + 100)
+        o = self.query_obj.get(book_id, -1)
         assert o is None
 
     def test_create_no_parent(self):
