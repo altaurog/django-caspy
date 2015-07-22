@@ -25,6 +25,11 @@ class Account(Base):
 class Transaction(Base):
     _fields = ('transaction_id', 'date', 'description', 'splits')
 
+    def __init__(self, *args, **kwargs):
+        super(Transaction, self).__init__(*args, **kwargs)
+        if self.splits is None:
+            self.splits = []
+
 
 class Split(Base):
     _fields = ('split_id', 'number', 'description', 'account_id',

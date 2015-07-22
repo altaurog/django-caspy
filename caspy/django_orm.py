@@ -96,7 +96,6 @@ class TransactionAdaptor(BaseAdaptor):
                         transaction_id=instance.transaction_id,
                         date=instance.date,
                         description=instance.description,
-                        splits=[],
                     )
 
 
