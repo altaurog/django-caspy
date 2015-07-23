@@ -1,9 +1,15 @@
 from datetime import datetime, date
+try:
+    from itertools import izip_longest as zip_longest  # 2
+except ImportError:
+    from itertools import zip_longest  # 3
+
 import pytest
 from django.db import connection
 from caspy import query, models
 from caspy.domain import models as dm
 from testapp import factories, fixtures, set_constraints_immediate
+from testapp.django_helpers import assert_max_queries
 
 pytestmark = pytest.mark.django_db()
 
@@ -319,8 +325,23 @@ class TestTransactionQuery:
 
     def setup(self):
         instances = fixtures.test_fixture()
+        self.book = instances['books'][0]
         self.salary = instances['accounts'][1]
         self.citibank = instances['accounts'][3]
+
+    def test_get_book(self):
+        with assert_max_queries(2):
+            qres = self.query_obj.all(book_id=self.book.book_id)
+        ol = sorted(qres, key=lambda x: x.date)
+        for o, expd in zip_longest(ol, fixtures.transaction_data):
+            assert isinstance(o, dm.Transaction)
+            assert o.date == expd['date']
+            assert o.description == expd['description']
+            splits = sorted(o.splits, key=lambda s: s.amount)
+            for so, es in zip_longest(splits, expd['splits']):
+                assert so.number == es['number']
+                assert so.status == es['status']
+                assert so.amount == es['amount']
 
     def test_create_transaction(self):
         sa = {
@@ -338,7 +359,7 @@ class TestTransactionQuery:
                 'description': '',
             }
         xact = {
-                'date': date(2015, 7, 22),
+                'date': date(2015, 7, 26),
                 'description': 'Payday',
             }
         splits = [dm.Split(**sa), dm.Split(**sb)]

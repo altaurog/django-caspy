@@ -1,6 +1,6 @@
 # vim:fileencoding=utf-8
 from __future__ import unicode_literals
-from datetime import datetime
+from datetime import datetime, date
 from caspy import models, time
 
 
@@ -26,6 +26,7 @@ def test_fixture():
             'account_type': accounttype_objs[1],
         }
     chase = create_account('Chase', asset2_kwargs)
+    create_transactions(salary, tips, citibank)
     return {
             'currencies': currency_objs,
             'accounttypes': accounttype_objs,
@@ -43,6 +44,28 @@ def _load(django_model, data):
 def create_account(name, kwargs):
     desc = name + ' Test Account'
     return models.Account.objects.create(name=name, description=desc, **kwargs)
+
+
+def create_transactions(*accounts):
+    for xdata in transaction_data:
+        xact = models.Transaction.objects.create(
+                date=xdata['date'],
+                description=xdata['description'],
+            )
+        for sdata in xdata['splits']:
+            xact.split_set.create(
+                    number=sdata['number'],
+                    account=find(sdata['account'], accounts),
+                    status=sdata['status'],
+                    amount=sdata['amount'],
+                    description=sdata.get('description', ''),
+                )
+
+
+def find(account_name, accounts):
+    for a in accounts:
+        if a.name == account_name:
+            return a
 
 
 currency_data = [
@@ -78,6 +101,45 @@ accounttype_data = [
             'sign': True,
             'credit_term': 'withdraw',
             'debit_term': 'deposit',
+        },
+    ]
+
+transaction_data = [
+        {
+            'date': date(2015, 6, 28),
+            'description': 'Payday',
+            'splits': [
+                {
+                    'number': '100',
+                    'account': 'Salary',
+                    'status': 'c',
+                    'amount': -8000,
+                },
+                {
+                    'number': '1339',
+                    'account': 'Citibank',
+                    'status': 'c',
+                    'amount': 8000,
+                },
+            ],
+        },
+        {
+            'date': date(2015, 7, 3),
+            'description': 'Tips w/dl',
+            'splits': [
+                {
+                    'number': '129',
+                    'account': 'Tips',
+                    'status': 'n',
+                    'amount': -837,
+                },
+                {
+                    'number': '1345',
+                    'account': 'Citibank',
+                    'status': 'n',
+                    'amount': 837,
+                },
+            ],
         },
     ]
 

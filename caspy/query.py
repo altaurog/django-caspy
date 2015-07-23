@@ -74,6 +74,19 @@ account = AccountQuery(models.Account)
 
 
 class TransactionQuery(BaseQuery):
+    def all(self, book_id):
+        qargs = {'account__book_id': book_id}
+        qset = models.Split.objects.filter(**qargs)
+        transactions = {}
+        for split in qset.select_related('transaction'):
+            try:
+                xact = transactions[split.transaction_id]
+            except KeyError:
+                xact = self.to_domain(split.transaction)
+                transactions[split.transaction_id] = xact
+            xact.splits.append(self.to_domain(split))
+        return transactions.values()
+
     def save(self, obj):
         instance = super(TransactionQuery, self).save(obj)
         models.Split.objects.bulk_create(self.splits(obj, instance))
