@@ -328,20 +328,22 @@ class TestTransactionQuery:
         self.book = instances['books'][0]
         self.salary = instances['accounts'][1]
         self.citibank = instances['accounts'][3]
+        self.transactions = instances['transactions']
 
     def test_get_book(self):
         with assert_max_queries(2):
             qres = self.query_obj.all(book_id=self.book.book_id)
         ol = sorted(qres, key=lambda x: x.date)
-        for o, expd in zip_longest(ol, fixtures.transaction_data):
-            assert isinstance(o, dm.Transaction)
-            assert o.date == expd['date']
-            assert o.description == expd['description']
-            splits = sorted(o.splits, key=lambda s: s.amount)
-            for so, es in zip_longest(splits, expd['splits']):
-                assert so.number == es['number']
-                assert so.status == es['status']
-                assert so.amount == es['amount']
+        for o, xdata in zip_longest(ol, fixtures.transaction_data):
+            self.check_match(o, xdata)
+
+    def test_get_one(self):
+        book_id = self.book.book_id
+        for i, xact in enumerate(self.transactions):
+            transaction_id = xact.transaction_id
+            xdata = fixtures.transaction_data[i]
+            o = self.query_obj.get(book_id, transaction_id)
+            self.check_match(o, xdata)
 
     def test_create_transaction(self):
         sa = {
@@ -377,3 +379,14 @@ class TestTransactionQuery:
         assert xact_qset.exists()
         assert sa_qset.exists()
         assert sb_qset.exists()
+
+    def check_match(self, o, data):
+        assert isinstance(o, dm.Transaction)
+        assert o.date == data['date']
+        assert o.description == data['description']
+        splits = sorted(o.splits, key=lambda s: s.amount)
+        for so, es in zip_longest(splits, data['splits']):
+            assert isinstance(so, dm.Split)
+            assert so.number == es['number']
+            assert so.status == es['status']
+            assert so.amount == es['amount']

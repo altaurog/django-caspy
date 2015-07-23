@@ -26,12 +26,13 @@ def test_fixture():
             'account_type': accounttype_objs[1],
         }
     chase = create_account('Chase', asset2_kwargs)
-    create_transactions(salary, tips, citibank)
+    transactions = list(create_transactions(salary, tips, citibank))
     return {
             'currencies': currency_objs,
             'accounttypes': accounttype_objs,
             'books': book_objs,
             'accounts': [income, salary, tips, citibank, chase],
+            'transactions': transactions,
         }
 
 
@@ -60,6 +61,7 @@ def create_transactions(*accounts):
                     amount=sdata['amount'],
                     description=sdata.get('description', ''),
                 )
+        yield xact
 
 
 def find(account_name, accounts):

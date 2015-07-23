@@ -77,15 +77,14 @@ class TransactionQuery(BaseQuery):
     def all(self, book_id):
         qargs = {'account__book_id': book_id}
         qset = models.Split.objects.filter(**qargs)
-        transactions = {}
-        for split in qset.select_related('transaction'):
-            try:
-                xact = transactions[split.transaction_id]
-            except KeyError:
-                xact = self.to_domain(split.transaction)
-                transactions[split.transaction_id] = xact
-            xact.splits.append(self.to_domain(split))
-        return transactions.values()
+        return list(self._load(qset))
+
+    def get(self, book_id, transaction_id):
+        qargs = {'account__book_id': book_id, 'transaction': transaction_id}
+        qset = models.Split.objects.filter(**qargs)
+        result = list(self._load(qset))
+        if result:
+            return result[0]
 
     def save(self, obj):
         instance = super(TransactionQuery, self).save(obj)
@@ -97,6 +96,17 @@ class TransactionQuery(BaseQuery):
             si = self.to_orm(s)
             si.transaction = instance
             yield si
+
+    def _load(self, split_qset):
+        transactions = {}
+        for split in split_qset.select_related('transaction'):
+            try:
+                xact = transactions[split.transaction_id]
+            except KeyError:
+                xact = self.to_domain(split.transaction)
+                transactions[split.transaction_id] = xact
+            xact.splits.append(self.to_domain(split))
+        return transactions.values()
 
 
 transaction = TransactionQuery(models.Transaction)
