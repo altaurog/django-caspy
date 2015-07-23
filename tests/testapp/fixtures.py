@@ -1,7 +1,7 @@
 # vim:fileencoding=utf-8
 from __future__ import unicode_literals
 from datetime import datetime
-from caspy import models
+from caspy import models, time
 
 
 def test_fixture():
@@ -81,7 +81,9 @@ accounttype_data = [
         },
     ]
 
+u = time.utc.localize
+
 book_data = [
-        {'name': 'Test Book 1', 'created_at': datetime(2015, 7, 22, 15)},
-        {'name': 'Test Book 2', 'created_at': datetime(2015, 7, 22, 16)},
+        {'name': 'Test Book 1', 'created_at': u(datetime(2015, 7, 22, 15))},
+        {'name': 'Test Book 2', 'created_at': u(datetime(2015, 7, 22, 16))},
     ]
