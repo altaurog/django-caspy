@@ -17,19 +17,15 @@ def test_fixture():
     salary = create_account('Salary', income_kwargs)
     models.Account.tree.attach(salary, income)
     tips = create_account('Tips', income_kwargs)
-    citibank = models.Account.objects.create(
-            name='Citibank',
-            currency=currency_objs[0],
-            book=book_objs[0],
-            account_type=accounttype_objs[1],
-            description='Citibank Test Account',
-        )
-    chase = models.Account.objects.create(
-            name='Chase',
-            currency=currency_objs[1],
-            book=book_objs[1],
-            account_type=accounttype_objs[1],
-        )
+    asset_kwargs = income_kwargs.copy()
+    asset_kwargs['account_type'] = accounttype_objs[1]
+    citibank = create_account('Citibank', asset_kwargs)
+    asset2_kwargs = {
+            'currency': currency_objs[1],
+            'book': book_objs[1],
+            'account_type': accounttype_objs[1],
+        }
+    chase = create_account('Chase', asset2_kwargs)
     return {
             'currencies': currency_objs,
             'accounttypes': accounttype_objs,
