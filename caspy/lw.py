@@ -4,7 +4,7 @@ Lightweight objects
 from caspy import str
 
 
-class Lightweight:
+class Lightweight(object):
     def __init__(self, *args, **kwargs):
         for f in self._fields:
             setattr(self, f, get(f, *args, **kwargs))
