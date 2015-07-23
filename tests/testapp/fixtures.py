@@ -56,7 +56,7 @@ def create_transactions(*accounts):
         for sdata in xdata['splits']:
             xact.split_set.create(
                     number=sdata['number'],
-                    account=find(sdata['account'], accounts),
+                    account=find(sdata['account__name'], accounts),
                     status=sdata['status'],
                     amount=sdata['amount'],
                     description=sdata.get('description', ''),
@@ -113,13 +113,13 @@ transaction_data = [
             'splits': [
                 {
                     'number': '100',
-                    'account': 'Salary',
+                    'account__name': 'Salary',
                     'status': 'c',
                     'amount': -8000,
                 },
                 {
                     'number': '1339',
-                    'account': 'Citibank',
+                    'account__name': 'Citibank',
                     'status': 'c',
                     'amount': 8000,
                 },
@@ -131,13 +131,13 @@ transaction_data = [
             'splits': [
                 {
                     'number': '129',
-                    'account': 'Tips',
+                    'account__name': 'Tips',
                     'status': 'n',
                     'amount': -837,
                 },
                 {
                     'number': '1345',
-                    'account': 'Citibank',
+                    'account__name': 'Citibank',
                     'status': 'n',
                     'amount': 837,
                 },

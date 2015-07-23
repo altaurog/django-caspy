@@ -339,10 +339,10 @@ class TestTransactionQuery:
 
     def test_get_one(self):
         book_id = self.book.book_id
-        for i, xact in enumerate(self.transactions):
-            transaction_id = xact.transaction_id
-            xdata = fixtures.transaction_data[i]
-            o = self.query_obj.get(book_id, transaction_id)
+        for i, xdata in enumerate(fixtures.transaction_data):
+            transaction_id = self.transactions[i].transaction_id
+            with assert_max_queries(2):
+                o = self.query_obj.get(book_id, transaction_id)
             self.check_match(o, xdata)
 
     def test_create_transaction(self):
@@ -366,19 +366,36 @@ class TestTransactionQuery:
             }
         splits = [dm.Split(**sa), dm.Split(**sb)]
         xact_obj = dm.Transaction(splits=splits, **xact)
-        xact_qset = models.Transaction.objects.filter(**xact)
-        for f, v in xact.items():
-            sa['transaction__' + f] = v
-            sb['transaction__' + f] = v
-        sa_qset = models.Split.objects.filter(**sa)
-        sb_qset = models.Split.objects.filter(**sb)
-        assert not xact_qset.exists()
-        assert not sa_qset.exists()
-        assert not sb_qset.exists()
+        self.assert_transaction_not_exists(xact, [sa, sb])
         self.query_obj.save(xact_obj)
-        assert xact_qset.exists()
-        assert sa_qset.exists()
-        assert sb_qset.exists()
+        self.assert_transaction_exists(xact, [sa, sb])
+
+    def test_delete_transaction(self):
+        book_id = self.book.book_id
+        for i, xdata in enumerate(fixtures.transaction_data):
+            transaction_id = self.transactions[i].transaction_id
+            self.assert_transaction_exists(xdata)
+            with assert_max_queries(3):
+                self.query_obj.delete(book_id, transaction_id)
+            self.assert_transaction_not_exists(xdata)
+
+    def assert_transaction_exists(self, xdata, splits=[]):
+        for q in self._qsets(xdata, splits, join=True):
+            assert q.exists()
+
+    def assert_transaction_not_exists(self, xdata, splits=[]):
+        for q in self._qsets(xdata, splits, join=False):
+            assert not q.exists()
+
+    def _qsets(self, xdata, splits, join=True):
+        qargs = xdata.copy()
+        sdata = [s.copy() for s in qargs.pop('splits', splits)]
+        yield models.Transaction.objects.filter(**qargs)
+        for s in sdata:
+            if join:
+                for f, v in qargs.items():
+                    s['transaction__' + f] = v
+            yield models.Split.objects.filter(**s)
 
     def check_match(self, o, data):
         assert isinstance(o, dm.Transaction)

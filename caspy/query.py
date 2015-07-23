@@ -75,13 +75,11 @@ account = AccountQuery(models.Account)
 
 class TransactionQuery(BaseQuery):
     def all(self, book_id):
-        qargs = {'account__book_id': book_id}
-        qset = models.Split.objects.filter(**qargs)
+        qset = self._split_qset(book_id)
         return list(self._load(qset))
 
     def get(self, book_id, transaction_id):
-        qargs = {'account__book_id': book_id, 'transaction': transaction_id}
-        qset = models.Split.objects.filter(**qargs)
+        qset = self._split_qset(book_id, transaction_id)
         result = list(self._load(qset))
         if result:
             return result[0]
@@ -91,11 +89,22 @@ class TransactionQuery(BaseQuery):
         models.Split.objects.bulk_create(self.splits(obj, instance))
         return instance
 
+    def delete(self, book_id, transaction_id):
+        qset = self._split_qset(book_id, transaction_id)
+        splits = iter(qset.select_related('transaction'))
+        next(splits).transaction.delete()
+
     def splits(self, obj, instance):
         for s in obj.splits:
             si = self.to_orm(s)
             si.transaction = instance
             yield si
+
+    def _split_qset(self, book_id, transaction_id=None):
+        qargs = {'account__book_id': book_id}
+        if transaction_id is not None:
+            qargs['transaction'] = transaction_id
+        return models.Split.objects.filter(**qargs)
 
     def _load(self, split_qset):
         transactions = {}
