@@ -42,7 +42,8 @@ class Book(models.Model):
 class AccountType(models.Model):
     account_type = models.CharField(max_length=128, primary_key=True)
     # (debits increase account balance) <=> (sign == True)
-    sign = models.BooleanField(verbose_name="Debits increase balance")
+    sign = models.BooleanField(verbose_name="Debits increase balance",
+                               default=True)
     credit_term = models.CharField(max_length=32)
     debit_term = models.CharField(max_length=32)
 
