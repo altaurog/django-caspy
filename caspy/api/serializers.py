@@ -2,6 +2,13 @@ from rest_framework import serializers
 from caspy.domain import models as dm
 
 
+class BlankableCharField(serializers.CharField):
+    def __init__(self, *args, **kwargs):
+        super(BlankableCharField, self).__init__(*args, **kwargs)
+        self.required = False
+        self.allow_blank = True
+
+
 class DomainModelSerializer(serializers.Serializer):
     def create(self, validated_data):
         return self._domain_model(**validated_data)
@@ -53,3 +60,33 @@ class AccountSerializer(DomainModelSerializer):
     description = serializers.CharField(max_length=255, required=False)
     path = serializers.CharField(read_only=True)
     parent_id = serializers.IntegerField(allow_null=True)
+
+
+class SplitSerializer(DomainModelSerializer):
+    _domain_model = dm.Split
+    split_id = serializers.IntegerField(required=False)
+    number = BlankableCharField(max_length=32)
+    description = BlankableCharField(max_length=128)
+    account_id = serializers.IntegerField()
+    status = serializers.CharField(max_length=1, required=False)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+
+class TransactionSerializer(DomainModelSerializer):
+    _domain_model = dm.Transaction
+    transaction_id = serializers.IntegerField(read_only=True)
+    date = serializers.DateField()
+    description = BlankableCharField(max_length=128)
+    splits = SplitSerializer(many=True)
+
+    def create(self, validated_data):
+        data = validated_data.copy()
+        data['splits'] = [dm.Split(**sdata) for sdata in data['splits']]
+        return super(TransactionSerializer, self).create(data)
+
+    class Meta:
+        def valid_splits(data):
+            if len(data['splits']) == 0:
+                raise serializers.ValidationError('Must not be an empty list')
+
+        validators = [valid_splits]
