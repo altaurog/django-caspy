@@ -33,6 +33,7 @@ def api_root(request):
             'accounttype': rev('api-accounttype-detail', 'account_type'),
             'book': rev('api-book-detail', 'book_id'),
             'account': rev('api-account-detail', 'account_id'),
+            'transaction': rev('api-transaction-detail', 'transaction_id'),
         })
 
 
@@ -64,4 +65,10 @@ urlpatterns = patterns('',  # noqa
     url(r'^book/(?P<book_id>\d+)/account/(?P<pk>\d+)/$',
         views.AccountDetail.as_view(),
         name='api-account-detail'),
+    url(r'^book/(?P<book_id>\d+)/transaction/$',
+        views.TransactionList.as_view(),
+        name='api-transaction-list'),
+    url(r'^book/(?P<book_id>\d+)/transaction/(?P<pk>\d+)/$',
+        views.TransactionDetail.as_view(),
+        name='api-transaction-detail'),
 )

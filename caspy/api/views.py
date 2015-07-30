@@ -140,3 +140,57 @@ class AccountDetail(DetailView):
         if not self.query_obj.delete(book_id, pk):
             raise Http404('Not found')
         return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TransactionList(ListView):
+    query_obj = query.transaction
+    serializer_class = serializers.TransactionSerializer
+
+    def get(self, request, book_id, format=None):
+        objects = self.query_obj.all(book_id)
+        data = self.serialize(objects, many=True)
+        return response.Response(data)
+
+    def post(self, request, book_id, format=None):
+        data = request.data.copy()
+        data['book'] = book_id
+        ser = self.serializer_class(data=data)
+        if not ser.is_valid():
+            pass
+        #   return response.Response(ser.errors,
+        #                            status=status.HTTP_400_BAD_REQUEST)
+        obj = self.create(ser)
+        self.query_obj.save(obj)
+        data = self.serialize(obj)
+        return response.Response(data, status=status.HTTP_201_CREATED)
+
+
+class TransactionDetail(DetailView):
+    query_obj = query.transaction
+    serializer_class = serializers.TransactionSerializer
+
+    def get(self, request, book_id, pk, format=None):
+        obj = self.query_obj.get(book_id, pk)
+        data = self.serialize(obj)
+        return response.Response(data)
+
+    def put(self, request, book_id, pk, format=None):
+        obj = self.query_obj.get(book_id, pk)
+        if obj is None:
+            raise Http404('Not found')
+        data = request.data.copy()
+        data['book'] = book_id
+        ser = self.serializer_class(obj, data=data)
+        if not ser.is_valid():
+            pass
+#           return response.Response(ser.errors,
+#                                    status=status.HTTP_400_BAD_REQUEST)
+        updated = ser.save()
+        self.query_obj.save(updated)
+        data = self.serialize(updated)
+        return response.Response(data)
+
+    def delete(self, request, book_id, pk, format=None):
+        if not self.query_obj.delete(book_id, pk):
+            raise Http404('Not found')
+        return response.Response(status=status.HTTP_204_NO_CONTENT)

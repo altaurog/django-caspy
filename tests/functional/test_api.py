@@ -2,7 +2,7 @@ try:
     from itertools import izip_longest as zip_longest  # 2
 except ImportError:
     from itertools import zip_longest  # 3
-from datetime import datetime
+from datetime import datetime, timedelta
 from operator import itemgetter, attrgetter
 import pytest
 from django.core.urlresolvers import reverse
@@ -376,3 +376,144 @@ class TestAccountEndpoint(EndpointMixin):
         assert pd['account_type'] == db_o.account_type_id
         assert pd['currency'] == db_o.currency_id
         assert pd['description'] == db_o.description
+
+
+class TestTransactionEndpoint(EndpointMixin):
+    name = 'transaction'
+    pk = 'transaction_id'
+    orm_filter = models.Transaction.objects.filter
+
+    def setup(self):
+        self.client = APIClient()
+        self.instances = fixtures.test_fixture()
+        self.book = self.instances['books'][0]
+        self.salary = self.instances['accounts'][1]
+        self.citibank = self.instances['accounts'][3]
+        self.transactions = self.instances['transactions']
+
+    def teardown(self):
+        # django's flush doesn't purge db intelligently enough
+        cur = connection.cursor()
+        cur.execute("DELETE FROM caspy_split")
+        cur.execute("DELETE FROM caspy_accountpath")
+        cur.execute("DELETE FROM caspy_account")
+        cur.close()
+
+    def test_list_get(self):
+        url = self._list_endpoint(self.book.book_id)
+        response = self.client.get(url)
+        assert response.status_code == 200
+        pairs = list(self._pair(response.data, self.transactions))
+        for pd, db_o in pairs:
+            self.check_match(pd, db_o)
+
+    def test_list_post(self):
+        data = self.new_pd()
+        self.assert_transaction_not_exists(data)
+        endpoint = self._list_endpoint(self.book.book_id)
+        response = self.client.post(endpoint, data)
+        assert response.status_code == 201
+        self.assert_transaction_exists(data)
+
+    def test_item_get(self):
+        for db_o in self.transactions:
+            url = self._item_endpoint(db_o.pk, book_id=self.book.book_id)
+            response = self.client.get(url)
+            assert response.status_code == 200
+            self.check_match(response.data, db_o)
+
+    def test_item_put(self):
+        for i, db_o in enumerate(self.transactions):
+            url = self._item_endpoint(db_o.pk, book_id=self.book.book_id)
+            data = self.modified(i, db_o)
+            response = self.client.put(url, data)
+            assert response.status_code == 200
+            self.assert_transaction_exists(data)
+
+    def test_item_delete(self):
+        for i, db_o in enumerate(self.transactions):
+            url = self._item_endpoint(db_o.pk, book_id=self.book.book_id)
+            xqset = self._qset(pk=db_o.pk)
+            sqset = models.Split.objects.filter(transaction=db_o)
+            assert xqset.exists()
+            assert sqset.exists()
+            response = self.client.delete(url)
+            assert response.status_code == 204
+            assert not sqset.exists()
+            assert not xqset.exists()
+
+    def new_pd(self):
+        return {
+                'date': '2015-07-26',
+                'description': 'Payday',
+                'splits': [
+                    {
+                        'number': '101',
+                        'account_id': str(self.salary.account_id),
+                        'status': 'n',
+                        'amount': -8000,
+                        'description': '',
+                    },
+                    {
+                        'number': '1432',
+                        'account_id': str(self.citibank.account_id),
+                        'status': 'n',
+                        'amount': 8000,
+                        'description': '',
+                    }
+                ],
+            }
+
+    def modified(self, i, db_o):
+        splits = [self.modsplit(i, s) for s in db_o.split_set.all()]
+        return {
+                'date': (db_o.date + timedelta(i)).isoformat(),
+                'description': 'Test Account %d Description' % i,
+                'splits': splits,
+            }
+
+    def modsplit(self, i, dbs):
+        return {
+                'split_id': dbs.split_id,
+                'number': dbs.number + 'm',
+                'account_id': dbs.account_id,
+                'status': 'r',
+                'amount': '%.2f' % (dbs.amount + i),
+                'description': 'Modified ' + dbs.description,
+            }
+
+    def assert_transaction_exists(self, xdata, splits=[]):
+        for q in self._qsets(xdata, splits, join=True):
+            assert q.exists()
+
+    def assert_transaction_not_exists(self, xdata, splits=[]):
+        for q in self._qsets(xdata, splits, join=False):
+            assert not q.exists()
+
+    def _qsets(self, xdata, splits, join=True):
+        qargs = xdata.copy()
+        sdata = [s.copy() for s in qargs.pop('splits', splits)]
+        yield models.Transaction.objects.filter(**qargs)
+        for s in sdata:
+            if join:
+                for f, v in qargs.items():
+                    s['transaction__' + f] = v
+            yield models.Split.objects.filter(**s)
+
+    def _endpoint(self, book_id):
+        url_template = super(TestTransactionEndpoint, self)._endpoint()
+        return url_template.replace(':book_id', str(book_id))
+
+    def check_match(self, pd, db_o):
+        assert pd['transaction_id'] == db_o.transaction_id
+        assert pd['date'] == db_o.date.isoformat()
+        assert pd['description'] == db_o.description
+        pd_splits = sorted(pd['splits'], key=itemgetter('split_id'))
+        db_splits = db_o.split_set.order_by('split_id')
+        for pds, dbs in zip_longest(pd_splits, db_splits):
+            assert pds['split_id'] == dbs.split_id
+            assert pds['number'] == dbs.number
+            assert pds['description'] == dbs.description
+            assert pds['account_id'] == dbs.account_id
+            assert pds['status'] == dbs.status
+            assert pds['amount'] == '%.2f' % (dbs.amount)
