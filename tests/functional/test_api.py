@@ -10,7 +10,7 @@ from django.db import connection
 from rest_framework.test import APIClient
 from rest_framework.fields import DateTimeField
 from caspy import models, time
-from testapp import factories
+from testapp import factories, fixtures
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -288,25 +288,15 @@ class TestAccountEndpoint(EndpointMixin):
 
     def setup(self):
         self.client = APIClient()
-        self.book = factories.BookFactory()
-        factories.CurrencyFactory(cur_code='CAD')
-        kwargs = {
-            'book': self.book,
-            'currency': factories.CurrencyFactory(cur_code='USD'),
-            'account_type': factories.AccountTypeFactory(
-                                            account_type='Income'),
-        }
-        self.income = factories.AccountFactory.create(name='Income', **kwargs)
-        self.salary = factories.AccountFactory.create(name='Salary', **kwargs)
-        self.asset = factories.AccountTypeFactory(account_type='Asset')
-        self.other = factories.AccountFactory(
-                                    name='My Bank',
-                                    account_type=self.asset,
-                                )
+        self.instances = fixtures.test_fixture()
+        self.book = self.instances['books'][0]
+        self.book1_accounts = self.instances['accounts'][:4]
+        self.citibank = self.instances['accounts'][3]
 
     def teardown(self):
         # django's flush doesn't purge db intelligently enough
         cur = connection.cursor()
+        cur.execute("DELETE FROM caspy_split")
         cur.execute("DELETE FROM caspy_accountpath")
         cur.execute("DELETE FROM caspy_account")
         cur.close()
@@ -314,7 +304,7 @@ class TestAccountEndpoint(EndpointMixin):
     def test_list_get(self):
         response = self.client.get(self._list_endpoint(self.book.book_id))
         assert response.status_code == 200
-        pairs = list(self._pair(response.data, [self.income, self.salary]))
+        pairs = list(self._pair(response.data, self.book1_accounts))
         for pd, db_o in pairs:
             self.check_match(pd, db_o)
 
@@ -323,22 +313,22 @@ class TestAccountEndpoint(EndpointMixin):
         qargs = {k: v for k, v in data.items() if k != 'parent_id'}
         qset = self._qset(**qargs)
         assert not qset.exists()
-        endpoint = self._list_endpoint(self.other.book.book_id)
+        endpoint = self._list_endpoint(self.book.book_id)
         response = self.client.post(endpoint, data)
-        data['book'] = self.other.book_id
+        data['book'] = self.book.book_id
         assert response.status_code == 201
         assert slicedict(response.data, data.keys()) == data
         assert qset.exists()
 
     def test_item_get(self):
-        for db_o in [self.income, self.salary, self.other]:
+        for db_o in self.book1_accounts:
             url = self._item_endpoint(db_o.pk, book=db_o.book_id)
             response = self.client.get(url)
             assert response.status_code == 200
             self.check_match(response.data, db_o)
 
     def test_item_put(self):
-        for i, db_o in enumerate([self.income, self.salary, self.other]):
+        for i, db_o in enumerate(self.book1_accounts):
             url = self._item_endpoint(db_o.pk, book=db_o.book_id)
             data = self.modified(i, db_o)
             response = self.client.put(url, data)
@@ -348,7 +338,7 @@ class TestAccountEndpoint(EndpointMixin):
             assert self._qset(book=db_o.book, **data).exists()
 
     def test_item_delete(self):
-        for i, db_o in enumerate([self.income, self.salary, self.other]):
+        for i, db_o in enumerate(self.book1_accounts):
             url = self._item_endpoint(db_o.pk, book=db_o.book_id)
             qset = self._qset(pk=db_o.pk)
             assert qset.exists()
@@ -359,8 +349,8 @@ class TestAccountEndpoint(EndpointMixin):
     def new_pd(self):
         return {
                 'name': 'Test',
-                'account_type': self.other.account_type_id,
-                'currency': self.income.currency_id,
+                'account_type': self.citibank.account_type_id,
+                'currency': 'USD',
                 'description': 'Test account description',
                 'parent_id': None,
             }
