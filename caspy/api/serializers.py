@@ -84,6 +84,12 @@ class TransactionSerializer(DomainModelSerializer):
         data['splits'] = [dm.Split(**sdata) for sdata in data['splits']]
         return super(TransactionSerializer, self).create(data)
 
+    def update(self, instance, validated_data):
+        data = validated_data.copy()
+        # this won't support partial split updates
+        data['splits'] = [dm.Split(**sdata) for sdata in data['splits']]
+        return super(TransactionSerializer, self).update(instance, data)
+
     class Meta:
         def valid_splits(data):
             if len(data['splits']) == 0:

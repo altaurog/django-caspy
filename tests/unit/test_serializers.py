@@ -300,7 +300,24 @@ class TestTransactionSerializer:
     serializer_class = serializers.TransactionSerializer
 
     def test_dm_to_pd(self):
-        obj = dm.Transaction(
+        obj = self.domain_obj()
+        ser = self.serializer_class(obj)
+        data = ser.data
+        assert data['transaction_id'] == 248
+        assert data['date'] == '2015-07-16'
+        assert data['description'] == 'Birthday card'
+        assert data['splits'][0]['split_id'] == 613
+        assert data['splits'][0]['number'] == '365'
+        assert data['splits'][0]['account_id'] == 10
+        assert data['splits'][0]['status'] == 'c'
+        assert data['splits'][0]['amount'] == '-25.00'
+        assert data['splits'][1]['split_id'] == 614
+        assert data['splits'][1]['description'] == 'Moked'
+        assert data['splits'][1]['account_id'] == 18
+        assert data['splits'][1]['amount'] == '25.00'
+
+    def domain_obj(self):
+        return dm.Transaction(
             transaction_id=248,
             date=date(2015, 7, 16),
             description='Birthday card',
@@ -320,47 +337,34 @@ class TestTransactionSerializer:
                 ),
             ],
         )
-        ser = self.serializer_class(obj)
-        data = ser.data
-        assert data['transaction_id'] == 248
-        assert data['date'] == '2015-07-16'
-        assert data['description'] == 'Birthday card'
-        assert data['splits'][0]['split_id'] == 613
-        assert data['splits'][0]['number'] == '365'
-        assert data['splits'][0]['account_id'] == 10
-        assert data['splits'][0]['status'] == 'c'
-        assert data['splits'][0]['amount'] == '-25.00'
-        assert data['splits'][1]['split_id'] == 614
-        assert data['splits'][1]['description'] == 'Moked'
-        assert data['splits'][1]['account_id'] == 18
-        assert data['splits'][1]['amount'] == '25.00'
 
-    data = {
-            'transaction_id': 249,
-            'date': '2015-07-17',
-            'description': 'Eye Drops',
-            'splits': [
-                    {
-                        'split_id': 615,
-                        'number': '366',
-                        'description': '',
-                        'account_id': 10,
-                        'status': 'c',
-                        'amount': '-16',
-                    },
-                    {
-                        'split_id': 616,
-                        'number': '',
-                        'description': 'Wolfson Pharmacy',
-                        'account_id': 20,
-                        'status': 'c',
-                        'amount': '16',
-                    },
-                ]
-        }
+    def data(self):
+        return {
+                'transaction_id': 249,
+                'date': '2015-07-17',
+                'description': 'Eye Drops',
+                'splits': [
+                        {
+                            'split_id': 615,
+                            'number': '366',
+                            'description': '',
+                            'account_id': 10,
+                            'status': 'c',
+                            'amount': '-16',
+                        },
+                        {
+                            'split_id': 616,
+                            'number': '',
+                            'description': 'Wolfson Pharmacy',
+                            'account_id': 20,
+                            'status': 'c',
+                            'amount': '16',
+                        },
+                    ]
+            }
 
     def test_pd_to_dm(self):
-        ser = self.serializer_class(data=self.data)
+        ser = self.serializer_class(data=self.data())
         assert ser.is_valid()
         obj = ser.save()
         assert isinstance(obj, dm.Transaction)
@@ -382,20 +386,48 @@ class TestTransactionSerializer:
         assert obj.splits[1].status == 'c'
         assert obj.splits[1].amount == Decimal('16.00')
 
+    def test_update_dm(self):
+        obj = self.domain_obj()
+        data = self.data()
+        del data['transaction_id']
+        data['splits'][0]['split_id'] = 613
+        data['splits'][1]['split_id'] = 614
+        ser = self.serializer_class(obj, data=data)
+        assert ser.is_valid()
+        updated = ser.save()
+        assert isinstance(updated, dm.Transaction)
+        assert updated.transaction_id == obj.transaction_id
+        assert updated.date == date(2015, 7, 17)
+        assert updated.description == 'Eye Drops'
+        assert isinstance(updated.splits[0], dm.Split)
+        assert updated.splits[0].split_id == 613
+        assert updated.splits[0].number == '366'
+        assert updated.splits[0].description == ''
+        assert updated.splits[0].account_id == 10
+        assert updated.splits[0].status == 'c'
+        assert updated.splits[0].amount == Decimal('-16.00')
+        assert isinstance(updated.splits[1], dm.Split)
+        assert updated.splits[1].split_id == 614
+        assert updated.splits[1].number == ''
+        assert updated.splits[1].description == 'Wolfson Pharmacy'
+        assert updated.splits[1].account_id == 20
+        assert updated.splits[1].status == 'c'
+        assert updated.splits[1].amount == Decimal('16.00')
+
     optional = ['transaction_id', 'description']
 
     @pytest.mark.parametrize('field', optional)
     def test_optional_fields(self, field):
-        data = self.data.copy()
+        data = self.data()
         del data[field]
         ser = self.serializer_class(data=data)
         assert ser.is_valid()
 
-    required = set(data.keys()).difference(optional)
+    required = ['date', 'splits']
 
     @pytest.mark.parametrize('field', required)
     def test_required_fields(self, field):
-        data = self.data.copy()
+        data = self.data()
         del data[field]
         ser = self.serializer_class(data=data)
         assert not ser.is_valid()
@@ -404,34 +436,34 @@ class TestTransactionSerializer:
 
     @pytest.mark.parametrize('field', ['transaction_id', 'description'])
     def test_blank_description(self, field):
-        data = self.data.copy()
+        data = self.data()
         data[field] = ''
         ser = self.serializer_class(data=data)
         assert ser.is_valid()
 
     @pytest.mark.parametrize('field', ['date'])
     def test_nonblank_fields(self, field):
-        data = self.data.copy()
+        data = self.data()
         data[field] = ''
         ser = self.serializer_class(data=data)
         assert not ser.is_valid()
 
     def test_empty_split_list(self):
-        data = self.data.copy()
+        data = self.data()
         data['splits'] = []
         ser = self.serializer_class(data=data)
         assert not ser.is_valid()
 
     @pytest.mark.parametrize('val', [1, 'hi', None])
     def test_split_invalid_values(self, val):
-        data = self.data.copy()
+        data = self.data()
         data['splits'] = val
         ser = self.serializer_class(data=data)
         assert not ser.is_valid()
 
     @pytest.mark.parametrize('field', ['number', 'description', 'status'])
     def test_optional_split_fields(self, field):
-        data = self.data.copy()
+        data = self.data()
         del data['splits'][0][field]
         ser = self.serializer_class(data=data)
         assert ser.is_valid()
@@ -439,7 +471,7 @@ class TestTransactionSerializer:
     @pytest.mark.parametrize('split', [0, 1])
     @pytest.mark.parametrize('field', ['account_id', 'amount'])
     def test_required_split_fields(self, split, field):
-        data = self.data.copy()
+        data = self.data()
         del data['splits'][split][field]
         ser = self.serializer_class(data=data)
         assert not ser.is_valid()
