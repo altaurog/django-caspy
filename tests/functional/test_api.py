@@ -322,14 +322,14 @@ class TestAccountEndpoint(EndpointMixin):
 
     def test_item_get(self):
         for db_o in self.book1_accounts:
-            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
             response = self.client.get(url)
             assert response.status_code == 200
             self.check_match(response.data, db_o)
 
     def test_item_put(self):
         for i, db_o in enumerate(self.book1_accounts):
-            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
             data = self.modified(i, db_o)
             response = self.client.put(url, data)
             assert response.status_code == 200
@@ -339,7 +339,7 @@ class TestAccountEndpoint(EndpointMixin):
 
     def test_item_delete(self):
         for i, db_o in enumerate(self.book1_accounts):
-            url = self._item_endpoint(db_o.pk, book=db_o.book_id)
+            url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
             qset = self._qset(pk=db_o.pk)
             assert qset.exists()
             response = self.client.delete(url)
@@ -365,9 +365,9 @@ class TestAccountEndpoint(EndpointMixin):
                 'parent_id': None,
             }
 
-    def _endpoint(self, book):
+    def _endpoint(self, book_id):
         url_template = super(TestAccountEndpoint, self)._endpoint()
-        return url_template.replace(':book_id', str(book))
+        return url_template.replace(':book_id', str(book_id))
 
     def check_match(self, pd, db_o):
         assert pd['account_id'] == db_o.account_id
