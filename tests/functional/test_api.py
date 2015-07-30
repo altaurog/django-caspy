@@ -282,7 +282,7 @@ class TestAccountTypeEndpoint(APIMixin):
 
 
 class TestAccountEndpoint(EndpointMixin):
-    name = 'book_account'
+    name = 'account'
     pk = 'account_id'
     orm_filter = models.Account.objects.filter
 

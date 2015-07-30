@@ -32,7 +32,7 @@ def api_root(request):
             'currency': rev('api-currency-detail', 'cur_code'),
             'accounttype': rev('api-accounttype-detail', 'account_type'),
             'book': rev('api-book-detail', 'book_id'),
-            'book_account': rev('api-account-detail', 'account_id'),
+            'account': rev('api-account-detail', 'account_id'),
         })
 
 

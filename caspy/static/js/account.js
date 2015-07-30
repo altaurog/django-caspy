@@ -7,7 +7,7 @@ mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
             function makeChoice(account) {
                 return [account.account_id, account.path];
             };
-            var res = caspyAPI.get_resource('book_account', {'book_id': book_id});
+            var res = caspyAPI.get_resource('account', {'book_id': book_id});
             return new ResourceWrapper(res, 'account_id', makeChoice);
         };
     }]
