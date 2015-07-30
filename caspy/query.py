@@ -91,8 +91,12 @@ class TransactionQuery(BaseQuery):
 
     def delete(self, book_id, transaction_id):
         qset = self._split_qset(book_id, transaction_id)
-        splits = iter(qset.select_related('transaction'))
-        next(splits).transaction.delete()
+        try:
+            split = qset.select_related('transaction')[0]
+        except IndexError:
+            return False
+        split.transaction.delete()
+        return True
 
     def splits(self, obj, instance):
         for s in obj.splits:

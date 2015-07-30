@@ -376,8 +376,14 @@ class TestTransactionQuery:
             transaction_id = self.transactions[i].transaction_id
             self.assert_transaction_exists(xdata)
             with assert_max_queries(3):
-                self.query_obj.delete(book_id, transaction_id)
+                assert self.query_obj.delete(book_id, transaction_id)
             self.assert_transaction_not_exists(xdata)
+
+    def test_delete_not_exists(self):
+        book_id = self.book.book_id
+        transactions = models.Transaction.objects.all()
+        max_id = max(x.transaction_id for x in transactions)
+        assert not self.query_obj.delete(book_id, max_id + 100)
 
     def assert_transaction_exists(self, xdata, splits=[]):
         for q in self._qsets(xdata, splits, join=True):
