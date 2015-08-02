@@ -22,8 +22,7 @@ def orm_to_domain(obj):
 
 class BaseAdaptor:
     def to_orm(self, obj):
-        kwargs = obj.dict()
-        return self.django_model(**kwargs)
+        return self.django_model(**obj)
 
     def to_domain(self, instance):
         kwargs = {f: getattr(instance, f) for f in self.domain_model._fields}

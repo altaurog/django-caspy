@@ -1,10 +1,11 @@
 """
 Lightweight objects
 """
+import collections
 from caspy import str
 
 
-class Lightweight(object):
+class Lightweight(collections.Mapping):
     def __init__(self, *args, **kwargs):
         for f in self._fields:
             setattr(self, f, get(f, *args, **kwargs))
@@ -12,14 +13,17 @@ class Lightweight(object):
     def copy(self, **kwargs):
         return self.__class__(self, **kwargs)
 
-    def dict(self):
-        return dict(self._items())
+    def __iter__(self):
+        return iter(self._fields)
 
-    def _items(self):
-        return ((f, getattr(self, f)) for f in self._fields)
+    def __len__(self):
+        return len(self._fields)
 
     def __str__(self):
         return str(getattr(self, self._fields[0]))
+
+    def __getitem__(self, name):
+        return getattr(self, name)
 
     def __repr__(self):
         kwargs = ['{}={!r}'.format(f, getattr(self, f)) for f in self._fields]
@@ -32,4 +36,7 @@ def get(*args, **kwargs):
 
 def _get(name, *args):
     if args:
-        return getattr(args[0], name, get(name, *args[1:]))
+        try:
+            return args[0].get(name, get(name, *args[1:]))
+        except AttributeError:
+            return getattr(args[0], name, get(name, *args[1:]))

@@ -61,7 +61,7 @@ class BaseTestQuery:
         return self.orm_filter(pk=pk)
 
     def obj_qset(self, domain_object):
-        return self.orm_filter(**domain_object.dict())
+        return self.orm_filter(**domain_object)
 
 
 class TestCurrencyQuery(BaseTestQuery):

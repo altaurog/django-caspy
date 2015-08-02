@@ -44,6 +44,24 @@ class TestLightweight:
         assert u_triangle.sides == 3
         assert u_triangle.size == 1
 
+    def test_init_copy(self):
+        obj = self.Polygon(self.u_square)
+        assert obj.sides == 4
+        assert obj.size == 1
+
+    def test_init_dict(self):
+        obj = self.Polygon({'sides': 4, 'size': 1})
+        assert obj.sides == 4
+        assert obj.size == 1
+
+    def test_init_from_obj(self):
+        class TestClass:
+            sides = 8
+            size = 2
+        obj = self.Polygon(TestClass())
+        assert obj.sides == 8
+        assert obj.size == 2
+
     def test_copy(self):
         self.u_square = self.Polygon(sides=4, size=1)
         u_pent = self.u_square.copy(sides=5)
@@ -65,9 +83,7 @@ class TestLightweight:
         assert repr(o) == "Obj(name='Bob')"
 
     def test_dict(self):
-        assert self.u_square.dict() == {'sides': 4, 'size': 1}
+        assert dict(self.u_square) == {'sides': 4, 'size': 1}
 
-    def test_items(self):
-        items = list(self.u_square._items())
-        assert items[0] == ('sides', 4)
-        assert items[1] == ('size', 1)
+    def test_doublestar(self):
+        assert dict(**self.u_square) == {'sides': 4, 'size': 1}
