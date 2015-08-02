@@ -228,7 +228,7 @@ class TestSplitSerializer:
         )
         ser = self.serializer_class(obj)
         data = ser.data
-        assert data['split_id'] == 53
+        assert 'split_id' not in data
         assert data['number'] == '100'
         assert data['description'] == 'Paycheck'
         assert data['account_id'] == 3
@@ -250,7 +250,7 @@ class TestSplitSerializer:
         obj = ser.save()
         assert isinstance(obj, dm.Split)
         assert isinstance(obj.amount, Decimal)
-        assert obj.split_id == 50124
+        assert obj.split_id is None
         assert obj.number == '692'
         assert obj.description == 'Water bill'
         assert obj.account_id == 24
@@ -277,7 +277,7 @@ class TestSplitSerializer:
         ser = self.serializer_class(data=data)
         assert ser.is_valid()
 
-    blank = ['number', 'description']
+    blank = ['number', 'description', 'split_id']
 
     @pytest.mark.parametrize('field', blank)
     def test_blank_fields(self, field):
@@ -306,12 +306,12 @@ class TestTransactionSerializer:
         assert data['transaction_id'] == 248
         assert data['date'] == '2015-07-16'
         assert data['description'] == 'Birthday card'
-        assert data['splits'][0]['split_id'] == 613
+        assert 'split_id' not in data['splits'][0]
         assert data['splits'][0]['number'] == '365'
         assert data['splits'][0]['account_id'] == 10
         assert data['splits'][0]['status'] == 'c'
         assert data['splits'][0]['amount'] == '-25.00'
-        assert data['splits'][1]['split_id'] == 614
+        assert 'split_id' not in data['splits'][1]
         assert data['splits'][1]['description'] == 'Moked'
         assert data['splits'][1]['account_id'] == 18
         assert data['splits'][1]['amount'] == '25.00'
@@ -372,14 +372,14 @@ class TestTransactionSerializer:
         assert obj.date == date(2015, 7, 17)
         assert obj.description == 'Eye Drops'
         assert isinstance(obj.splits[0], dm.Split)
-        assert obj.splits[0].split_id == 615
+        assert obj.splits[0].split_id is None
         assert obj.splits[0].number == '366'
         assert obj.splits[0].description == ''
         assert obj.splits[0].account_id == 10
         assert obj.splits[0].status == 'c'
         assert obj.splits[0].amount == Decimal('-16.00')
         assert isinstance(obj.splits[1], dm.Split)
-        assert obj.splits[1].split_id == 616
+        assert obj.splits[1].split_id is None
         assert obj.splits[1].number == ''
         assert obj.splits[1].description == 'Wolfson Pharmacy'
         assert obj.splits[1].account_id == 20
@@ -390,8 +390,6 @@ class TestTransactionSerializer:
         obj = self.domain_obj()
         data = self.data()
         del data['transaction_id']
-        data['splits'][0]['split_id'] = 613
-        data['splits'][1]['split_id'] = 614
         ser = self.serializer_class(obj, data=data)
         assert ser.is_valid()
         updated = ser.save()
@@ -400,14 +398,14 @@ class TestTransactionSerializer:
         assert updated.date == date(2015, 7, 17)
         assert updated.description == 'Eye Drops'
         assert isinstance(updated.splits[0], dm.Split)
-        assert updated.splits[0].split_id == 613
+        assert updated.splits[0].split_id is None
         assert updated.splits[0].number == '366'
         assert updated.splits[0].description == ''
         assert updated.splits[0].account_id == 10
         assert updated.splits[0].status == 'c'
         assert updated.splits[0].amount == Decimal('-16.00')
         assert isinstance(updated.splits[1], dm.Split)
-        assert updated.splits[1].split_id == 614
+        assert updated.splits[1].split_id is None
         assert updated.splits[1].number == ''
         assert updated.splits[1].description == 'Wolfson Pharmacy'
         assert updated.splits[1].account_id == 20

@@ -64,7 +64,6 @@ class AccountSerializer(DomainModelSerializer):
 
 class SplitSerializer(DomainModelSerializer):
     _domain_model = dm.Split
-    split_id = serializers.IntegerField(required=False)
     number = BlankableCharField(max_length=32)
     description = BlankableCharField(max_length=128)
     account_id = serializers.IntegerField()
