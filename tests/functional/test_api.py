@@ -422,13 +422,16 @@ class TestTransactionEndpoint(EndpointMixin):
             assert response.status_code == 200
             self.check_match(response.data, db_o)
 
-    def test_item_put(self):
-        for i, db_o in enumerate(self.transactions):
-            url = self._item_endpoint(db_o.pk, book_id=self.book.book_id)
-            data = self.modified(i, db_o)
-            response = self.client.put(url, data)
-            assert response.status_code == 200
-            self.assert_transaction_exists(data)
+    @pytest.mark.parametrize('xdata', fixtures.transaction_data)
+    def test_transaction_put(self, xdata):
+        self.assert_transaction_exists(xdata)
+        book_id = self.book.book_id
+        url = self._item_endpoint(xdata['transaction_id'], book_id=book_id)
+        updated = self.modified(xdata)
+        self.assert_transaction_not_exists(updated)
+        response = self.client.put(url, updated)
+        assert response.status_code == 200
+        self.assert_transaction_exists(updated)
 
     def test_item_delete(self):
         for i, db_o in enumerate(self.transactions):
@@ -464,22 +467,21 @@ class TestTransactionEndpoint(EndpointMixin):
                 ],
             }
 
-    def modified(self, i, db_o):
-        splits = [self.modsplit(i, s) for s in db_o.split_set.all()]
+    def modified(self, xdata):
+        splits = [self.modsplit(s) for s in xdata['splits']]
         return {
-                'date': (db_o.date + timedelta(i)).isoformat(),
-                'description': 'Test Account %d Description' % i,
+                'date': (xdata['date'] + timedelta(1)).isoformat(),
+                'description': 'Description %d' % xdata['transaction_id'],
                 'splits': splits,
             }
 
-    def modsplit(self, i, dbs):
+    def modsplit(self, split):
         return {
-                'split_id': dbs.split_id,
-                'number': dbs.number + 'm',
-                'account_id': dbs.account_id,
-                'status': 'r',
-                'amount': '%.2f' % (dbs.amount + i),
-                'description': 'Modified ' + dbs.description,
+                'number': split['number'],
+                'account_id': split['account_id'],
+                'status': split['status'],
+                'amount': '%.2f' % (split['amount'] * 2),
+                'description': '%s (factor 2)' % split['description'],
             }
 
     def assert_transaction_exists(self, xdata, splits=[]):
@@ -495,6 +497,7 @@ class TestTransactionEndpoint(EndpointMixin):
         sdata = [s.copy() for s in qargs.pop('splits', splits)]
         yield models.Transaction.objects.filter(**qargs)
         for s in sdata:
+            s.pop('split_id', None)
             if join:
                 for f, v in qargs.items():
                     s['transaction__' + f] = v
@@ -508,10 +511,10 @@ class TestTransactionEndpoint(EndpointMixin):
         assert pd['transaction_id'] == db_o.transaction_id
         assert pd['date'] == db_o.date.isoformat()
         assert pd['description'] == db_o.description
-        pd_splits = sorted(pd['splits'], key=itemgetter('split_id'))
-        db_splits = db_o.split_set.order_by('split_id')
+        sort_by = ('number', 'amount', 'description', 'status')
+        pd_splits = sorted(pd['splits'], key=itemgetter(*sort_by))
+        db_splits = db_o.split_set.order_by(*sort_by)
         for pds, dbs in zip_longest(pd_splits, db_splits):
-            assert pds['split_id'] == dbs.split_id
             assert pds['number'] == dbs.number
             assert pds['description'] == dbs.description
             assert pds['account_id'] == dbs.account_id
