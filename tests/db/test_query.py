@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 try:
     from itertools import izip_longest as zip_longest  # 2
 except ImportError:
@@ -324,6 +324,7 @@ class TestTransactionQuery:
     query_obj = query.transaction
 
     def setup(self):
+        set_constraints_immediate(connection)
         instances = fixtures.test_fixture()
         self.book = instances['books'][0]
         self.salary = instances['accounts'][1]
@@ -364,11 +365,52 @@ class TestTransactionQuery:
                 'date': date(2015, 7, 26),
                 'description': 'Payday',
             }
-        splits = [dm.Split(**sa), dm.Split(**sb)]
-        xact_obj = dm.Transaction(splits=splits, **xact)
+        splits = [dm.Split(sa), dm.Split(sb)]
+        xact_obj = dm.Transaction(xact, splits=splits)
         self.assert_transaction_not_exists(xact, [sa, sb])
         self.query_obj.save(xact_obj)
         self.assert_transaction_exists(xact, [sa, sb])
+
+    @pytest.mark.parametrize('xdata', fixtures.transaction_data)
+    def test_update_transaction(self, xdata):
+        self.assert_transaction_exists(xdata)
+        updated = dm.Transaction(
+                        date=xdata['date'] + timedelta(1),
+                        description='updated description',
+                        transaction_id=xdata['transaction_id'],
+                        splits=[dm.Split(s) for s in xdata['splits']],
+                    )
+        db_o = self.query_obj.save(updated)
+        assert db_o.transaction_id == updated.transaction_id
+        assert db_o.split_set.count() == 2
+        self.assert_transaction_exists(updated)
+
+    def make_split(self, dbs):
+        return dm.Split(
+                account_id=dbs.account_id,
+                number=dbs.number,
+                description=dbs.description,
+                amount=dbs.amount,
+                status=dbs.status,
+            )
+
+    @pytest.mark.parametrize('xdata', fixtures.transaction_data)
+    def test_update_transaction_splits(self, xdata):
+        self.assert_transaction_exists(xdata)
+        updated = dm.Transaction(xdata,
+                                 splits=map(self.mod_split, xdata['splits']))
+        self.query_obj.save(updated)
+        self.assert_transaction_exists(updated)
+        self.assert_num_splits(updated.transaction_id, 2)
+
+    def mod_split(self, split):
+        return dm.Split(
+                account_id=split['account_id'],
+                number=split['number'] + 'm',
+                description='x' + split['description'],
+                amount=split['amount'] * 2,
+                status='r',
+            )
 
     def test_delete_transaction(self):
         book_id = self.book.book_id
@@ -385,6 +427,10 @@ class TestTransactionQuery:
         max_id = max(x.transaction_id for x in transactions)
         assert not self.query_obj.delete(book_id, max_id + 100)
 
+    def assert_num_splits(self, transaction, numsplits):
+        qset = models.Split.objects.filter(transaction=transaction)
+        assert numsplits == qset.count()
+
     def assert_transaction_exists(self, xdata, splits=[]):
         for q in self._qsets(xdata, splits, join=True):
             assert q.exists()
@@ -394,10 +440,11 @@ class TestTransactionQuery:
             assert not q.exists()
 
     def _qsets(self, xdata, splits, join=True):
-        qargs = xdata.copy()
-        sdata = [s.copy() for s in qargs.pop('splits', splits)]
+        qargs = dict(xdata)
+        sdata = [dict(s) for s in qargs.pop('splits', splits)]
         yield models.Transaction.objects.filter(**qargs)
         for s in sdata:
+            s.pop('split_id', None)
             if join:
                 for f, v in qargs.items():
                     s['transaction__' + f] = v

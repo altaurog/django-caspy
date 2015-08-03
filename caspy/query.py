@@ -85,13 +85,13 @@ class TransactionQuery(BaseQuery):
             return result[0]
 
     def save(self, obj):
+        if obj.transaction_id:
+            models.Split.objects.filter(
+                                    transaction=obj.transaction_id
+                               ).delete()
         instance = super(TransactionQuery, self).save(obj)
         splits = list(self.splits(obj, instance))
-        if not any(filter(lambda s: s.split_id, splits)):
-            models.Split.objects.bulk_create(splits)
-        else:
-            for s in splits:
-                s.save()
+        models.Split.objects.bulk_create(splits)
         return instance
 
     def delete(self, book_id, transaction_id):
