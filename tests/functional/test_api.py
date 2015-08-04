@@ -155,8 +155,8 @@ class TestCurrencyEndpoint(APIMixin):
                 'long_name': 'Modified Currency %d' % i,
             }
 
-    @pytest.mark.parametrize('field', ('cur_code',))
-    def test_post_missing_required_fields(self, field):
+    def test_post_missing_required_fields(self):
+        field = 'cur_code'
         data = self.new_pd()
         del data[field]
         response = self.client.post(self._list_endpoint(), data)
@@ -164,15 +164,15 @@ class TestCurrencyEndpoint(APIMixin):
         assert field in response.data
         assert 'This field is required.' in response.data[field]
 
-    @pytest.mark.parametrize('field', ('shortcut', 'symbol', 'long_name',))
-    def test_post_missing_optional_fields(self, field):
+    def test_post_missing_optional_fields(self):
+        field = 'shortcut'
         data = self.new_pd()
         del data[field]
         response = self.client.post(self._list_endpoint(), data)
         assert response.status_code == 201
 
-    @pytest.mark.parametrize('field', ('cur_code',))
-    def test_put_missing_fields(self, field):
+    def test_put_missing_fields(self):
+        field = 'cur_code'
         for i, db_o in enumerate(self.db_objs):
             url = self._item_endpoint(db_o.pk)
             data = self.modified(i, db_o.pk)
@@ -182,8 +182,8 @@ class TestCurrencyEndpoint(APIMixin):
             assert field in response.data
             assert 'This field is required.' in response.data[field]
 
-    @pytest.mark.parametrize('field', ('shortcut', 'symbol', 'long_name',))
-    def test_put_missing_optional_fields(self, field):
+    def test_put_missing_optional_fields(self):
+        field = 'long_name'
         for i, db_o in enumerate(self.db_objs):
             url = self._item_endpoint(db_o.pk)
             data = self.modified(i, db_o.pk)
@@ -216,8 +216,8 @@ class TestBookEndpoint(APIMixin):
     def modified(self, i, pk):
         return {'name': 'Functional Test Book %d' % i}
 
-    @pytest.mark.parametrize('field', ('name',))
-    def test_post_missing_required_fields(self, field):
+    def test_post_missing_required_fields(self):
+        field = 'name'
         data = self.new_pd()
         del data[field]
         response = self.client.post(self._list_endpoint(), data)
@@ -269,10 +269,8 @@ class TestAccountTypeEndpoint(APIMixin):
                 'debit_term': 'increase',
             }
 
-    required_fields = ('account_type', 'sign', 'credit_term', 'debit_term')
-
-    @pytest.mark.parametrize('field', required_fields)
-    def test_post_missing_required_fields(self, field):
+    def test_post_missing_required_fields(self):
+        field = 'sign'
         data = self.new_pd()
         del data[field]
         response = self.client.post(self._list_endpoint(), data)
@@ -422,8 +420,8 @@ class TestTransactionEndpoint(EndpointMixin):
             assert response.status_code == 200
             self.check_match(response.data, db_o)
 
-    @pytest.mark.parametrize('xdata', fixtures.transaction_data)
-    def test_transaction_put(self, xdata):
+    def test_transaction_put(self):
+        xdata = fixtures.transaction_data[0]
         self.assert_transaction_exists(xdata)
         book_id = self.book.book_id
         endpoint = self._item_endpoint(xdata['transaction_id'], book_id)
