@@ -1,5 +1,4 @@
 {% load staticfiles %}
-{% load assets %}
 <!doctype html>
 <html lang="en" ng-app="caspy">
     <head>
@@ -22,9 +21,13 @@
                     }));
             })();
         </script>
-        {% assets "js_all" %}
-        <script src="{{ ASSET_URL }}"></script>
-        {% endassets %}
+        <script src="{% static 'js/caspy.js' %}"></script>
+        <script src="{% static 'js/api.js' %}"></script>
+        <script src="{% static 'js/currency.js' %}"></script>
+        <script src="{% static 'js/book.js' %}"></script>
+        <script src="{% static 'js/accounttype.js' %}"></script>
+        <script src="{% static 'js/account.js' %}"></script>
+        <script src="{% static 'js/generic.js' %}"></script>
     </head>
     <body>
         <a href="#/menu/">Menu</a>
