@@ -426,10 +426,10 @@ class TestTransactionEndpoint(EndpointMixin):
     def test_transaction_put(self, xdata):
         self.assert_transaction_exists(xdata)
         book_id = self.book.book_id
-        url = self._item_endpoint(xdata['transaction_id'], book_id=book_id)
+        endpoint = self._item_endpoint(xdata['transaction_id'], book_id)
         updated = self.modified(xdata)
         self.assert_transaction_not_exists(updated)
-        response = self.client.put(url, updated)
+        response = self.client.put(endpoint, updated)
         assert response.status_code == 200
         self.assert_transaction_exists(updated)
 
