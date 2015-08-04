@@ -1,0 +1,13 @@
+<tr>
+    <td>{{ item.date }}</td>
+    <td>{{ item.description }}</td>
+</tr>
+<tr ng-repeat="split in item.splits">
+    <td></td>
+    <td>{{ split.description }}</td>
+    <td>{{ split.number }}</td>
+    <td>{{ split.account_id }}</td>
+    <td>{{ split.status }}</td>
+    <td>{{ split.debit }}</td>
+    <td>{{ split.credit }}</td>
+</tr>

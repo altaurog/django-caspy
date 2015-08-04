@@ -7,6 +7,7 @@ var mod = angular.module('caspy',
       , 'caspy.book'
       , 'caspy.accounttype'
       , 'caspy.account'
+      , 'caspy.transaction'
     ]
 );
 
@@ -66,6 +67,11 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
             .when('/book/:book_id/account/', {
                   templateUrl: 'partials/account/account-list.html'
                 , controller: 'AccountController'
+                , controllerAs: 'listcontroller'
+            })
+            .when('/book/:book_id/transaction/', {
+                  templateUrl: 'partials/transaction/transaction-list.html'
+                , controller: 'TransactionController'
                 , controllerAs: 'listcontroller'
             })
             .otherwise({

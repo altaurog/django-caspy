@@ -1,0 +1,23 @@
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Num</th>
+            <th>Account</th>
+            <th>Status</th>
+            <th>Debit</th>
+            <th>Credit</th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="item in listcontroller.transactions"
+        ng-include="'partials/transaction/transaction-item.html'"
+        ng-click="listcontroller.select(item)">
+    </tbody>
+</table>
+<div ng-show="listcontroller.edititem"
+    ng-include="'partials/transaction/edit.html'">
+</div>
+<div ng-include="'partials/generic/buttons.html'">
+
+
