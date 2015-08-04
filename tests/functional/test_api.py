@@ -445,6 +445,42 @@ class TestTransactionEndpoint(EndpointMixin):
             assert not sqset.exists()
             assert not xqset.exists()
 
+    def test_post_missing_required_fields(self):
+        field = 'date'
+        data = self.new_pd()
+        del data[field]
+        endpoint = self._list_endpoint(self.book.book_id)
+        response = self.client.post(endpoint, data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field is required.' in response.data[field]
+
+    def test_put_missing_required_fields(self):
+        field = 'splits'
+        xdata = fixtures.transaction_data[0]
+        book_id = self.book.book_id
+        endpoint = self._item_endpoint(xdata['transaction_id'], book_id)
+        updated = self.modified(xdata)
+        del updated[field]
+        response = self.client.put(endpoint, updated)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field is required.' in response.data[field]
+
+    def test_put_nonexistent(self):
+        xid = max(x['transaction_id'] for x in fixtures.transaction_data) + 1
+        book_id = self.book.book_id
+        endpoint = self._item_endpoint(xid, book_id)
+        response = self.client.put(endpoint, {})
+        assert response.status_code == 404
+
+    def test_delete_nonexistent(self):
+        xid = max(x['transaction_id'] for x in fixtures.transaction_data) + 1
+        book_id = self.book.book_id
+        endpoint = self._item_endpoint(xid, book_id)
+        response = self.client.delete(endpoint)
+        assert response.status_code == 404
+
     def new_pd(self):
         return {
                 'date': '2015-07-26',

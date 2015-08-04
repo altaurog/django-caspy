@@ -163,9 +163,8 @@ class TransactionList(ListView):
         data['book'] = book_id
         ser = self.serializer_class(data=data)
         if not ser.is_valid():
-            pass
-        #   return response.Response(ser.errors,
-        #                            status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
         obj = self.create(ser)
         with transaction.atomic():
             self.query_obj.save(obj)
@@ -190,9 +189,8 @@ class TransactionDetail(DetailView):
         data['book'] = book_id
         ser = self.serializer_class(obj, data=data)
         if not ser.is_valid():
-            pass
-#           return response.Response(ser.errors,
-#                                    status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(ser.errors,
+                                     status=status.HTTP_400_BAD_REQUEST)
         updated = ser.save()
         with transaction.atomic():
             self.query_obj.save(updated)
