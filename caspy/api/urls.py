@@ -1,6 +1,5 @@
 import re
 from django.conf.urls import patterns, url
-from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from . import views
@@ -42,10 +41,10 @@ urlpatterns = patterns('',  # noqa
         api_root,
         name='api-root'),
     url(r'^currency/$',
-        transaction.atomic(views.CurrencyList.as_view()),
+        views.CurrencyList.as_view(),
         name='api-currency-list'),
     url(r'^currency/(?P<pk>[A-Z]+)/$',
-        transaction.atomic(views.CurrencyDetail.as_view()),
+        views.CurrencyDetail.as_view(),
         name='api-currency-detail'),
     url(r'^book/$',
         views.BookList.as_view(),

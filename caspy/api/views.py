@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import Http404
 from rest_framework import response, status, views
 from ..domain import command
@@ -25,9 +26,10 @@ class ListView(BaseAPIView):
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)
         obj = self.create(ser)
-        self.query_obj.save(obj)
-        data = self.serialize(obj)
-        return response.Response(data, status=status.HTTP_201_CREATED)
+        with transaction.atomic():
+            self.query_obj.save(obj)
+            data = self.serialize(obj)
+            return response.Response(data, status=status.HTTP_201_CREATED)
 
 
 class DetailView(BaseAPIView):
@@ -47,14 +49,16 @@ class DetailView(BaseAPIView):
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)
         updated = ser.save()
-        self.query_obj.save(updated)
-        data = self.serialize(updated)
-        return response.Response(data)
+        with transaction.atomic():
+            self.query_obj.save(updated)
+            data = self.serialize(updated)
+            return response.Response(data)
 
     def delete(self, request, pk, format=None):
-        if not self.query_obj.delete(pk):
-            raise Http404('Not found')
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        with transaction.atomic():
+            if not self.query_obj.delete(pk):
+                raise Http404('Not found')
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CurrencyList(ListView):
@@ -107,9 +111,10 @@ class AccountList(ListView):
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)
         obj = self.create(ser)
-        self.query_obj.save(obj)
-        data = self.serialize(obj)
-        return response.Response(data, status=status.HTTP_201_CREATED)
+        with transaction.atomic():
+            self.query_obj.save(obj)
+            data = self.serialize(obj)
+            return response.Response(data, status=status.HTTP_201_CREATED)
 
 
 class AccountDetail(DetailView):
@@ -132,14 +137,16 @@ class AccountDetail(DetailView):
             return response.Response(ser.errors,
                                      status=status.HTTP_400_BAD_REQUEST)
         updated = ser.save()
-        self.query_obj.save(updated)
-        data = self.serialize(updated)
-        return response.Response(data)
+        with transaction.atomic():
+            self.query_obj.save(updated)
+            data = self.serialize(updated)
+            return response.Response(data)
 
     def delete(self, request, book_id, pk, format=None):
-        if not self.query_obj.delete(book_id, pk):
-            raise Http404('Not found')
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        with transaction.atomic():
+            if not self.query_obj.delete(book_id, pk):
+                raise Http404('Not found')
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TransactionList(ListView):
@@ -160,9 +167,10 @@ class TransactionList(ListView):
         #   return response.Response(ser.errors,
         #                            status=status.HTTP_400_BAD_REQUEST)
         obj = self.create(ser)
-        self.query_obj.save(obj)
-        data = self.serialize(obj)
-        return response.Response(data, status=status.HTTP_201_CREATED)
+        with transaction.atomic():
+            self.query_obj.save(obj)
+            data = self.serialize(obj)
+            return response.Response(data, status=status.HTTP_201_CREATED)
 
 
 class TransactionDetail(DetailView):
@@ -186,11 +194,13 @@ class TransactionDetail(DetailView):
 #           return response.Response(ser.errors,
 #                                    status=status.HTTP_400_BAD_REQUEST)
         updated = ser.save()
-        self.query_obj.save(updated)
-        data = self.serialize(updated)
-        return response.Response(data)
+        with transaction.atomic():
+            self.query_obj.save(updated)
+            data = self.serialize(updated)
+            return response.Response(data)
 
     def delete(self, request, book_id, pk, format=None):
-        if not self.query_obj.delete(book_id, pk):
-            raise Http404('Not found')
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        with transaction.atomic():
+            if not self.query_obj.delete(book_id, pk):
+                raise Http404('Not found')
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
