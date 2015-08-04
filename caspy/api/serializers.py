@@ -57,7 +57,7 @@ class AccountSerializer(DomainModelSerializer):
     book = serializers.IntegerField()
     account_type = serializers.CharField(max_length=128)
     currency = serializers.CharField(max_length=8)
-    description = serializers.CharField(max_length=255, required=False)
+    description = BlankableCharField(max_length=255)
     path = serializers.CharField(read_only=True)
     parent_id = serializers.IntegerField(allow_null=True)
 

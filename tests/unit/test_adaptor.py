@@ -5,6 +5,28 @@ from caspy import django_orm as orm
 import pytest
 
 
+class TestGetField:
+    def test_foreign(self):
+        class X:
+            pass
+        o = X()
+        assert orm.get_field(o) is o
+        assert orm.get_field(o, 'something') is o
+
+    def test_domain(self):
+        o = domain.Book(book_id=1, name='1996')
+        assert orm.get_field(o) == 1
+
+    def test_domain_field_name(self):
+        o = domain.Book(book_id=1, name='1996')
+        assert orm.get_field(o, 'name') == '1996'
+
+    def test_domain_bad_field(self):
+        o = domain.Book(book_id=1, name='1996')
+        with pytest.raises(AttributeError):
+            assert orm.get_field(o, 'bad')
+
+
 class TestCurrency:
     def test_domain_to_orm(self):
         obj = domain.Currency(

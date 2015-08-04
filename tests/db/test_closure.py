@@ -10,6 +10,10 @@ class TestClosureTable:
     treemgr = testapp.models.Thing.tree
     pathmgr = testapp.models.ThingPath.objects
 
+    def test_path_str(self):
+        path = testapp.models.ThingPath(upper_id=1, lower_id=2, length=1)
+        assert str(path) == '1 2 1'
+
     def test_self_path_created(self):
         a = factories.ThingFactory()
         assert self.pathmgr.filter(

@@ -6,9 +6,17 @@ def pytest_configure():
     sys.path.append(os.path.join(os.path.dirname(__file__), 'tests'))
     test_settings = {
         'INSTALLED_APPS': (
+            'django.contrib.staticfiles',
             'caspy',
             'rest_framework',
             'testapp',
+        ),
+
+        'STATIC_URL': '/static/',
+        'STATICFILES_FINDERS': (
+           "django.contrib.staticfiles.finders.FileSystemFinder",
+           "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+           "django_assets.finders.AssetsFinder"
         ),
 
         'REST_FRAMEWORK': {

@@ -10,6 +10,7 @@ from django.db import connection
 from rest_framework.test import APIClient
 from rest_framework.fields import DateTimeField
 from caspy import models, time
+from caspy.api import urls
 from testapp import factories, fixtures
 
 pytestmark = pytest.mark.django_db(transaction=True)
@@ -117,6 +118,12 @@ class APIMixin(EndpointMixin):
 
 def slicedict(d, keys):
     return {k: d[k] for k in keys}
+
+
+class TestRev:
+    def test_no_match(self):
+        with pytest.raises(RuntimeError):
+            urls.rev('no-such-view', 'nsv')
 
 
 class TestCurrencyEndpoint(APIMixin):
@@ -335,6 +342,49 @@ class TestAccountEndpoint(EndpointMixin):
             del data['parent_id']
             assert self._qset(book=db_o.book, **data).exists()
 
+    def test_post_missing_required_field(self):
+        field = 'account_type'
+        data = self.new_pd()
+        data[field] = ''
+        endpoint = self._list_endpoint(self.book.book_id)
+        response = self.client.post(endpoint, data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field may not be blank.' in response.data[field]
+
+    def test_post_missing_optional_fields(self):
+        field = 'description'
+        data = self.new_pd()
+        data[field] = ''
+        endpoint = self._list_endpoint(self.book.book_id)
+        response = self.client.post(endpoint, data)
+        assert response.status_code == 201
+
+    def test_put_missing_required_field(self):
+        field = 'name'
+        i = 0
+        db_o = self.book1_accounts[i]
+        url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
+        data = self.modified(i, db_o)
+        data[field] = ''
+        response = self.client.put(url, data)
+        assert response.status_code == 400
+        assert field in response.data
+        assert 'This field may not be blank.' in response.data[field]
+
+    def test_put_missing_optional_fields(self):
+        field = 'description'
+        i = 0
+        db_o = self.book1_accounts[i]
+        url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
+        data = self.modified(i, db_o)
+        data[field] = ''
+        response = self.client.put(url, data)
+        assert response.status_code == 200
+        assert slicedict(response.data, data.keys()) == data
+        del data['parent_id']
+        assert self._qset(book=db_o.book, **data).exists()
+
     def test_item_delete(self):
         for i, db_o in enumerate(self.book1_accounts):
             url = self._item_endpoint(db_o.pk, book_id=db_o.book_id)
@@ -343,6 +393,20 @@ class TestAccountEndpoint(EndpointMixin):
             response = self.client.delete(url)
             assert response.status_code == 204
             assert not qset.exists()
+
+    def test_put_nonexistent(self):
+        account_id = max(a.account_id for a in self.book1_accounts) + 1
+        book_id = self.book.book_id
+        endpoint = self._item_endpoint(account_id, book_id)
+        response = self.client.put(endpoint, {})
+        assert response.status_code == 404
+
+    def test_delete_nonexistent(self):
+        account_id = max(a.account_id for a in self.book1_accounts) + 1
+        book_id = self.book.book_id
+        endpoint = self._item_endpoint(account_id, book_id)
+        response = self.client.delete(endpoint)
+        assert response.status_code == 404
 
     def new_pd(self):
         return {

@@ -11,6 +11,10 @@ class TestGet:
         self.b.color = 'blue'
         self.b.size = 2
 
+    def test_get_dict_item(self):
+        a = {'color': 'gold'}
+        assert lw.get('color', a) == 'gold'
+
     def test_get_obj_attr(self):
         assert lw.get('color', self.a) == 'crimson'
 
@@ -61,6 +65,9 @@ class TestLightweight:
         obj = self.Polygon(TestClass())
         assert obj.sides == 8
         assert obj.size == 2
+
+    def test_len(self):
+        assert len(self.u_square) == 2
 
     def test_copy(self):
         self.u_square = self.Polygon(sides=4, size=1)
