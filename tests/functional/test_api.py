@@ -469,6 +469,12 @@ class TestTransactionEndpoint(EndpointMixin):
         for pd, db_o in pairs:
             self.check_match(pd, db_o)
 
+    def test_list_is_sorted_by_date(self):
+        url = self._list_endpoint(self.book.book_id)
+        response = self.client.get(url)
+        dates = [t['date'] for t in response.data]
+        assert sorted(dates) == dates
+
     def test_list_post(self):
         data = self.new_pd()
         self.assert_transaction_not_exists(data)

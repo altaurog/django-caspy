@@ -13,3 +13,10 @@ class TestBook:
         result = command.prepare_book(dated_book, 'now')
         assert isinstance(result, models.Book)
         assert result.created_at == 'last week'
+
+
+class TestTransaction:
+    def test_sort_transactions(self):
+        a = models.Transaction(date=1)
+        b = models.Transaction(date=2)
+        assert command.sort_transactions([b, a]) == [a, b]

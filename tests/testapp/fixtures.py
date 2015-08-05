@@ -112,7 +112,7 @@ accounttype_data = [
 
 transaction_data = [
         {
-            'date': date(2015, 6, 28),
+            'date': date(2015, 7, 3),
             'description': 'Payday',
             'splits': [
                 {
@@ -132,7 +132,7 @@ transaction_data = [
             ],
         },
         {
-            'date': date(2015, 7, 3),
+            'date': date(2015, 6, 28),
             'description': 'Tips w/dl',
             'splits': [
                 {

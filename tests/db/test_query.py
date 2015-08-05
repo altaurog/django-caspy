@@ -4,6 +4,7 @@ try:
 except ImportError:
     from itertools import zip_longest  # 3
 
+import operator
 import pytest
 from django.db import connection
 from caspy import query, models
@@ -320,6 +321,13 @@ class TestAccountQuery:
         assert not self.query_obj.delete(book_id, account_id + 100)
 
 
+def _pair(pdl, dbl, pk):
+    "sort and pair db objects with python dicts"
+    spdl = sorted(pdl, key=operator.itemgetter(pk))
+    sdbl = sorted(dbl, key=operator.attrgetter(pk))
+    return zip_longest(spdl, sdbl)
+
+
 class TestTransactionQuery:
     query_obj = query.transaction
 
@@ -334,9 +342,8 @@ class TestTransactionQuery:
     def test_get_book(self):
         with assert_max_queries(2):
             qres = self.query_obj.all(book_id=self.book.book_id)
-        ol = sorted(qres, key=lambda x: x.date)
-        for o, xdata in zip_longest(ol, fixtures.transaction_data):
-            self.check_match(o, xdata)
+        for x, o in _pair(fixtures.transaction_data, qres, 'transaction_id'):
+            self.check_match(o, x)
 
     def test_get_one(self):
         book_id = self.book.book_id

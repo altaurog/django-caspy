@@ -154,7 +154,7 @@ class TransactionList(ListView):
     serializer_class = serializers.TransactionSerializer
 
     def get(self, request, book_id, format=None):
-        objects = self.query_obj.all(book_id)
+        objects = command.sort_transactions(self.query_obj.all(book_id))
         data = self.serialize(objects, many=True)
         return response.Response(data)
 
