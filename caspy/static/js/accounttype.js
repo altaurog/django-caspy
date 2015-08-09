@@ -1,15 +1,15 @@
 (function(){
 var mod = angular.module('caspy.accounttype', ['caspy.api', 'caspy.choice', 'generic']);
 
-mod.factory('AccountTypeService', ['$q', 'ResourceWrapper', 'caspyAPI',
-    function($q, ResourceWrapper, caspyAPI) {
+mod.factory('AccountTypeService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         var res = caspyAPI.get_resource('accounttype');
         return new ResourceWrapper(res, 'account_type');
     }]
 );
 
-mod.factory('AccountTypeChoiceService', ['$q', 'ChoiceService', 'AccountTypeService',
-    function($q, ChoiceService, AccountTypeService) {
+mod.factory('AccountTypeChoiceService', ['ChoiceService', 'AccountTypeService',
+    function(ChoiceService, AccountTypeService) {
         function makeChoice(accounttype) {
             return [accounttype.account_type, accounttype.account_type];
         };

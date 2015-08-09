@@ -1,8 +1,8 @@
 (function(){
 var mod = angular.module('caspy.account', ['caspy.api', 'caspy.choice', 'generic', 'MassAutoComplete']);
 
-mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
-    function($q, ResourceWrapper, caspyAPI) {
+mod.factory('AccountService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         return function(book_id) {
             var res = caspyAPI.get_resource('account', {'book_id': book_id});
             return new ResourceWrapper(res, 'account_id');
@@ -66,17 +66,13 @@ function makeRegex(search) {
 mod.controller('AccountController'
     ,['$injector'
     , '$routeParams'
-    , '$q'
     , 'ListControllerMixin'
-    , 'AccountService'
     , 'AccountChoiceService'
     , 'AccountTypeChoiceService'
     , 'CurrencyChoiceService'
     , function($injector
              , $routeParams
-             , $q
              , ListControllerMixin
-             , AccountService
              , AccountChoiceService
              , AccountTypeChoiceService
              , CurrencyChoiceService

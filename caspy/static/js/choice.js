@@ -1,8 +1,8 @@
 (function(){
-var mod = angular.module('caspy.choice', ['caspy.api']);
+var mod = angular.module('caspy.choice', []);
 
-mod.factory('ChoiceService', ['$q',
-    function($q) {
+mod.factory('ChoiceService', [
+    function() {
         return function(dataservice, makeChoice) {
             var p = dataservice.all();
 

@@ -1,8 +1,8 @@
 (function(){
 var mod = angular.module('caspy.transaction', ['caspy.api', 'caspy.split', 'generic', 'MassAutoComplete']);
 
-mod.factory('TransactionService', ['$q', 'Split', 'ResourceWrapper', 'caspyAPI',
-    function($q, Split, ResourceWrapper, caspyAPI) {
+mod.factory('TransactionService', ['Split', 'ResourceWrapper', 'caspyAPI',
+    function(Split, ResourceWrapper, caspyAPI) {
         function mapSplits(sdata) {
             return sdata.map(function(splitdata) { return new Split(splitdata); });
         }
@@ -33,15 +33,11 @@ mod.factory('TransactionService', ['$q', 'Split', 'ResourceWrapper', 'caspyAPI',
 mod.controller('TransactionController'
     ,['$injector'
     , '$routeParams'
-    , '$q'
-    , '$sce'
     , 'ListControllerMixin'
     , 'TransactionService'
     , 'AccountChoiceService'
     , function($injector
              , $routeParams
-             , $q
-             , $sce
              , ListControllerMixin
              , TransactionService
              , AccountChoiceService
