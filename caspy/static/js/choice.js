@@ -18,7 +18,7 @@ mod.factory('ChoiceService', ['$q',
                 return choices;
             });
 
-            lookup = function (val) {
+            lookup = function(val) {
                 if (typeof lookupCache[val] !== 'undefined')
                     return lookupCache[val];
                 return d.then(function(cdata) {
