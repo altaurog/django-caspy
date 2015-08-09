@@ -20,6 +20,7 @@ mod.factory('AccountChoiceService', ['$q', '$sce', 'ChoiceService', 'AccountServ
             var dataservice = AccountService(book_id);
             var cs = ChoiceService(dataservice, makeChoice);
 
+            cs.dataservice = dataservice;
             cs.suggest = function(text) {
                 var re = makeRegex(text);
                 return cs.data.then(function(data) {
@@ -35,6 +36,18 @@ mod.factory('AccountChoiceService', ['$q', '$sce', 'ChoiceService', 'AccountServ
                     return s;
                 });
             };
+            cs.all = function() {
+                return $q.all([cs.data, cs.choices]).then(function(p) {
+                    var data = p[0];
+                    data.forEach(function(account) {
+                        if (account.parent_id)
+                            account.parentPath = cs.lookup(account.parent_id);
+                        else
+                            account.parentPath = '';
+                    });
+                    return data;
+                });
+            }
             return cs;
         }
     }]
@@ -71,14 +84,14 @@ mod.controller('AccountController'
         $injector.invoke(ListControllerMixin, this);
         var ref = this;
         this.book_id = $routeParams['book_id'];
-        this.dataservice = AccountService(this.book_id);
-        this.assign('accounts', this.dataservice.all().then(parentPath));
+        this.accountchoiceservice = AccountChoiceService(this.book_id);
+        this.assign('accounts', this.accountchoiceservice.all());
+        this.dataservice = this.accountchoiceservice.dataservice;
         this.pk = 'account_id';
         this.onParentSelect = function(obj) {
             console.log(obj);
             ref.edititem.parent_id = obj.id;
         };
-        this.accountchoiceservice = AccountChoiceService(this.book_id);
         this.parent_ac = {
               suggest: this.accountchoiceservice.suggest
             , on_select: this.onParentSelect
@@ -86,7 +99,7 @@ mod.controller('AccountController'
         this.fields = [
               {i: -1, name: 'account_id', pk: true, hide: true}
             , {i: 0, name: 'name'}
-            , {i: 1, name: 'parent', autocomplete: this.parent_ac}
+            , {i: 1, name: 'parentPath', autocomplete: this.parent_ac}
             , {i: 2, name: 'description'}
         ];
         this.choiceFields([
@@ -95,15 +108,6 @@ mod.controller('AccountController'
         ]);
     }]
 );
-
-function parentPath(p) {
-    return p.$promise.then(function(data) {
-        data.forEach(function(account) {
-            account.parent = account.path.replace(/(^|::)[^:]+$/, '');
-        });
-        return data;
-    });
-}
 
 })();
 
