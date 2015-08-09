@@ -8,7 +8,7 @@ mod.config(['$resourceProvider',
 );
 
 function ResourceWrapperFactory($q) {
-    return function ResourceWrapper(promise, pk, makeChoice) {
+    return function ResourceWrapper(promise, pk) {
         // Provides a little glue
         // ------------------------
         // API endpoints are retrieved in request to API root, which is
@@ -55,22 +55,6 @@ function ResourceWrapperFactory($q) {
             var p = this.param(id);
             return this.rc(function(res) { return res.delete(p).$promise; });
         };
-
-        if (typeof makeChoice !== 'undefined') {
-            var ref = this;
-            this.choices = function() {
-                var d = $q.defer();
-                this.all().then(function(all) {
-                    // the resource calls immediately return
-                    // an empty object with a promise
-                    all.$promise.then(
-                        function(data) { d.resolve(data.map(makeChoice)); },
-                        function(message) { d.reject(message); }
-                    );
-                });
-                return d.promise;
-            };
-        }
     }
 }
 

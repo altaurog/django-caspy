@@ -1,15 +1,25 @@
 (function(){
-var mod = angular.module('caspy.account', ['caspy.api', 'generic', 'MassAutoComplete']);
+var mod = angular.module('caspy.account', ['caspy.api', 'caspy.choice', 'generic', 'MassAutoComplete']);
 
 mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
     function($q, ResourceWrapper, caspyAPI) {
         return function(book_id) {
-            function makeChoice(account) {
-                return [account.account_id, account.path];
-            };
             var res = caspyAPI.get_resource('account', {'book_id': book_id});
-            return new ResourceWrapper(res, 'account_id', makeChoice);
+            return new ResourceWrapper(res, 'account_id');
         };
+    }]
+);
+
+mod.factory('AccountChoiceService', ['$q', 'ChoiceService', 'AccountService',
+    function($q, ChoiceService, AccountService) {
+        function makeChoice(account) {
+            return [account.account_id, account.path];
+        };
+
+        return function(book_id) {
+            var dataservice = AccountService(book_id);
+            return ChoiceService(dataservice, makeChoice);
+        }
     }]
 );
 
@@ -20,16 +30,16 @@ mod.controller('AccountController'
     , '$sce'
     , 'ListControllerMixin'
     , 'AccountService'
-    , 'AccountTypeService'
-    , 'CurrencyService'
+    , 'AccountTypeChoiceService'
+    , 'CurrencyChoiceService'
     , function($injector
              , $routeParams
              , $q
              , $sce
              , ListControllerMixin
              , AccountService
-             , AccountTypeService
-             , CurrencyService
+             , AccountTypeChoiceService
+             , CurrencyChoiceService
         ) {
         $injector.invoke(ListControllerMixin, this);
         var ref = this;
@@ -65,8 +75,8 @@ mod.controller('AccountController'
             , {i: 2, name: 'description'}
         ];
         this.choiceFields([
-            , [3, 'account_type', AccountTypeService.choices()]
-            , [4, 'currency', CurrencyService.choices()]
+            , [3, 'account_type', AccountTypeChoiceService.choices]
+            , [4, 'currency', CurrencyChoiceService.choices]
         ]);
     }]
 );
