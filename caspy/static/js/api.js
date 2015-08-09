@@ -34,7 +34,7 @@ function ResourceWrapperFactory($q) {
         this.rc = function (fcn) { return this.resource.then(fcn); };
 
         this.all = function() {
-            return this.rc(function(res) { return res.query(); });
+            return this.rc(function(res) { return res.query().$promise; });
         };
 
         this.get = function(id) {

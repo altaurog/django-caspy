@@ -23,9 +23,7 @@ mod.factory('TransactionService', ['$q', 'Split', 'ResourceWrapper', 'caspyAPI',
             var rw = new ResourceWrapper(res, 'transaction_id');
             rw.orig_all = rw.all;
             rw.all = function() {
-                return this.orig_all().then(function(data) {
-                    return data.$promise.then(mapTransactions);
-                })
+                return this.orig_all().then(mapTransactions);
             }
             return rw;
         };

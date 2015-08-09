@@ -4,9 +4,7 @@ var mod = angular.module('caspy.choice', ['caspy.api']);
 mod.factory('ChoiceService', ['$q',
     function($q) {
         return function(dataservice, makeChoice) {
-            var p = dataservice.all().then(function(all) {
-                return all.$promise;
-            });
+            var p = dataservice.all();
 
             var lookupCache = {};
             var d = p.then(function(data) {
