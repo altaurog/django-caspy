@@ -1,15 +1,6 @@
 (function(){
 var mod = angular.module('caspy.choice', ['caspy.api']);
 
-function choiceLookup(cdata, lookupVal) {
-    for (var i = 0; i < cdata.length; i++) {
-        if (cdata[i][0] == lookupVal) {
-            return cdata[i][1]
-        }
-    }
-    return undefined;
-}
-
 mod.factory('ChoiceService', ['$q',
     function($q) {
         return function(dataservice, makeChoice) {
@@ -17,19 +8,21 @@ mod.factory('ChoiceService', ['$q',
                 return all.$promise;
             });
 
+            var lookupCache = {};
             var d = p.then(function(data) {
-                return data.map(makeChoice);
+                var choices = data.map(makeChoice);
+                // cache values to prevent infinite digest loop
+                choices.forEach(function(item) {
+                    lookupCache[item[0]] = item[1];
+                });
+                return choices;
             });
 
-            var lookupCache = {};
             lookup = function (val) {
-                // cache values to prevent infinite digest loop
                 if (typeof lookupCache[val] !== 'undefined')
                     return lookupCache[val];
                 return d.then(function(cdata) {
-                    var res = choiceLookup(cdata, val);
-                    lookupCache[val] = res;
-                    return res;
+                    return lookupCache[val];
                 });
             }
 
