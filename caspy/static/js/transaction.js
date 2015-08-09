@@ -7,12 +7,18 @@ mod.factory('TransactionService', ['Split', 'ResourceWrapper', 'caspyAPI',
             return sdata.map(function(splitdata) { return new Split(splitdata); });
         }
 
+        function splitcmp(a, b) {
+            if (0 < a.amount && 0 < b.amount)
+                return 1/a.amount - 1/b.amount;
+            return a.amount - b.amount;
+        }
+
         function mapTransactions(transactions) {
             return transactions.map(function(xdata) {
                 var xact = {
                     'date': xdata.date,
                     'description': xdata.description,
-                    'splits': mapSplits(xdata.splits)
+                    'splits': mapSplits(xdata.splits).sort(splitcmp)
                 };
                 return xact;
             });
