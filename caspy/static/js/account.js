@@ -10,34 +10,61 @@ mod.factory('AccountService', ['$q', 'ResourceWrapper', 'caspyAPI',
     }]
 );
 
-mod.factory('AccountChoiceService', ['$q', 'ChoiceService', 'AccountService',
-    function($q, ChoiceService, AccountService) {
+mod.factory('AccountChoiceService', ['$q', '$sce', 'ChoiceService', 'AccountService',
+    function($q, $sce, ChoiceService, AccountService) {
         function makeChoice(account) {
             return [account.account_id, account.path];
         };
 
         return function(book_id) {
             var dataservice = AccountService(book_id);
-            return ChoiceService(dataservice, makeChoice);
+            var cs = ChoiceService(dataservice, makeChoice);
+
+            cs.suggest = function(text) {
+                var re = makeRegex(text);
+                return cs.data.then(function(data) {
+                    var s = [];
+                    data.forEach(function(account) {
+                        if (re.test(account.path))
+                            s.push({
+                                  id: account.account_id
+                                , value: account.path
+                                , label: $sce.trustAsHtml(account.path)
+                            });
+                    });
+                    return s;
+                });
+            };
+            return cs;
         }
     }]
 );
+
+function subFunc(c) {
+    if ('\\^$*+?.()|{}[]'.indexOf(c) >= 0)
+        return '\\' + c
+    return c
+}
+
+function makeRegex(search) {
+    return new RegExp(search.split('').map(subFunc).join('.*'), 'i');
+}
 
 mod.controller('AccountController'
     ,['$injector'
     , '$routeParams'
     , '$q'
-    , '$sce'
     , 'ListControllerMixin'
     , 'AccountService'
+    , 'AccountChoiceService'
     , 'AccountTypeChoiceService'
     , 'CurrencyChoiceService'
     , function($injector
              , $routeParams
              , $q
-             , $sce
              , ListControllerMixin
              , AccountService
+             , AccountChoiceService
              , AccountTypeChoiceService
              , CurrencyChoiceService
         ) {
@@ -47,25 +74,13 @@ mod.controller('AccountController'
         this.dataservice = AccountService(this.book_id);
         this.assign('accounts', this.dataservice.all().then(parentPath));
         this.pk = 'account_id';
-        this.suggestParentAccount = function(text) {
-            var re = makeRegex(text);
-            var s = [];
-            ref.accounts.forEach(function(account) {
-                if (re.test(account.path))
-                    s.push({
-                          id: account.account_id
-                        , value: account.path
-                        , label: $sce.trustAsHtml(account.path)
-                    });
-            });
-            return s;
-        };
         this.onParentSelect = function(obj) {
             console.log(obj);
             ref.edititem.parent_id = obj.id;
         };
+        this.accountchoiceservice = AccountChoiceService(this.book_id);
         this.parent_ac = {
-              suggest: this.suggestParentAccount
+              suggest: this.accountchoiceservice.suggest
             , on_select: this.onParentSelect
         };
         this.fields = [
@@ -80,16 +95,6 @@ mod.controller('AccountController'
         ]);
     }]
 );
-
-function subFunc(c) {
-    if ('\\^$*+?.()|{}[]'.indexOf(c) >= 0)
-        return '\\' + c
-    return c
-}
-
-function makeRegex(search) {
-    return new RegExp(search.split('').map(subFunc).join('.*'), 'i');
-}
 
 function parentPath(p) {
     return p.$promise.then(function(data) {
