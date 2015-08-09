@@ -21,9 +21,22 @@ mod.factory('ChoiceService', ['$q',
                 return data.map(makeChoice);
             });
 
+            var lookupCache = {};
+            lookup = function (val) {
+                // cache values to prevent infinite digest loop
+                if (typeof lookupCache[val] !== 'undefined')
+                    return lookupCache[val];
+                return d.then(function(cdata) {
+                    var res = choiceLookup(cdata, val);
+                    lookupCache[val] = res;
+                    return res;
+                });
+            }
+
             return {
                   data: p
                 , choices: d
+                , lookup: lookup
             };
         };
     }]

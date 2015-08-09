@@ -39,14 +39,14 @@ mod.controller('TransactionController'
     , '$sce'
     , 'ListControllerMixin'
     , 'TransactionService'
-    , 'AccountService'
+    , 'AccountChoiceService'
     , function($injector
              , $routeParams
              , $q
              , $sce
              , ListControllerMixin
              , TransactionService
-             , AccountService
+             , AccountChoiceService
         ) {
         $injector.invoke(ListControllerMixin, this);
         var ref = this;
@@ -54,6 +54,8 @@ mod.controller('TransactionController'
         this.dataservice = TransactionService(this.book_id);
         this.assign('transactions', this.dataservice.all());
         this.pk = 'transaction_id';
+        this.accountchoiceservice = AccountChoiceService(this.book_id);
+        this.accountlookup = this.accountchoiceservice.lookup;
     }]
 );
 
