@@ -1,5 +1,5 @@
 (function(){
-var mod = angular.module('caspy.transaction', ['caspy.api', 'generic', 'MassAutoComplete']);
+var mod = angular.module('caspy.transaction', ['caspy.api', 'generic']);
 
 mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
     function(ResourceWrapper, caspyAPI) {

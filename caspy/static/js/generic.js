@@ -100,8 +100,6 @@ mod.directive('fieldEdit', function() {
             $scope.readonly = '';
             if ($scope.field.choices)
                 $scope.display = 'select';
-            else if ($scope.field.autocomplete)
-                $scope.display = 'autocomplete'
             $scope.displayname = displayName($scope.field);
             if ($scope.field.pk === true) {
                 $scope.$watch ('listcontroller.edit_code', function(edit_code, _) {
