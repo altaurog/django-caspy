@@ -2,12 +2,12 @@
     <td>{{ item.date }}</td>
     <td>{{ item.description }}</td>
 </tr>
-<tr ng-repeat="split in item.splits">
+<tr ng-repeat="split in item.splits" csp-split="split">
     <td></td>
-    <td>{{ split.description }}</td>
-    <td>{{ split.number }}</td>
-    <td>{{ listcontroller.accountlookup(split.account_id) }}</td>
-    <td>{{ split.status }}</td>
-    <td>{{ split.debit }}</td>
-    <td>{{ split.credit }}</td>
+    <td>{{ ctrl.split.description }}</td>
+    <td>{{ ctrl.split.number }}</td>
+    <td>{{ ctrl.accountPath() }}</td>
+    <td>{{ ctrl.split.status }}</td>
+    <td>{{ ctrl.debit() }}</td>
+    <td>{{ ctrl.credit() }}</td>
 </tr>

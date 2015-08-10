@@ -1,12 +1,8 @@
 (function(){
-var mod = angular.module('caspy.transaction', ['caspy.api', 'caspy.split', 'generic', 'MassAutoComplete']);
+var mod = angular.module('caspy.transaction', ['caspy.api', 'generic', 'MassAutoComplete']);
 
-mod.factory('TransactionService', ['Split', 'ResourceWrapper', 'caspyAPI',
-    function(Split, ResourceWrapper, caspyAPI) {
-        function mapSplits(sdata) {
-            return sdata.map(function(splitdata) { return new Split(splitdata); });
-        }
-
+mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         function splitcmp(a, b) {
             if (0 < a.amount && 0 < b.amount)
                 return 1/a.amount - 1/b.amount;
@@ -18,7 +14,7 @@ mod.factory('TransactionService', ['Split', 'ResourceWrapper', 'caspyAPI',
                 var xact = {
                     'date': xdata.date,
                     'description': xdata.description,
-                    'splits': mapSplits(xdata.splits).sort(splitcmp)
+                    'splits': xdata.splits.sort(splitcmp)
                 };
                 return xact;
             });
@@ -41,12 +37,10 @@ mod.controller('TransactionController'
     , '$routeParams'
     , 'ListControllerMixin'
     , 'TransactionService'
-    , 'AccountChoiceService'
     , function($injector
              , $routeParams
              , ListControllerMixin
              , TransactionService
-             , AccountChoiceService
         ) {
         $injector.invoke(ListControllerMixin, this);
         var ref = this;
@@ -54,8 +48,6 @@ mod.controller('TransactionController'
         this.dataservice = TransactionService(this.book_id);
         this.assign('transactions', this.dataservice.all());
         this.pk = 'transaction_id';
-        this.accountchoiceservice = AccountChoiceService(this.book_id);
-        this.accountlookup = this.accountchoiceservice.lookup;
     }]
 );
 
