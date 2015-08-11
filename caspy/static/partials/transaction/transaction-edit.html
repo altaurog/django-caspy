@@ -1,12 +1,5 @@
 <table class="transaction">
-    <colgroup>
-        <col class="xact-date">
-        <col class="xact-description">
-        <col class="split-number">
-        <col class="split-account">
-        <col class="split-status">
-        <col class="split-amount debit">
-        <col class="split-amount credit">
+    <colgroup ng-include="'partials/transaction/colgroup.html'">
     </colgroup>
     <thead ng-include="'partials/transaction/thead.html'">
     </thead>
@@ -41,13 +34,13 @@
                 </select>
             </td>
             <td>
-                <input type="text"
+                <input type="text" class="amount"
                     ng-model="splitctrl.debit"
                     ng-model-options="{ updateOn: 'blur', getterSetter: true }">
                 </input>
             </td>
             <td>
-                <input type="text"
+                <input type="text" class="amount"
                     ng-model="splitctrl.credit"
                     ng-model-options="{ updateOn: 'blur', getterSetter: true }">
                 </input>
