@@ -1,5 +1,5 @@
 (function(){
-var mod = angular.module('caspy.transaction', ['caspy.api', 'generic']);
+var mod = angular.module('caspy.transaction', ['caspy.api', 'caspy.ui', 'generic']);
 
 mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
     function(ResourceWrapper, caspyAPI) {
@@ -52,8 +52,8 @@ mod.controller('TransactionController'
 );
 
 mod.controller('TransactionEditController'
-    ,['$scope',
-    function($scope) {
+    ,['$scope', 'focus',
+    function($scope, focus) {
         var ctrl = this;
         this.splits = function(splits) {
             if (arguments.length)
@@ -92,6 +92,7 @@ mod.controller('TransactionEditController'
                 this.splits([]);
             if (0 == this.splits().length)
                 this.addSplit();
+            focus('date');
         }
         $scope.$watch('transaction', function() {
             if ($scope.transaction)

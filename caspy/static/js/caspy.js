@@ -9,6 +9,7 @@ var mod = angular.module('caspy',
       , 'caspy.account'
       , 'caspy.transaction'
       , 'caspy.split'
+      , 'caspy.ui'
     ]
 );
 

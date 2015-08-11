@@ -6,7 +6,9 @@
     <tbody>
         <tr>
             <td>
-                <input type="text" ng-model="transaction.date"></input>
+                <input type="text"
+                    csp-focus="date"
+                    ng-model="transaction.date"></input>
             </td>
             <td colspan="3">
                 <input type="text" ng-model="transaction.description"></input>
@@ -16,7 +18,8 @@
             <td>
             </td>
             <td>
-                <input type="text" ng-model="split.description"></input>
+                <input type="text"
+                    ng-model="split.description"></input>
             </td>
             <td>
                 <input type="text" ng-model="split.number"></input>
