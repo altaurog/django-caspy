@@ -9,14 +9,12 @@ User Experience
 ----------------
 Caspy is a web-based application.  It will be fully AJAX/HTML5 for most
 responsive user experience.  Page content will be linked with specific urls
-for bookmarking/quick access.  As page content changes, the url will be
-updated using HTML5 location API.
+for bookmarking/quick access.
 
 Caspy will not implement bookmarking/favorites or back/forward buttons.
 This functionality already exists on every modern browser.  By keeping the
 location and page content in sync, we allow the browser to do it's job in
-this regard.  See `Home Page`_ below for the sole, minor exception to this
-rule.
+this regard.
 
 The goal for the Caspy UX is to provide a simple, uncluttered interface
 with clear affordances for the functionality available.  Icons may be used

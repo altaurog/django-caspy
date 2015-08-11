@@ -2,7 +2,7 @@ Accounting concepts
 =====================
 
 :Debit: Transfer *to* an account; left column entry.
-    
+
     Debit increases the balance of the following account types:
 
     * Assets

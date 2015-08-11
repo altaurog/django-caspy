@@ -1,6 +1,12 @@
 Caspy Changelog
 ==================
 
+Version 0.2
+-------------
+:date: 2015-08-11
+
+Minimally functional version based on Angular and DRF.
+
 Revival
 --------------------------
 :date: 2014-10-23
