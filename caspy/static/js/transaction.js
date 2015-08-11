@@ -51,4 +51,63 @@ mod.controller('TransactionController'
     }]
 );
 
+mod.controller('TransactionEditController'
+    ,['$scope',
+    function($scope) {
+        var ctrl = this;
+        this.splits = function(splits) {
+            if (arguments.length)
+                $scope.transaction.splits = splits;
+            return $scope.transaction.splits;
+        };
+        this.addSplit = function addSplit(amount) {
+            var splitObj = {
+                     'amount': amount
+                    ,'status': 'n'
+                    ,'number': ''
+                    ,'description': ''
+                };
+            splitObj.auto = true;
+            this.splits().push(splitObj);
+        };
+        this.onSplitChange = function(split) {
+            split.auto = false;
+            var total = 0;
+            var auto;
+            this.splits().forEach(function(s) {
+                if (s.auto)
+                    auto = s;
+                else
+                    total += s.amount;
+            });
+            if (0 != total) {
+                if (auto)
+                    auto.amount = -total;
+                else
+                    this.addSplit(-total);
+            }
+        };
+        this.onTransactionChange = function() {
+            if (typeof this.splits() === 'undefined')
+                this.splits([]);
+            if (0 == this.splits().length)
+                this.addSplit();
+        }
+        $scope.$watch('transaction', function() {
+            if ($scope.transaction)
+                ctrl.onTransactionChange();
+        });
+    }]
+);
+
+mod.directive('cspTransactionEdit', function() {
+    return {
+          scope: {
+            transaction: '='
+          }
+        , controller: 'TransactionEditController'
+        , templateUrl: 'partials/transaction/transaction-edit.html'
+    };
+});
+
 })();

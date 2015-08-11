@@ -4,10 +4,10 @@
 </tr>
 <tr ng-repeat="split in item.splits" csp-split="split">
     <td></td>
-    <td>{{ ctrl.split.description }}</td>
-    <td>{{ ctrl.split.number }}</td>
-    <td>{{ ctrl.accountPath() }}</td>
-    <td>{{ ctrl.split.status }}</td>
-    <td>{{ ctrl.debit() }}</td>
-    <td>{{ ctrl.credit() }}</td>
+    <td>{{ split.description }}</td>
+    <td>{{ split.number }}</td>
+    <td>{{ splitctrl.accountPath() }}</td>
+    <td>{{ split.status }}</td>
+    <td>{{ splitctrl.debit() }}</td>
+    <td>{{ splitctrl.credit() }}</td>
 </tr>

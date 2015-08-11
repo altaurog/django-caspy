@@ -6,8 +6,8 @@
         ng-click="listcontroller.select(item)">
     </tbody>
 </table>
-<div ng-show="listcontroller.edititem"
-    ng-include="'partials/transaction/edit.html'">
+<div ng-show="listcontroller.edititem">
+    <div csp-transaction-edit transaction="listcontroller.edititem"></div>
 </div>
 <div ng-include="'partials/generic/buttons.html'">
 

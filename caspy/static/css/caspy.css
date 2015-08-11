@@ -1,0 +1,13 @@
+table.transaction {
+    table-layout: fixed;
+}
+
+col.xact-date { width: 6em; }
+col.xact-description { width: 14em; }
+col.split-number { width: 4em; }
+col.split-account { width: 14em; }
+col.split-amount { width: 4em; }
+
+div[csp-transaction-edit] input {
+    width: 100%;
+}

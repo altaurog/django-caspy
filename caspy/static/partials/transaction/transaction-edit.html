@@ -1,0 +1,57 @@
+<table class="transaction">
+    <colgroup>
+        <col class="xact-date">
+        <col class="xact-description">
+        <col class="split-number">
+        <col class="split-account">
+        <col class="split-status">
+        <col class="split-amount debit">
+        <col class="split-amount credit">
+    </colgroup>
+    <thead ng-include="'partials/transaction/thead.html'">
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input type="text" ng-model="transaction.date"></input>
+            </td>
+            <td colspan="3">
+                <input type="text" ng-model="transaction.description"></input>
+            </td>
+        </tr>
+        <tr ng-repeat="split in transaction.splits" csp-split="split">
+            <td>
+            </td>
+            <td>
+                <input type="text" ng-model="split.description"></input>
+            </td>
+            <td>
+                <input type="text" ng-model="split.number"></input>
+            </td>
+            <td>
+                <select ng-model="split.account_id"
+                        ng-options="v[0] as v[1] for v in splitctrl.accountchoices">
+                </select>
+            </td>
+            <td>
+                <select ng-model="split.status">
+                  <option value="n">New</option>
+                  <option value="c">Cleared</option>
+                  <option value="r">Reconciled</option>
+                </select>
+            </td>
+            <td>
+                <input type="text"
+                    ng-model="splitctrl.debit"
+                    ng-model-options="{ updateOn: 'blur', getterSetter: true }">
+                </input>
+            </td>
+            <td>
+                <input type="text"
+                    ng-model="splitctrl.credit"
+                    ng-model-options="{ updateOn: 'blur', getterSetter: true }">
+                </input>
+            </td>
+        </tr>
+    </tbody>
+</table>
