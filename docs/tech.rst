@@ -28,7 +28,7 @@ but currently only have tests for back end:
     * factory_boy_ (minimally; proved not to be very useful)
     * coverage.py_
     * py.test and tox
-    * CI: drone.io (also bitbucket) or travis-ci.org (github only)
+    * CI: travis-ci.org
 
 .. _factory_boy: https://github.com/rbarrois/factory_boy
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
