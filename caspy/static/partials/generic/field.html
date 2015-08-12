@@ -1,6 +1,6 @@
-<th>{{ fieldctrl.displayname }}</th>
+<th>{{ fieldctrl.displayname() }}</th>
 <td ng-switch on="fieldctrl.display()">
-    <span ng-switch-when="readonly">{{ readonly }}</span>
+    <span ng-switch-when="readonly">{{ fieldctrl.readonly() }}</span>
     <select
         ng-switch-when="select"
         ng-model="listcontroller.edititem[field.name]"

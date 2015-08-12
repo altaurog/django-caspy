@@ -100,17 +100,26 @@ mod.directive('fieldEdit', function() {
     return {
           templateUrl: 'partials/generic/field.html'
         , controllerAs: 'fieldctrl'
-        , controller: ['$scope', function($scope) {
+        , controller: function() {
+            this.displayname = function() {
+                return displayName(this.field);
+            };
+            this.readonly = function() {
+                if (this.field.pk)
+                    return this.listcontroller.edit_code;
+            };
             this.display = function() {
-                if ($scope.field.choices)
+                if (this.field.choices)
                     return 'select';
-                $scope.readonly = $scope.listcontroller.edit_code;
-                if ($scope.field.pk && $scope.readonly)
+                if (this.readonly())
                     return 'readonly';
                 return 'text';
             };
-            this.displayname = displayName($scope.field);
-        }]
+          }
+        , link: function(scope, elem, attr, ctrl) {
+            ctrl.field = scope.field;
+            ctrl.listcontroller = scope.listcontroller;
+          }
     };
 });
 
