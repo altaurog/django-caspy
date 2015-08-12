@@ -6,8 +6,6 @@ Version 1.0
 Reorganize navigation
 Single-account register w/ running balance
 CSS element positioning: menu, buttons, edit pane
-Focus first field when opening edit pane
-Focus auto split
 Date entry interface
 Account Autocomplete
 Display errors from server appropriately

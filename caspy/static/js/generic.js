@@ -10,7 +10,7 @@ mod.factory('ListControllerMixin', ['$q', 'focus',
                     this.edit_code = this.edititem[this.pk];
                 else
                     this.edit_code = null;
-                focus('$first');
+                focus("cspFocus == 'edit-pane'");
             };
 
             this.close = function() {
