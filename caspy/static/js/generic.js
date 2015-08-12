@@ -99,17 +99,17 @@ function displayName(field) {
 mod.directive('fieldEdit', function() {
     return {
           templateUrl: 'partials/generic/field.html'
+        , controllerAs: 'fieldctrl'
         , controller: ['$scope', function($scope) {
-            $scope.readonly = '';
-            if ($scope.field.choices)
-                $scope.display = 'select';
-            $scope.displayname = displayName($scope.field);
-            if ($scope.field.pk === true) {
-                $scope.$watch ('listcontroller.edit_code', function(edit_code, _) {
-                    if ($scope.readonly = edit_code)
-                        $scope.display = 'readonly';
-                });
-            }
+            this.display = function() {
+                if ($scope.field.choices)
+                    return 'select';
+                $scope.readonly = $scope.listcontroller.edit_code;
+                if ($scope.field.pk && $scope.readonly)
+                    return 'readonly';
+                return 'text';
+            };
+            this.displayname = displayName($scope.field);
         }]
     };
 });

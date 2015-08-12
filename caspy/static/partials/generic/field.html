@@ -1,5 +1,5 @@
-<th>{{ displayname }}</th>
-<td ng-switch on="display">
+<th>{{ fieldctrl.displayname }}</th>
+<td ng-switch on="fieldctrl.display()">
     <span ng-switch-when="readonly">{{ readonly }}</span>
     <select
         ng-switch-when="select"
