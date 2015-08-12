@@ -1,8 +1,8 @@
 (function(){
-var mod = angular.module('generic', []);
+var mod = angular.module('generic', ['caspy.ui']);
 
-mod.factory('ListControllerMixin', ['$q',
-    function($q) {
+mod.factory('ListControllerMixin', ['$q', 'focus',
+    function($q, focus) {
         function mixin($route) {
             this.select = function(item) {
                 this.edititem = angular.copy(item);
@@ -10,6 +10,7 @@ mod.factory('ListControllerMixin', ['$q',
                     this.edit_code = this.edititem[this.pk];
                 else
                     this.edit_code = null;
+                focus('$first');
             };
 
             this.close = function() {

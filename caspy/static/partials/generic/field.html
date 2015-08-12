@@ -7,6 +7,7 @@
         ng-options="v[0] as v[1] for v in field.choices">
     </select>
     <input type="text"
+        csp-focus
         ng-switch-default
         ng-model="listcontroller.edititem[field.name]"></input>
 </td>
