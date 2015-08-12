@@ -69,6 +69,8 @@ mod.controller('TransactionEditController'
                 };
             splitObj.auto = true;
             this.splits().push(splitObj);
+            if (arguments.length)
+                focus('split.auto');
         };
         this.onSplitChange = function(split) {
             split.auto = false;
@@ -92,7 +94,7 @@ mod.controller('TransactionEditController'
                 this.splits([]);
             if (0 == this.splits().length)
                 this.addSplit();
-            focus('date');
+            focus("cspFocus == 'date'");
         }
         $scope.$watch('transaction', function() {
             if ($scope.transaction)
