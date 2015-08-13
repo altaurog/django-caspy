@@ -1,6 +1,12 @@
 django-caspy
 =============
 
+.. image:: https://travis-ci.org/altaurog/django-caspy.svg
+    :target: https://travis-ci.org/altaurog/django-caspy
+
+.. image:: https://coveralls.io/repos/altaurog/django-caspy/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/altaurog/django-caspy?branch=master
+
 Introduction
 """"""""""""
 

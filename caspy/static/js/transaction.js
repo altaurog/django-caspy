@@ -76,15 +76,20 @@ mod.controller('TransactionEditController'
             split.auto = false;
             var total = 0;
             var auto;
-            this.splits().forEach(function(s) {
+            var zero = [];
+            var splits = this.splits();
+            splits.forEach(function(s, i) {
                 if (s.auto)
-                    auto = s;
-                else
+                    auto = i;
+                else if (s.amount)
                     total += s.amount;
+                else
+                    zero.unshift(i);
             });
+            zero.forEach(function(i) { splits.splice(i, 1); });
             if (0 != total) {
                 if (auto)
-                    auto.amount = -total;
+                    splits[auto].amount = -total;
                 else
                     this.addSplit(-total);
             }
