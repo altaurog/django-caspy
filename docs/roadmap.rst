@@ -3,7 +3,6 @@ Roadmap
 
 Version 1.0
 -----------
-* Reorganize navigation
 * Single-account register w/ running balance
 * CSS element positioning: menu, buttons, edit pane
 * Date entry interface
