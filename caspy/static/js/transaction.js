@@ -61,6 +61,7 @@ mod.controller('TransactionEditController'
             return $scope.transaction.splits;
         };
         this.addSplit = function addSplit(amount) {
+            console.log('addSplit', amount);
             var splitObj = {
                      'amount': amount
                     ,'status': 'n'
@@ -76,20 +77,15 @@ mod.controller('TransactionEditController'
             split.auto = false;
             var total = 0;
             var auto;
-            var zero = [];
-            var splits = this.splits();
-            splits.forEach(function(s, i) {
+            this.splits().forEach(function(s, i) {
                 if (s.auto)
-                    auto = i;
-                else if (s.amount)
-                    total += s.amount;
+                    auto = s;
                 else
-                    zero.unshift(i);
+                    total += +s.amount;
             });
-            zero.forEach(function(i) { splits.splice(i, 1); });
             if (0 != total) {
                 if (auto)
-                    splits[auto].amount = -total;
+                    auto.amount = -total;
                 else
                     this.addSplit(-total);
             }
