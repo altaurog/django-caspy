@@ -61,7 +61,6 @@ mod.controller('TransactionEditController'
             return $scope.transaction.splits;
         };
         this.addSplit = function addSplit(amount) {
-            console.log('addSplit', amount);
             var splitObj = {
                      'amount': amount
                     ,'status': 'n'
