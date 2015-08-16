@@ -82,17 +82,19 @@ mod.controller('TransactionEditController'
             var total = 0;
             var auto;
             var splits = this.splits(this.splits().filter(nonzero));
-            splits.forEach(function(s) {
+            splits.forEach(function(s, i) {
                 if (s.auto)
-                    auto = s;
+                    auto = i;
                 else
                     total += +s.amount;
             });
             if (0 != total) {
-                if (auto)
-                    auto.amount = -total;
+                if (typeof auto !== 'undefined')
+                    splits[auto].amount = -total;
                 else
                     this.addSplit(-total);
+            } else {
+                splits.splice(auto, 1);
             }
         };
         this.onTransactionChange = function() {
