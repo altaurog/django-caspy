@@ -72,11 +72,17 @@ mod.controller('TransactionEditController'
             if (arguments.length)
                 focus('split.auto');
         };
+
+        function nonzero(split) {
+            return split.amount || split.auto;
+        }
+
         this.onSplitChange = function(split) {
             split.auto = false;
             var total = 0;
             var auto;
-            this.splits().forEach(function(s, i) {
+            var splits = this.splits(this.splits().filter(nonzero));
+            splits.forEach(function(s) {
                 if (s.auto)
                     auto = s;
                 else
