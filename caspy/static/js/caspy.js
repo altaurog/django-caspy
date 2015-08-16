@@ -77,7 +77,7 @@ mod.config(['$httpProvider', '$routeProvider', 'Constants',
                 , controllerAs: 'listcontroller'
             })
             .otherwise({
-                redirectTo: '/menu/'
+                redirectTo: '/book/'
             });
     }]);
 })();
