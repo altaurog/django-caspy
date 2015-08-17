@@ -88,7 +88,7 @@ mod.controller('TransactionEditController'
                 else
                     total += +s.amount;
             });
-            if (0 != total) {
+            if (Math.abs(total) >= 0.1) {
                 if (typeof auto !== 'undefined')
                     splits[auto].amount = -total;
                 else
