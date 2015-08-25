@@ -2,17 +2,6 @@ table.transaction {
     table-layout: fixed;
 }
 
-#ledger-head {
-    position: fixed;
-    top: 25px;
-    left: 3px;
-}
-
-#ledger-body {
-    margin-top: 25px;
-    margin-bottom: 320px;
-}
-
 col.xact-date { width: 6em; }
 col.xact-description { width: 14em; }
 col.split-number { width: 4em; }
@@ -31,22 +20,3 @@ col.split-amount { width: 5em; }
 div[csp-transaction-edit] input {
     width: 100%;
 }
-
-div.edit, div.buttons {
-    background: #f0f8ff;
-    border: 1px solid blue;
-    padding: 4px;
-    position: fixed;
-    width: 960px;
-    left: 3px;
-}
-
-div.buttons {
-    bottom: 1px;
-    height: 25px;
-}
-
-div.edit {
-    bottom: 38px;
-}
-
