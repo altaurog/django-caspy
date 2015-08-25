@@ -26,7 +26,8 @@ def get_version(package_name, default='0.1'):
 setup(
     name = 'django-caspy',
     version = get_version('caspy'),
-    packages = ['caspy'],
+    packages = ['caspy', 'caspy.api', 'caspy.domain'],
+    include_package_data = True,
     install_requires = [
             'pytz',
             'PyYAML',

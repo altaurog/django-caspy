@@ -1,1 +1,4 @@
 include *.rst *.txt
+recursive-include caspy/fixtures *.yaml
+recursive-include caspy/templates *.html
+recursive-include caspy/static *
