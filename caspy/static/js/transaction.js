@@ -48,6 +48,7 @@ mod.controller('TransactionController'
         this.dataservice = TransactionService(this.book_id);
         this.assign('transactions', this.dataservice.all());
         this.pk = 'transaction_id';
+        this.newitem = function() { return {splits: []}; };
     }]
 );
 
@@ -98,8 +99,6 @@ mod.controller('TransactionEditController'
             }
         };
         this.onTransactionChange = function() {
-            if (typeof this.splits() === 'undefined')
-                this.splits([]);
             if (0 == this.splits().length)
                 this.addSplit();
             focus("cspFocus == 'date'");
