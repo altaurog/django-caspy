@@ -17,9 +17,14 @@ mod.factory('ListControllerMixin', ['$q', 'focus',
                 this.select(null);
             };
 
+            this.newitem = function() {
+                var o = {};
+                o[this.pk] = '';
+                return o;
+            };
+
             this.add = function(item) {
-                newitem = {};
-                newitem[this.pk] = '';
+                newitem = this.newitem();
                 this.select(newitem);
             };
 

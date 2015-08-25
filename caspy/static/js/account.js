@@ -69,6 +69,16 @@ mod.controller('AccountController'
             , [3, 'account_type', AccountTypeChoiceService.choices]
             , [4, 'currency', CurrencyChoiceService.choices]
         ]);
+        this.newitem = function() {
+            return {
+                  account_id: ''
+                , name: ''
+                , description: ''
+                , parent_id: null
+                , account_type: ''
+                , currency: ''
+            };
+        };
     }]
 );
 
