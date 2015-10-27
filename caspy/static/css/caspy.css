@@ -27,6 +27,10 @@ div#top-nav, div.buttons, div[gen-edit-pane] {
     padding: 2px 0;
 }
 
+#side-pane > div.buttons, #side-pane > div[gen-edit-pane] {
+    left: 400px;
+}
+
 #top-nav {
     top: 1px;
 }
@@ -43,6 +47,10 @@ div#top-nav, div.buttons, div[gen-edit-pane] {
 #csp-list {
     top: 48px;
     position: relative;
+}
+
+#side-pane + #csp-list {
+    top: 22px;
 }
 
 [ng-click] {

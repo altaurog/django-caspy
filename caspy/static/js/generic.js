@@ -105,18 +105,21 @@ mod.directive('genEditPane', ['$timeout', function($timeout) {
     return {
           restrict: 'A'
         , link: function(scope, elem, attr) {
-            var strut = angular.element('<div/>');
-            elem.after(strut);
+            var adjust;
+            if (elem.parent().attr('id') !== 'side-pane') {
+                var strut = angular.element('<div/>');
+                elem.after(strut);
 
-            var adjust = function() {
-                var height = elem.prop('clientHeight');
-                strut.css('padding-bottom', height + 'px');
+                adjust = function() {
+                    var height = elem.prop('clientHeight');
+                    strut.css('padding-bottom', height + 'px');
+                };
             }
 
             scope.$watch('listcontroller.edititem',
                 function(val) {
                     elem.css('display', val ? '' : 'none');
-                    $timeout(adjust, 10);
+                    if (adjust) $timeout(adjust, 10);
                 }
             );
         }
