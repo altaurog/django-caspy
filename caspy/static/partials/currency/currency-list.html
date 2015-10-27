@@ -1,10 +1,21 @@
-<ul>
-    <li ng-repeat="item in listcontroller.currencies"
-        ng-include="'partials/currency/currency-item.html'"
-        ng-click="listcontroller.select(item)">
-    </li>
-</ul>
-<div ng-show="listcontroller.edititem"
-    ng-include="'partials/generic/edit.html'">
+<div id="side-pane">
+    <div class="buttons" ng-include="'partials/generic/buttons.html'"></div>
+    <div gen-edit-pane
+        ng-include="'partials/generic/edit.html'">
+    </div>
 </div>
-<div ng-include="'partials/generic/buttons.html'">
+<table id="csp-list">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Symbol</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="item in listcontroller.currencies"
+            ng-include="'partials/currency/currency-item.html'"
+            ng-click="listcontroller.select(item)">
+        </tr>
+    </tbody>
+</table>
