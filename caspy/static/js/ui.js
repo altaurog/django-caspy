@@ -34,4 +34,14 @@ mod.factory('focus', ['$rootScope', '$timeout',
     }]
 );
 
+mod.factory('scroll', function() {
+    return function(offset) {
+        var webkit = document.body, ffie = document.documentElement;
+        if (arguments.length) {
+            ffie.scrollTop = webkit.scrollTop = offset;
+        }
+        return ffie.scrollTop || webkit.scrollTop;
+    };
+});
+
 })();

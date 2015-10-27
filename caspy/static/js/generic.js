@@ -101,7 +101,9 @@ function displayName(field) {
     return field.long_name;
 }
 
-mod.directive('genEditPane', ['$timeout', function($timeout) {
+mod.directive('genEditPane', 
+    ['$timeout', 'scroll',
+    function($timeout, scroll) {
     return {
           restrict: 'A'
         , link: function(scope, elem, attr) {
@@ -112,6 +114,9 @@ mod.directive('genEditPane', ['$timeout', function($timeout) {
 
                 adjust = function() {
                     var height = elem.prop('clientHeight');
+                    var last = +strut.css('padding-bottom').replace('px', '');
+                    var diff = height - last;
+                    scroll(diff + scroll());
                     strut.css('padding-bottom', height + 'px');
                 };
             }
