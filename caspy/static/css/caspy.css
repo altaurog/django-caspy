@@ -21,7 +21,7 @@ div[csp-transaction-edit] input {
     width: 100%;
 }
 
-div#top-nav, div.buttons, div[gen-edit-pane] {
+#top-nav, .buttons, [gen-edit-pane] {
     position: fixed;
     z-index: 10;
     padding: 2px 0;
@@ -32,7 +32,10 @@ div#top-nav, div.buttons, div[gen-edit-pane] {
 }
 
 #top-nav {
-    top: 1px;
+    top: 0px;
+    background: #cadeff;
+    width: 808px;
+    padding: 2px 10px 3px;
 }
 
 .buttons {
