@@ -45,6 +45,6 @@ div#top-nav, div.buttons, div[gen-edit-pane] {
     position: relative;
 }
 
-li[ng-click] {
+[ng-click] {
     cursor: pointer;
 }
