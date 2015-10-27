@@ -1,16 +1,16 @@
-<table>
+<div class="buttons" ng-include="'partials/generic/buttons.html'"></div>
+<div gen-edit-pane>
+    <div csp-transaction-edit transaction="listcontroller.edititem"></div>
+</div>
+<table id="csp-list">
     <colgroup ng-include="'partials/transaction/colgroup.html'">
     </colgroup>
-    <thead ng-include="'partials/transaction/thead.html'">
+    <thead
+        ng-hide="listcontroller.edititem"
+        ng-include="'partials/transaction/thead.html'">
     </thead>
     <tbody ng-repeat="item in listcontroller.transactions"
         ng-include="'partials/transaction/transaction-item.html'"
         ng-click="listcontroller.select(item)">
     </tbody>
 </table>
-<div ng-show="listcontroller.edititem">
-    <div csp-transaction-edit transaction="listcontroller.edititem"></div>
-</div>
-<div ng-include="'partials/generic/buttons.html'">
-
-

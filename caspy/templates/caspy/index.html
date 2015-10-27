@@ -32,8 +32,10 @@
         <script src="{% static 'js/ui.js' %}"></script>
     </head>
     <body>
-        <a href="#/book/">Books</a>
-        <a href="#/menu/">Settings</a>
+        <div id="top-nav">
+            <a href="#/book/">Books</a>
+            <a href="#/menu/">Settings</a>
+        </div>
         <div ng-view></div>
     </body>
 </html>

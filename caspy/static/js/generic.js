@@ -101,7 +101,29 @@ function displayName(field) {
     return field.long_name;
 }
 
-mod.directive('fieldEdit', function() {
+mod.directive('genEditPane', ['$timeout', function($timeout) {
+    return {
+          restrict: 'A'
+        , link: function(scope, elem, attr) {
+            var strut = angular.element('<div/>');
+            elem.after(strut);
+
+            var adjust = function() {
+                var height = elem.prop('clientHeight');
+                strut.css('padding-bottom', height + 'px');
+            }
+
+            scope.$watch('listcontroller.edititem',
+                function(val) {
+                    elem.css('display', val ? '' : 'none');
+                    $timeout(adjust, 10);
+                }
+            );
+        }
+    };
+}]);
+
+mod.directive('genFieldEdit', function() {
     return {
           templateUrl: 'partials/generic/field.html'
         , controllerAs: 'fieldctrl'
