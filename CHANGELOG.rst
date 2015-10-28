@@ -1,6 +1,12 @@
 Caspy Changelog
 ==================
 
+Version 0.3
+------------
+:date: 2015-10-28
+
+Unsnazzy but functioning element positioning.
+
 Version 0.2
 -------------
 :date: 2015-08-11
