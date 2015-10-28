@@ -116,8 +116,8 @@ mod.directive('genEditPane',
                     var height = elem.prop('clientHeight');
                     var last = +strut.css('padding-bottom').replace('px', '');
                     var diff = height - last;
-                    scroll(diff + scroll());
                     strut.css('padding-bottom', height + 'px');
+                    scroll(diff + scroll());
                 };
             }
 
