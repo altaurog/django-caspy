@@ -4,9 +4,10 @@
     <tbody>
         <tr>
             <td>
-                <input type="text"
+                <md-datepicker type="text"
                     csp-focus="date"
-                    ng-model="transaction.date"></input>
+                    ng-model="transaction.date">
+                </md-datepicker>
             </td>
             <td colspan="3">
                 <input type="text" ng-model="transaction.description"></input>
@@ -50,9 +51,3 @@
         </tr>
     </tbody>
 </table>
-<div layout-padding>
-    <div flex>
-        <md-button class="md-raised md-primary" ng-click="listcontroller.save()">Save</md-button>
-        <md-button class="md-raised" ng-click="listcontroller.del()" ng-show="listcontroller.edit_code">Delete</md-button>
-    </div>
-</div>

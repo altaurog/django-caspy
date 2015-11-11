@@ -1,23 +1,32 @@
 (function(){
 var mod = angular.module('caspy.transaction', ['caspy.api', 'caspy.ui', 'generic']);
 
-mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
-    function(ResourceWrapper, caspyAPI) {
+mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI', 'dateFilter',
+    function(ResourceWrapper, caspyAPI, dateFilter) {
         function splitcmp(a, b) {
             if (0 < a.amount && 0 < b.amount)
                 return 1/a.amount - 1/b.amount;
             return a.amount - b.amount;
         }
 
+        function deserialize(xdata) {
+            return {
+                'date': new Date(xdata.date),
+                'description': xdata.description,
+                'splits': xdata.splits.sort(splitcmp)
+            };
+        }
+
+        function serialize(xact) {
+            return {
+                'date': dateFilter(xact.date, 'yyyy-MM-dd'),
+                'description': xact.description,
+                'splits': xact.splits
+            };
+        }
+
         function mapTransactions(transactions) {
-            return transactions.map(function(xdata) {
-                var xact = {
-                    'date': xdata.date,
-                    'description': xdata.description,
-                    'splits': xdata.splits.sort(splitcmp)
-                };
-                return xact;
-            });
+            return transactions.map(deserialize);
         }
 
         return function(book_id) {
@@ -26,7 +35,15 @@ mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
             rw.orig_all = rw.all;
             rw.all = function() {
                 return this.orig_all().then(mapTransactions);
-            }
+            };
+            rw.orig_create = rw.create;
+            rw.create = function(obj) {
+                return rw.orig_create(serialize(obj));
+            };
+            rw.orig_update = rw.update;
+            rw.update = function(pk, obj) {
+                return rw.orig_update(pk, serialize(obj));
+            };
             return rw;
         };
     }]

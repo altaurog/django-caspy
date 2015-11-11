@@ -9,6 +9,12 @@
     </table>
     <div gen-edit-pane>
         <div csp-transaction-edit transaction="listcontroller.edititem"></div>
+        <div layout-padding>
+            <div flex>
+                <md-button class="md-raised md-primary" ng-click="listcontroller.save()">Save</md-button>
+                <md-button class="md-raised" ng-click="listcontroller.del()" ng-show="listcontroller.edit_code">Delete</md-button>
+            </div>
+        </div>
     </div>
     <md-content md-scroll-y flex>
         <table id="csp-list" class="transaction">

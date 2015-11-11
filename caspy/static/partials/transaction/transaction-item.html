@@ -1,5 +1,5 @@
 <tr>
-    <td>{{ item.date }}</td>
+    <td class="date">{{ item.date | date:'yyyy-MM-dd' }}</td>
     <td>{{ item.description }}</td>
 </tr>
 <tr ng-repeat="split in item.splits" csp-split="split">
