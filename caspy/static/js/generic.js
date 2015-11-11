@@ -107,24 +107,9 @@ mod.directive('genEditPane',
     return {
           restrict: 'A'
         , link: function(scope, elem, attr) {
-            var adjust;
-            if (elem.parent().attr('id') !== 'side-pane') {
-                var strut = angular.element('<div/>');
-                elem.after(strut);
-
-                adjust = function() {
-                    var height = elem.prop('clientHeight');
-                    var last = +strut.css('padding-bottom').replace('px', '');
-                    var diff = height - last;
-                    strut.css('padding-bottom', height + 'px');
-                    scroll(diff + scroll());
-                };
-            }
-
             scope.$watch('listcontroller.edititem',
                 function(val) {
                     elem.css('display', val ? '' : 'none');
-                    if (adjust) $timeout(adjust, 10);
                 }
             );
         }

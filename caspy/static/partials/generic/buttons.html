@@ -1,8 +1,6 @@
 <div ng-hide="listcontroller.edititem">
-    <button ng-click="listcontroller.add()">Add</button>
+    <md-button class="md-raised" ng-click="listcontroller.add()">Add</md-button>
 </div>
 <div ng-show="listcontroller.edititem">
-    <button ng-click="listcontroller.close()">Close</button>
-    <button ng-click="listcontroller.del()" ng-show="listcontroller.edit_code">Delete</button>
-    <button ng-click="listcontroller.save()">Save</button>
+    <md-button class="md-raised" ng-click="listcontroller.close()">Close</md-button>
 </div>

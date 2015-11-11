@@ -1,19 +1,21 @@
-<div id="side-pane">
+<md-sidenav class="md-sidenav-left md-whiteframe-z2 layout-padding" md-is-locked-open="1">
     <div class="buttons" ng-include="'partials/generic/buttons.html'"></div>
     <div gen-edit-pane
         ng-include="'partials/generic/edit.html'">
     </div>
-</div>
-<table id="csp-list">
-    <thead>
-        <tr>
-            <th>Account Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="item in listcontroller.accounttypes"
-            ng-include="'partials/accounttype/accounttype-item.html'"
-            ng-click="listcontroller.select(item)">
-        </tr>
-    </tbody>
-</table>
+</md-sidenav>
+<md-content md-scroll-y layout-padding flex>
+    <table id="csp-list">
+        <thead>
+            <tr>
+                <th>Account Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in listcontroller.accounttypes"
+                ng-include="'partials/accounttype/accounttype-item.html'"
+                ng-click="listcontroller.select(item)">
+            </tr>
+        </tbody>
+    </table>
+</md-content>

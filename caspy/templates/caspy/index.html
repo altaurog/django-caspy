@@ -4,11 +4,16 @@
     <head>
         <meta charset="utf-8">
         <title>Caspy</title>
+        <link rel="stylesheet"
+            href="{% static 'bower_components/angular-material/angular-material.min.css' %}"></script>
          <link rel="stylesheet"
             href="{% static 'css/caspy.css' %}">
         <script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+        <script src="{% static 'bower_components/angular-animate/angular-animate.min.js' %}"></script>
+        <script src="{% static 'bower_components/angular-aria/angular-aria.min.js' %}"></script>
         <script src="{% static 'bower_components/angular-route/angular-route.min.js' %}"></script>
         <script src="{% static 'bower_components/angular-resource/angular-resource.min.js' %}"></script>
+        <script src="{% static 'bower_components/angular-material/angular-material.min.js' %}"></script>
         <script>
             /* inject a constant object */
             (function(){
@@ -31,11 +36,17 @@
         <script src="{% static 'js/choice.js' %}"></script>
         <script src="{% static 'js/ui.js' %}"></script>
     </head>
-    <body>
-        <div id="top-nav">
-            <a href="#/book/">Books</a>
-            <a href="#/menu/">Settings</a>
-        </div>
-        <div ng-view></div>
+    <body layout="column" flex>
+        <md-toolbar layout="row">
+            <div class="md-toolbar-tools">
+                <md-button>
+                    <a href="#/book/"> Books </a>
+                </md-button>
+                <md-button>
+                    <a href="#/menu/"> Settings </a>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <div ng-view layout="row" flex></div>
     </body>
 </html>

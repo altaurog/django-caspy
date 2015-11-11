@@ -1,6 +1,7 @@
 (function(){
 var mod = angular.module('caspy',
     ['ngRoute'
+      , 'ngMaterial'
       , 'generic'
       , 'caspy.server'
       , 'caspy.currency'

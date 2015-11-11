@@ -2,3 +2,7 @@
     <tr gen-field-edit
         ng-repeat="field in listcontroller.fields|filter:listcontroller.fieldvisible"/>
 </table>
+<div>
+    <md-button class="md-raised md-primary" ng-click="listcontroller.save()">Save</md-button>
+    <md-button class="md-raised" ng-click="listcontroller.del()" ng-show="listcontroller.edit_code">Delete</md-button>
+</div>

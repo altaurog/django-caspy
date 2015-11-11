@@ -21,41 +21,6 @@ div[csp-transaction-edit] input {
     width: 100%;
 }
 
-#top-nav, .buttons, [gen-edit-pane] {
-    position: fixed;
-    z-index: 10;
-    padding: 2px 0;
-}
-
-#side-pane > div.buttons, #side-pane > div[gen-edit-pane] {
-    left: 400px;
-}
-
-#top-nav {
-    top: 0px;
-    background: #cadeff;
-    width: 808px;
-    padding: 2px 10px 3px;
-}
-
-.buttons {
-    top:22px;
-}
-
-[gen-edit-pane] {
-    top: 54px;
-    background: white;
-}
-
-#csp-list {
-    top: 48px;
-    position: relative;
-}
-
-#side-pane + #csp-list {
-    top: 22px;
-}
-
 [ng-click] {
     cursor: pointer;
 }

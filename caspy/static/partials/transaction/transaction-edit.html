@@ -1,8 +1,6 @@
 <table class="transaction">
     <colgroup ng-include="'partials/transaction/colgroup.html'">
     </colgroup>
-    <thead ng-include="'partials/transaction/thead.html'">
-    </thead>
     <tbody>
         <tr>
             <td>
@@ -52,3 +50,9 @@
         </tr>
     </tbody>
 </table>
+<div layout-padding>
+    <div flex>
+        <md-button class="md-raised md-primary" ng-click="listcontroller.save()">Save</md-button>
+        <md-button class="md-raised" ng-click="listcontroller.del()" ng-show="listcontroller.edit_code">Delete</md-button>
+    </div>
+</div>
