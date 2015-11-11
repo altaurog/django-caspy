@@ -1,6 +1,6 @@
 <tr>
     <td class="date">{{ item.date | date:'yyyy-MM-dd' }}</td>
-    <td>{{ item.description }}</td>
+    <td colspan="6">{{ item.description }}</td>
 </tr>
 <tr ng-repeat="split in item.splits" csp-split="split">
     <td></td>

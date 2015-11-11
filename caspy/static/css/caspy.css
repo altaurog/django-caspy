@@ -1,5 +1,14 @@
 table.transaction {
     table-layout: fixed;
+    border-collapse: collapse;
+}
+
+md-content table.transaction td {
+    border-bottom: 1px solid #D3D3D3;
+}
+
+.alternate {
+    background-color: #eee;
 }
 
 col.xact-date { width: 14em; }

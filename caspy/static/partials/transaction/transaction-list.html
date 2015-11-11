@@ -21,6 +21,7 @@
             <colgroup ng-include="'partials/transaction/colgroup.html'">
             </colgroup>
             <tbody ng-repeat="item in listcontroller.transactions"
+                ng-class-odd="'alternate'"
                 ng-include="'partials/transaction/transaction-item.html'"
                 ng-click="listcontroller.select(item)">
             </tbody>
