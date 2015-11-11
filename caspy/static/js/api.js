@@ -7,8 +7,10 @@ mod.config(['$resourceProvider',
     }]
 );
 
+function identity(o) { return o; }
+
 function ResourceWrapperFactory($q) {
-    return function ResourceWrapper(promise, pk) {
+    return function ResourceWrapper(promise, pk, ser, deser) {
         // Provides a little glue
         // ------------------------
         // API endpoints are retrieved in request to API root, which is
@@ -25,6 +27,9 @@ function ResourceWrapperFactory($q) {
         // funny behavior if we try something like update().then(get()).
         this.resource = promise;
 
+        var _ser = (arguments.length > 2) ? ser : identity;
+        var _deser = (arguments.length > 3) ? deser : identity;
+
         this.param = function(id) {
             var p = {}
             p[pk] = id;
@@ -34,21 +39,27 @@ function ResourceWrapperFactory($q) {
         this.rc = function (fcn) { return this.resource.then(fcn); };
 
         this.all = function() {
-            return this.rc(function(res) { return res.query().$promise; });
+            return this.rc(function(res) { return res.query().$promise; }
+                    ).then(function(data) { return data.map(_deser); });
         };
 
         this.get = function(id) {
             var p = this.param(id);
-            return this.rc(function(res) { return res.get(p); });
+            return this.rc(function(res) { return res.get(p); }
+                    ).then(function(obj) { return _deser(o); });
         };
 
         this.create = function(obj) {
-            return this.rc(function(res) { return res.create(obj).$promise; });
+            return this.rc(function(res) {
+                return res.create(_ser(obj)).$promise;
+            });
         };
 
         this.update = function(obj_pk, obj) {
             var p = this.param(obj_pk);
-            return this.rc(function(res) { return res.update(p, obj).$promise; });
+            return this.rc(function(res) {
+                return res.update(p, _ser(obj)).$promise;
+            });
         };
 
         this.del = function(id) {

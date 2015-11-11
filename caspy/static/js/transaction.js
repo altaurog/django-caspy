@@ -31,20 +31,7 @@ mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI', 'dateFilter',
 
         return function(book_id) {
             var res = caspyAPI.get_resource('transaction', {'book_id': book_id});
-            var rw = new ResourceWrapper(res, 'transaction_id');
-            rw.orig_all = rw.all;
-            rw.all = function() {
-                return this.orig_all().then(mapTransactions);
-            };
-            rw.orig_create = rw.create;
-            rw.create = function(obj) {
-                return rw.orig_create(serialize(obj));
-            };
-            rw.orig_update = rw.update;
-            rw.update = function(pk, obj) {
-                return rw.orig_update(pk, serialize(obj));
-            };
-            return rw;
+            return new ResourceWrapper(res, 'transaction_id', serialize, deserialize);
         };
     }]
 );
