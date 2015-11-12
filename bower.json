@@ -8,5 +8,6 @@
         , "angular-route": "1.4.x"
         , "angular-resource": "1.4.x"
         , "angular-material": "1.0.x"
+        , "moment": "2.10.x"
     }
 }

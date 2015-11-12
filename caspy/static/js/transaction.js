@@ -1,8 +1,8 @@
 (function(){
 var mod = angular.module('caspy.transaction', ['caspy.api', 'caspy.ui', 'generic']);
 
-mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI', 'dateFilter',
-    function(ResourceWrapper, caspyAPI, dateFilter) {
+mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI',
+    function(ResourceWrapper, caspyAPI) {
         function splitcmp(a, b) {
             if (0 < a.amount && 0 < b.amount)
                 return 1/a.amount - 1/b.amount;
@@ -11,7 +11,7 @@ mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI', 'dateFilter',
 
         function deserialize(xdata) {
             return {
-                'date': new Date(xdata.date),
+                'date': moment(xdata.date, "YYYY-MM-DD").toDate(),
                 'description': xdata.description,
                 'splits': xdata.splits.sort(splitcmp)
             };
@@ -19,7 +19,7 @@ mod.factory('TransactionService', ['ResourceWrapper', 'caspyAPI', 'dateFilter',
 
         function serialize(xact) {
             return {
-                'date': dateFilter(xact.date, 'yyyy-MM-dd'),
+                'date': moment(xact.date).format('YYYY-MM-DD'),
                 'description': xact.description,
                 'splits': xact.splits
             };
@@ -55,6 +55,26 @@ mod.controller('TransactionController'
         this.newitem = function() { return {splits: []}; };
     }]
 );
+
+var dateFormats = [
+        "YYYY-MM-DD"
+        , "D"
+        , "D-M"
+        , "D-M-YYYY"
+        , "D MMM"
+        , "MMM D"
+        , "M-D"
+        , "M-D-YYYY"
+    ];
+
+function parseDate(dateString) {
+    var m = moment(dateString, dateFormats, true);
+    return m.isValid() ? m.toDate() : new Date(NaN);
+}
+
+function formatDate(date) {
+    return moment(date).format('YYYY-MM-DD');
+}
 
 mod.controller('TransactionEditController'
     ,['$scope', 'focus',
@@ -107,6 +127,16 @@ mod.controller('TransactionEditController'
                 this.addSplit();
             focus("cspFocus == 'date'");
         }
+
+        this.date = function(dateStr) {
+            var xact = $scope.transaction;
+            if (!xact)
+                return;
+            if (arguments.length)
+                xact.date = parseDate(dateStr);
+            return formatDate(xact.date);
+        };
+
         $scope.$watch('transaction', function() {
             if ($scope.transaction)
                 ctrl.onTransactionChange();
@@ -120,6 +150,7 @@ mod.directive('cspTransactionEdit', function() {
             transaction: '='
           }
         , controller: 'TransactionEditController'
+        , controllerAs: 'ctrl'
         , templateUrl: 'partials/transaction/transaction-edit.html'
     };
 });

@@ -4,10 +4,12 @@
     <tbody>
         <tr>
             <td>
-                <md-datepicker type="text"
+                <input type="text"
                     csp-focus="date"
-                    ng-model="transaction.date">
-                </md-datepicker>
+                    ng-model="ctrl.date"
+                    ng-model-options="{ updateOn: 'blur', getterSetter: true }"
+                    ng-change="console.log(transaction.date)">
+                </input>
             </td>
             <td colspan="3">
                 <input type="text" ng-model="transaction.description"></input>

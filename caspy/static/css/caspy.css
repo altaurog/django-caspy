@@ -11,7 +11,7 @@ md-content table.transaction td {
     background-color: #eee;
 }
 
-col.xact-date { width: 14em; }
+col.xact-date { width: 6em; }
 col.xact-description { width: 14em; }
 col.split-number { width: 4em; }
 col.split-account { width: 17em; }
@@ -22,7 +22,7 @@ col.split-amount { width: 5em; }
     text-align: right;
 }
 
-.status, .date {
+.status {
     text-align: center;
 }
 
