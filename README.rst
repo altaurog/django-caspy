@@ -31,7 +31,7 @@ Requirements
 
 * pytz
 * PyYAML
-* djangorestframework 3.0.X
-* Python 2.7 - 3.3
-* Django 1.6 - 1.8
+* djangorestframework 3.0 - 3.3
+* Python 2.7, 3.3 - 3.5
+* Django 1.6 - 1.9
 
