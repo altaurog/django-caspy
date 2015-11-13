@@ -1,5 +1,17 @@
 language: python
-python: 3.3
+
+matrix:
+    include:
+        - python: 2.7
+          env: TOXENV=py27-django{16,17,18,19}
+        - python: 3.3
+          env: TOXENV=py33-django{16,17}
+        - python: 3.4
+          env: TOXENV=py34-django{18,19}
+        - python: 3.5
+          env: TOXENV=py35-django{18,19}
+        - python: 3.4
+          env: TOXENV=psql,pep8,coverage
 install:
     - pip install tox coveralls
 script:
